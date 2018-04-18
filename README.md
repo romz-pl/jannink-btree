@@ -1,2 +1,4 @@
-# jannink-btree
-B+-tree in memory
+Downloaded from Jan Jannink web page:
+
+http://infolab.stanford.edu/pub/jannink/btree/
+
