@@ -1,23 +1,18 @@
-/***********************************************************************\
-|                                    |
-|    B+tree function tests                        |
-|                                    |
-|                                    |
-|    Jan Jannink    created 12/22/94    revised 1/30/95        |
-|                                    |
-\***********************************************************************/
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "gtest/gtest.h"
 #include "btree.h"
 
-int main( )
-{
-    Tree *tree = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compareKeys );
 
-    btree_free( tree );
-    return 0;
+TEST( btree, init_free )
+{
+    Tree *tree;
+    tree = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compareKeys );
+
+    btree_insert( tree, 17 );
+    EXPECT_TRUE( btree_search( tree, 17 ) != nullptr );
+
+    EXPECT_NO_THROW( btree_free( tree ) );
 }
+
 
 //int main(void)
 //{
