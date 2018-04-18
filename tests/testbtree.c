@@ -14,7 +14,6 @@
 int main(void)
 {
   Tree	*Bplus;
-  Nptr	keyNode;
   int	i, j;
 
   Bplus = initBtree(ARRAY_SIZE, NODE_SIZE / sizeof(Entry), compareKeys);
