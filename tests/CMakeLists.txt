@@ -1,4 +1,4 @@
-set( TEST_NAME jannink-btree-test )
+set( TEST_NAME testbtree )
 
 add_executable( ${TEST_NAME}
     testbtree.c
