@@ -18,6 +18,6 @@ make -j4 || exit 1
 #
 # Run test
 #
-./tests/jannink-btree-test
+./tests/testbtree
 
 

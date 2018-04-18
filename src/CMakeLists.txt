@@ -2,7 +2,7 @@
 set( LIB_NAME jannink-btree )
 
 add_library( ${LIB_NAME} STATIC
-    btree.c
+    btree.cpp
 )
 
 target_include_directories( ${LIB_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src )
