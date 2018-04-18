@@ -1,8 +1,7 @@
 set( TEST_NAME testbtree )
 
 add_executable( ${TEST_NAME}
-    #testbtree.cpp
-    node.cpp
+    testbtree.cpp
 )
 
 target_compile_options( ${TEST_NAME} PRIVATE ${ROMZ_CXX_FLAGS} )
