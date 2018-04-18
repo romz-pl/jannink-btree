@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "btree.h"
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
@@ -72,7 +73,7 @@
 #define getfunkey B->theKey
 #define getfundata B->theData
 #define setfunkey(v) (B->theKey = (v))
-#define setfundata(v) (B->theData = (v))
+#define setfundata(v) (B->theData = strdup(v))
 
 			/* define number of B+tree nodes for free node pool */
 #define getpoolsize B->poolsize
