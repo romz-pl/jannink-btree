@@ -141,7 +141,7 @@ Nptr getFreeNode(Tree *B);
 void putFreeNode(Tree *B, Nptr self);
 
 /*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
-Tree *initBtree(int poolsz, int fan, KeyCmp keyCmp)
+Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 {
   Tree *B;
 
@@ -171,7 +171,7 @@ Tree *initBtree(int poolsz, int fan, KeyCmp keyCmp)
 }
 
 /*~~~~~~~~~~~~~~~~~~~   Clean up B+tree structure   ~~~~~~~~~~~~~~~~~~~*/
-void freeBtree(Tree *B)
+void btree_free(Tree *B)
 {
 #ifdef DEBUG
   fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
@@ -193,7 +193,7 @@ int findKey(Tree *B, Nptr curr, int lo, int hi);
 int bestMatch(Tree *B, Nptr curr, int slot);
 
 /*~~~~~~~~~~~~~~~~~~~~~   top level search call   ~~~~~~~~~~~~~~~~~~~~~*/
-Nptr search(Tree *B, keyT key)
+Nptr btree_search(Tree *B, keyT key)
 {
   Nptr	findNode;
 
@@ -334,7 +334,7 @@ Nptr split(Tree *B, Nptr node);
 void makeNewRoot(Tree *B, Nptr oldRoot, Nptr newNode);
 
 /*~~~~~~~~~~~~~~~~~~~~~   top level insert call   ~~~~~~~~~~~~~~~~~~~~~*/
-void insert(Tree *B, keyT key)
+void btree_insert(Tree *B, keyT key)
 {
   Nptr newNode;
 
@@ -522,7 +522,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor);
 |	and minimize the need for non-local key manipulation.
 |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-void delete(Tree *B, keyT key)
+void btree_delete(Tree *B, keyT key)
 {
   Nptr newNode;
 

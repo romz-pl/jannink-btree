@@ -167,9 +167,9 @@ typedef struct tree {
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~	B+tree methods		~~~~~~~~~~~~~~~*/
-Tree	*initBtree(int poolsz, int fan, KeyCmp keyCmp);
+Tree	*btree_init(int poolsz, int fan, KeyCmp keyCmp);
 /* Tree	*remakeBtree(Tree * B, int fillfactor); */
-void	freeBtree(Tree *B);
+void	btree_free(Tree *B);
 
 #ifdef DEBUG
 void	showNode(Tree *B, Nptr node);
@@ -181,9 +181,9 @@ void	listAllBtreeValues(Tree *B);
 
 int	compareKeys(keyT key1, keyT key2);
 
-Nptr	search(Tree *B, keyT key);
-void	insert(Tree *B, keyT key);
-void	delete(Tree *B, keyT key);
+Nptr	btree_search(Tree *B, keyT key);
+void	btree_insert(Tree *B, keyT key);
+void	btree_delete(Tree *B, keyT key);
 
 #endif
 

@@ -16,7 +16,7 @@ int main(void)
   Tree	*Bplus;
   int	i, j;
 
-  Bplus = initBtree(ARRAY_SIZE, NODE_SIZE / sizeof(Entry), compareKeys);
+  Bplus = btree_init(ARRAY_SIZE, NODE_SIZE / sizeof(Entry), compareKeys);
 /*  insert(Bplus,17);
   insert(Bplus,16);
   insert(Bplus,15);
@@ -34,40 +34,40 @@ int main(void)
   insert(Bplus,3);
   insert(Bplus,2);
   insert(Bplus,1);
-  delete(Bplus,1);
-  delete(Bplus,2);
-  delete(Bplus,3);
-  delete(Bplus,4);
-  delete(Bplus,5);
-  delete(Bplus,6);
-  delete(Bplus,7);
-  delete(Bplus,8);
-  delete(Bplus,9);
-  delete(Bplus,10);
-  delete(Bplus,11);
-  delete(Bplus,12);
-  delete(Bplus,13);
-  delete(Bplus,14);
-  delete(Bplus,15);
-  delete(Bplus,16);
-  delete(Bplus,17); */
+  btree_delete(Bplus,1);
+  btree_delete(Bplus,2);
+  btree_delete(Bplus,3);
+  btree_delete(Bplus,4);
+  btree_delete(Bplus,5);
+  btree_delete(Bplus,6);
+  btree_delete(Bplus,7);
+  btree_delete(Bplus,8);
+  btree_delete(Bplus,9);
+  btree_delete(Bplus,10);
+  btree_delete(Bplus,11);
+  btree_delete(Bplus,12);
+  btree_delete(Bplus,13);
+  btree_delete(Bplus,14);
+  btree_delete(Bplus,15);
+  btree_delete(Bplus,16);
+  btree_delete(Bplus,17); */
   for (i = 0; i < 2048; i++) {
     j = rand() >> 3 & 255;
-    if (search(Bplus, j) == Bplus->tree - 1) {
-      insert(Bplus, j);
+    if (btree_search(Bplus, j) == Bplus->tree - 1) {
+      btree_insert(Bplus, j);
       fprintf(stderr, "XXX %d, insert %d XXX\n", i, j);
     }
     else {
-      delete(Bplus, j);
+      btree_delete(Bplus, j);
       fprintf(stderr, "XXX %d, delete %d XXX\n", i, j);
     }
     if (i > 2000)
       listAllBtreeValues(Bplus);
   }
   for (i = 0; i < 256; i++)
-    (void) search(Bplus, i);
+    (void) btree_search(Bplus, i);
   listAllBtreeValues(Bplus);
-  freeBtree(Bplus);
+  btree_free(Bplus);
 
   return 1;
 }
