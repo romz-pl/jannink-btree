@@ -112,21 +112,21 @@ typedef struct dupdata {
 |	Internal node:			Leaf node:
 |
 |	+---------------+		+---------------+
-|	|Inner: X.i	|		|Leaf: X.l	|
-|	|  info		|		|  info		|
-|	|  firstNode	|		|  nextNode	|
+|	|Inner: X.i	    |		|Leaf: X.l	    |
+|	|  info		    |		|  info		    |
+|	|  firstNode	|		|  nextNode	     |
 |	|---------------|		|---------------|
 |	|Entry: X.e[1]	|		|Entry: X.e[1]	|
-|	|  key		|		|  key		|
-|	|  downNode	|		|  downNode	|
+|	|  key		    |		|  key		|
+|	|  downNode	    |		|  downNode	|
 |	|---------------|		|---------------|
 |	|	.	|		|	.	|
 |	|	.	|		|	.	|
 |	|	.	|		|	.	|
 |	|---------------|		|---------------|
 |	|Entry: X.e[n]	|		|Entry: X.e[n]	|
-|	|  key		|		|  key		|
-|	|  downNode	|		|  downNode	|
+|	|  key		    |		|  key		|
+|	|  downNode	    |		|  downNode	|
 |	+---------------+		+---------------+
 |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -146,8 +146,9 @@ typedef int (*KeyCmp)(keyT, keyT);
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~	tree definitions	~~~~~~~~~~~~~~~*/
-typedef struct tree {
-			/* `private' variables */
+class Tree {
+public:
+            /* `private' variables */
   int	poolsize;	/* # of nodes allocated for tree */
   Node		*tree;		/* pointer to array of nodes (NOT Nptr !) */
   Nptr		root;		/* pointer to root node */
@@ -163,7 +164,7 @@ typedef struct tree {
     Nptr	merge;
   } branch;
   KeyCmp	keycmp;		/* pointer to function comparing two keys */
-} Tree;
+};
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~	B+tree methods		~~~~~~~~~~~~~~~*/
