@@ -141,7 +141,7 @@ Nptr getFreeNode(Tree *B);
 void putFreeNode(Tree *B, Nptr self);
 
 /*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
-Tree *initBtree(unsigned int poolsz, unsigned int fan, KeyCmp keyCmp)
+Tree *initBtree(int poolsz, int fan, KeyCmp keyCmp)
 {
   Tree *B;
 

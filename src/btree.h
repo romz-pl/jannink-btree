@@ -148,13 +148,13 @@ typedef int (*KeyCmp)(keyT, keyT);
 /*~~~~~~~~~~~~~~~~~~~~~~~~	tree definitions	~~~~~~~~~~~~~~~*/
 typedef struct tree {
 			/* `private' variables */
-  unsigned int	poolsize;	/* # of nodes allocated for tree */
+  int	poolsize;	/* # of nodes allocated for tree */
   Node		*tree;		/* pointer to array of nodes (NOT Nptr !) */
   Nptr		root;		/* pointer to root node */
   Nptr		leaf;		/* pointer to first leaf node in B+tree */
-  unsigned int	fanout;		/* # of pointers to other nodes */
-  unsigned int	minfanout;	/* usually minfanout == ceil(fanout/2) */
-  unsigned int	height;		/* nodes traversed from root to leaves */
+  int	fanout;		/* # of pointers to other nodes */
+  int	minfanout;	/* usually minfanout == ceil(fanout/2) */
+  int	height;		/* nodes traversed from root to leaves */
   Nptr		pool;		/* list of empty nodes */
   keyT		theKey;		/*  the key value used in tree operations */
   dataT		theData;	/*  data used for insertions/deletions */
@@ -167,7 +167,7 @@ typedef struct tree {
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~	B+tree methods		~~~~~~~~~~~~~~~*/
-Tree	*initBtree(unsigned int poolsz, unsigned int fan, KeyCmp keyCmp);
+Tree	*initBtree(int poolsz, int fan, KeyCmp keyCmp);
 /* Tree	*remakeBtree(Tree * B, int fillfactor); */
 void	freeBtree(Tree *B);
 
