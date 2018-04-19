@@ -15,61 +15,189 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 |    Implementation Hiding Macro Definitions                |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            /* low level definition of Nptr value usage */
-#ifdef POINTER
-#define nAdr(b) (b)->X
-#define nodearrayhead B->tree
-#else
-#define nAdr(b) B->tree[(b)].X
-#define nodearrayhead 0
-#endif
+
 
             /* access keys and pointers in a node */
-#define getkey(j, q) nAdr(j).e[(q)].key
-#define getnode(j, q) nAdr(j).e[(q)].downNode
-#define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
-#define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))
+// #define getkey(j, q) nAdr(j).e[(q)].key
+keyT get_key( const Node* j, int q )
+{
+    return j->X.e[ q ].key;
+}
+
+// #define getnode(j, q) nAdr(j).e[(q)].downNode
+Nptr get_node( const Node* j, int q )
+{
+    return j->X.e[ q ].downNode;
+}
+
+// #define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
+void set_key( Node* j, int q, keyT v )
+{
+    j->X.e[ q ].key = v;
+}
+
+// #define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))
+void set_node( Node* j, int q, Nptr v )
+{
+    j->X.e[ q ].downNode =  v;
+}
 
             /* access node flag values */
-#define setflag(j, v) (nAdr(j).i.info.flags |= (v))
-#define clrflag(j, v) (nAdr(j).i.info.flags &= ~(v))
-#define getflags(j) nAdr(j).i.info.flags
-#define clearflags(j) (nAdr(j).i.info.flags = (short) MAGIC)
+// #define setflag(j, v) (nAdr(j).i.info.flags |= (v))
+void set_flag( Node* j, short v )
+{
+    j->X.i.info.flags |= v;
+}
+
+// #define clrflag(j, v) (nAdr(j).i.info.flags &= ~(v))
+void clr_flag( Node* j, short v )
+{
+    j->X.i.info.flags &= ~v;
+}
+
+// #define getflags(j) nAdr(j).i.info.flags
+short get_flags( const Node* j )
+{
+    return j->X.i.info.flags;
+}
+
+// #define clearflags(j) (nAdr(j).i.info.flags = (short) MAGIC)
+void clear_flags( Node* j )
+{
+    j->X.i.info.flags = static_cast< short >( MAGIC );
+}
 
             /* check that a node is in fact a node */
-#define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
-#define isntnode(j) ((j) == NONODE)
+// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
+bool is_node( Tree* B, Node* j )
+{
+    return ( j != NONODE && ( ( j->X.i.info.flags & MASK ) == MAGIC ) );
+}
+
+// #define isntnode(j) ((j) == NONODE)
+bool isnt_node( Tree* B, Node* j )
+{
+    return ( j == NONODE );
+}
 
             /* test individual flag values */
-#define isinternal(j) ((nAdr(j).i.info.flags & isLEAF) == 0)
-#define isleaf(j) ((nAdr(j).i.info.flags & isLEAF) == isLEAF)
-#define isroot(j) ((nAdr(j).i.info.flags & isROOT) == isROOT)
-#define isfull(j) ((nAdr(j).i.info.flags & isFULL) == isFULL)
-#define isfew(j) ((nAdr(j).i.info.flags & FEWEST) == FEWEST)
+// #define isinternal(j) ((nAdr(j).i.info.flags & isLEAF) == 0)
+bool is_internal( Node* j)
+{
+    return ( ( j->X.i.info.flags & isLEAF ) == 0 );
+}
+
+// #define isleaf(j) ((nAdr(j).i.info.flags & isLEAF) == isLEAF)
+bool is_leaf( Node* j )
+{
+    return ( ( j->X.i.info.flags & isLEAF ) == isLEAF );
+}
+
+// #define isroot(j) ((nAdr(j).i.info.flags & isROOT) == isROOT)
+bool is_root( Node* j )
+{
+    return ( ( j->X.i.info.flags & isROOT ) == isROOT );
+}
+
+// #define isfull(j) ((nAdr(j).i.info.flags & isFULL) == isFULL)
+bool is_full( Node* j )
+{
+    return ( ( j->X.i.info.flags & isFULL ) == isFULL );
+}
+
+// #define isfew(j) ((nAdr(j).i.info.flags & FEWEST) == FEWEST)
+bool is_few( Node* j )
+{
+    return ( ( j->X.i.info.flags & FEWEST ) == FEWEST );
+}
 
             /* manage number of keys in a node */
-#define numentries(j) nAdr(j).i.info.pairs
-#define clearentries(j) (nAdr(j).i.info.pairs = 0)
-#define incentries(j) (nAdr(j).i.info.pairs++)
-#define decentries(j) (nAdr(j).i.info.pairs--)
+// #define numentries(j) nAdr(j).i.info.pairs
+short num_entries( Node* j )
+{
+    return j->X.i.info.pairs;
+}
+
+// #define clearentries(j) (nAdr(j).i.info.pairs = 0)
+void clear_entries( Node* j )
+{
+    j->X.i.info.pairs = 0;
+}
+
+// #define incentries(j) (nAdr(j).i.info.pairs++)
+void inc_entries( Node * j )
+{
+    j->X.i.info.pairs++;
+}
+
+// #define decentries(j) (nAdr(j).i.info.pairs--)
+void dec_entries( Node* j )
+{
+    j->X.i.info.pairs--;
+}
 
             /* manage first/last node pointers in internal nodes */
-#define setfirstnode(j, v) (nAdr(j).i.firstNode = (v))
-#define getfirstnode(j) nAdr(j).i.firstNode
-#define getlastnode(j) nAdr(j).e[nAdr(j).i.info.pairs].downNode
+// #define setfirstnode(j, v) (nAdr(j).i.firstNode = (v))
+void set_first_node( Node* j, Nptr v )
+{
+    j->X.i.firstNode = v;
+}
+
+// #define getfirstnode(j) nAdr(j).i.firstNode
+Nptr getfirstnode( Node* j )
+{
+    return j->X.i.firstNode;
+}
+
+// #define getlastnode(j) nAdr(j).e[nAdr(j).i.info.pairs].downNode
+Nptr get_last_node( Node* j )
+{
+    return j->X.e[ j->X.i.info.pairs ].downNode;
+}
 
             /* manage pointers to next nodes in leaf nodes */
-#define setnextnode(j, v) (nAdr(j).l.nextNode = (v))
-#define getnextnode(j) nAdr(j).l.nextNode
+// #define setnextnode(j, v) (nAdr(j).l.nextNode = (v))
+void set_next_node( Node* j, Nptr v )
+{
+    j->X.l.nextNode = v;
+}
+
+// #define getnextnode(j) nAdr(j).l.nextNode
+Nptr get_next_node( Node* j )
+{
+    return j->X.l.nextNode;
+}
 
             /* shift/transfer entries for insertion/deletion */
-#define pushentry(j, q, v) (nAdr(j).e[(q) + (v)] = nAdr(j).e[(q)])
-#define pullentry(j, q, v) (nAdr(j).e[(q)] = nAdr(j).e[(q) + (v)])
-#define xferentry(j, q, v, z) (nAdr(v).e[(z)] = nAdr(j).e[(q)])
-#define setentry(j, q, v, z) (nAdr(j).e[(q)].key = (v), nAdr(j).e[(q)].downNode = (z))
+// #define pushentry(j, q, v) (nAdr(j).e[(q) + (v)] = nAdr(j).e[(q)])
+void push_entry( Node* j, int q, int v )
+{
+    j->X.e[ q + v ] = j->X.e[ q ];
+}
 
-            /* access key and data values for B+tree methods */
-            /* pass values to getSlot(), descend...() */
+// #define pullentry(j, q, v) (nAdr(j).e[(q)] = nAdr(j).e[(q) + (v)])
+void pull_entry( Node* j, int q, int v )
+{
+    j->X.e[ q ] = j->X.e[ q + v ];
+}
+
+
+// #define xferentry(j, q, v, z) (nAdr(v).e[(z)] = nAdr(j).e[(q)])
+void xfer_entry( Node* j, int q, Node* v, int z )
+{
+    v->X.e[ z ] = j->X.e[ q ];
+}
+
+
+// #define setentry(j, q, v, z) (nAdr(j).e[(q)].key = (v), nAdr(j).e[(q)].downNode = (z))
+void set_entry( Node* j, int q, keyT v, Nptr z )
+{
+    j->X.e[ q ].key = v;
+    j->X.e[ q ].downNode = z;
+}
+
+/* access key and data values for B+tree methods */
+/* pass values to getSlot(), descend...() */
 // #define getfunkey B->theKey
 keyT get_fun_key( Tree* B )
 {
@@ -277,9 +405,9 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 
   set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
   set_root( B, getleaf);            /* the root is initially the leaf */
-  setflag(get_root( B ), isLEAF);
-  setflag(get_root( B ), isROOT);
-  setflag(get_root( B ), FEWEST);
+  set_flag(get_root( B ), isLEAF);
+  set_flag(get_root( B ), isROOT);
+  set_flag(get_root( B ), FEWEST);
   init_tree_height( B );
 
   set_fun_key( B, 0 );
@@ -342,9 +470,9 @@ Nptr descendToLeaf(Tree *B, Nptr curr)
   int    slot;
   Nptr    findNode;
 
-  for (slot = getSlot(B, curr); isinternal(curr); slot = getSlot(B, curr))
-    curr = getnode(curr, slot);
-  if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), getkey(curr, slot) ) )
+  for (slot = getSlot(B, curr); is_internal(curr); slot = getSlot(B, curr))
+    curr = get_node(curr, slot);
+  if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), get_key(curr, slot) ) )
     findNode = curr;            /* correct key value found */
   else
     findNode = NONODE;            /* key value not in tree */
@@ -357,7 +485,7 @@ int getSlot(Tree *B, Nptr curr)
 {
   int slot, entries;
 
-  entries = numentries(curr);        /* need this if root is ever empty */
+  entries = num_entries(curr);        /* need this if root is ever empty */
   slot = !entries ? 0 : findKey(B, curr, 1, entries);
 
 #ifdef DEBUG
@@ -413,10 +541,10 @@ int bestMatch(Tree *B, Nptr curr, int slot)
 {
   int diff, comp, findslot;
 
-  diff = compare_keys( B )(get_fun_key( B ), getkey(curr, slot));
+  diff = compare_keys( B )(get_fun_key( B ), get_key(curr, slot));
   if (diff < 0) {        /* also check previous slot */
     if ((slot == 1) ||
-        ((comp = compare_keys( B )(get_fun_key( B ), getkey(curr, slot - 1))) >= 0))
+        ((comp = compare_keys( B )(get_fun_key( B ), get_key(curr, slot - 1))) >= 0))
       findslot = slot - 1;
 
 #ifdef DEBUG
@@ -428,8 +556,8 @@ int bestMatch(Tree *B, Nptr curr, int slot)
       findslot = LOWER;        /* key must be below in node ordering */
   }
   else {            /* or check following slot */
-    if ((slot == numentries(curr)) ||
-        ((comp = compare_keys( B )(get_fun_key( B ), getkey(curr, slot + 1))) < 0))
+    if ((slot == num_entries(curr)) ||
+        ((comp = compare_keys( B )(get_fun_key( B ), get_key(curr, slot + 1))) < 0))
       findslot = slot;
     else if (comp == 0)
       findslot = slot + 1;
@@ -482,15 +610,15 @@ Nptr descendSplit(Tree *B, Nptr curr)
   Nptr    newMe, newNode;
   int    slot;
 
-  if (!isfull(curr))
+  if (!is_full(curr))
     set_split_path( B, NONODE );
   else if (get_split_path( B ) == NONODE)
     set_split_path( B, curr );            /* indicates where nodes must split */
 
   slot = getSlot(B, curr);        /* is null only if the root is empty */
-  if (isinternal(curr))            /* continue recursion to leaves */
-    newMe = descendSplit(B, getnode(curr, slot));
-  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), getkey(curr, slot))) {
+  if (is_internal(curr))            /* continue recursion to leaves */
+    newMe = descendSplit(B, get_node(curr, slot));
+  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), get_key(curr, slot))) {
     newMe = NONODE;            /* this code discards duplicates */
     set_split_path( B, NONODE );
   }
@@ -515,33 +643,33 @@ void insertEntry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
   if (sibling == NONODE) {        /* no split occurred */
     placeEntry(B, newNode, slot + 1, downPtr);
-    clrflag(newNode, FEWEST);
+    clr_flag(newNode, FEWEST);
   }
   else {                /* split entries between the two */
-    i = isinternal(newNode);        /* adjustment values */
+    i = is_internal(newNode);        /* adjustment values */
     split = i ? get_fanout( B ) - getminfanout(newNode): getminfanout(newNode);
     j = (slot != split);
     k = (slot >= split);
 
     for (x = split + k + j * i, y = 1; x <= get_fanout( B ); x++, y++) {
-      xferentry(newNode, x, sibling, y);    /* copy entries to sibling */
-      decentries(newNode);
-      incentries(sibling);
+      xfer_entry(newNode, x, sibling, y);    /* copy entries to sibling */
+      dec_entries(newNode);
+      inc_entries(sibling);
     }
-    if (numentries(sibling) == get_fanout( B ))
-      setflag(sibling, isFULL);        /* only ever happens in 2-3+trees */
+    if (num_entries(sibling) == get_fanout( B ))
+      set_flag(sibling, isFULL);        /* only ever happens in 2-3+trees */
 
     if (i) {                /* set first pointer of internal node */
       if (j) {
-        setfirstnode(sibling, getnode(newNode, split + k));
-        decentries(newNode);
+        set_first_node(sibling, get_node(newNode, split + k));
+        dec_entries(newNode);
       }
       else
-        setfirstnode(sibling, downPtr);
+        set_first_node(sibling, downPtr);
     }
 
     if (j) {                /* insert new entry into correct spot */
-      x = getkey(newNode, split + k);
+      x = get_key(newNode, split + k);
       if (k)
     placeEntry(B, sibling, slot - split + 1 - i, downPtr);
       else
@@ -551,11 +679,11 @@ void insertEntry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     else if (!i)
       placeEntry(B, sibling, 1, downPtr);
 
-    clrflag(newNode, isFULL);        /* adjust node flags */
-    if (numentries(newNode) == getminfanout(newNode))
-      setflag(newNode, FEWEST);        /* never happens in even size nodes */
-    if (numentries(sibling) > getminfanout(sibling))
-      clrflag(sibling, FEWEST);
+    clr_flag(newNode, isFULL);        /* adjust node flags */
+    if (num_entries(newNode) == getminfanout(newNode))
+      set_flag(newNode, FEWEST);        /* never happens in even size nodes */
+    if (num_entries(sibling) > getminfanout(sibling))
+      clr_flag(sibling, FEWEST);
 
 #ifdef DEBUG
   fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, getnodenumber(downPtr));
@@ -571,13 +699,13 @@ void placeEntry(Tree *B, Nptr newNode, int slot, Nptr downPtr)
 {
   int x;
 
-  for (x = numentries(newNode); x >= slot; x--)    /* make room for new entry */
-    pushentry(newNode, x, 1);
-  setentry(newNode, slot, get_fun_key( B ), downPtr);    /* place it in correct slot */
+  for (x = num_entries(newNode); x >= slot; x--)    /* make room for new entry */
+    push_entry(newNode, x, 1);
+  set_entry(newNode, slot, get_fun_key( B ), downPtr);    /* place it in correct slot */
 
-  incentries(newNode);                /* adjust entry counter */
-  if (numentries(newNode) == get_fanout( B ))
-    setflag(newNode, isFULL);
+  inc_entries(newNode);                /* adjust entry counter */
+  if (num_entries(newNode) == get_fanout( B ))
+    set_flag(newNode, isFULL);
 }
 
 
@@ -588,12 +716,12 @@ Nptr split(Tree *B, Nptr newNode)
 
   sibling = get_free_node(B);
 
-  setflag(sibling, FEWEST);            /* set up node flags */
+  set_flag(sibling, FEWEST);            /* set up node flags */
 
-  if (isleaf(newNode)) {
-    setflag(sibling, isLEAF);
-    setnextnode(sibling, getnextnode(newNode));    /* adjust leaf pointers */
-    setnextnode(newNode, sibling);
+  if (is_leaf(newNode)) {
+    set_flag(sibling, isLEAF);
+    set_next_node(sibling, get_next_node(newNode));    /* adjust leaf pointers */
+    set_next_node(newNode, sibling);
   }
   if (get_split_path( B ) == newNode)
     set_split_path( B, NONODE );            /* no more splitting needed */
@@ -607,13 +735,13 @@ void makeNewRoot(Tree *B, Nptr oldRoot, Nptr newNode)
 {
   set_root( B, get_free_node(B));
 
-  setfirstnode(get_root( B ), oldRoot);    /* old root becomes new root's child */
-  setentry(get_root( B ), 1, get_fun_key( B ), newNode);    /* old root's sibling also */
-  incentries(get_root( B ));
+  set_first_node(get_root( B ), oldRoot);    /* old root becomes new root's child */
+  set_entry(get_root( B ), 1, get_fun_key( B ), newNode);    /* old root's sibling also */
+  inc_entries(get_root( B ));
 
-  clrflag(oldRoot, isROOT);
-  setflag(get_root( B ), isROOT);
-  setflag(get_root( B ), FEWEST);
+  clr_flag(oldRoot, isROOT);
+  set_flag(get_root( B ), isROOT);
+  set_flag(get_root( B ), FEWEST);
   inc_tree_height( B );
 }
 
@@ -658,7 +786,7 @@ void btree_delete(Tree *B, keyT key)
   set_fun_key( B, key );            /* set deletion key */
   set_merge_path( B, NONODE );
   newNode = descendBalance(B, get_root( B ), NONODE, NONODE, NONODE, NONODE, NONODE);
-  if (isnode(newNode))
+  if (is_node( B, newNode ))
     collapseRoot(B, get_root( B ), newNode);    /* remove root when superfluous */
 }
 
@@ -674,7 +802,7 @@ void collapseRoot(Tree *B, Nptr oldRoot, Nptr newRoot)
 #endif
 
   set_root( B, newRoot);
-  setflag(newRoot, isROOT);
+  set_flag(newRoot, isROOT);
   putFreeNode(B, oldRoot);
   dec_tree_height( B );            /* the height of the tree decreases */
 }
@@ -686,33 +814,33 @@ Nptr descendBalance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr r
   Nptr    newMe, myLeft, myRight, lAnchor, rAnchor, newNode;
   int    slot, notleft, notright, fewleft, fewright, test;
 
-  if (!isfew(curr))
+  if (!is_few(curr))
     set_merge_path( B, NONODE );
   else if (get_merge_path( B ) == NONODE)
     set_merge_path( B, curr );        /* mark which nodes may need rebalancing */
 
   slot = getSlot(B, curr);
-  newNode = getnode(curr, slot);
-  if (isinternal(curr)) {    /* set up next recursion call's parameters */
+  newNode = get_node(curr, slot);
+  if (is_internal(curr)) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = isntnode(left) ? NONODE : getlastnode(left);
+      myLeft = isnt_node( B, left ) ? NONODE : get_last_node(left);
       lAnchor = lAnc;
     }
     else {
-      myLeft = getnode(curr, slot - 1);
+      myLeft = get_node(curr, slot - 1);
       lAnchor = curr;
     }
-    if (slot == numentries(curr)) {
-      myRight = isntnode(right) ? NONODE : getfirstnode(right);
+    if (slot == num_entries(curr)) {
+      myRight = isnt_node( B, right ) ? NONODE : getfirstnode(right);
       rAnchor = rAnc;
     }
     else {
-      myRight = getnode(curr, slot + 1);
+      myRight = get_node(curr, slot + 1);
       rAnchor = curr;
     }
     newMe = descendBalance(B, newNode, myLeft, myRight, lAnchor, rAnchor, curr);
   }
-  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), getkey(curr, slot)))
+  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), get_key(curr, slot)))
     newMe = newNode;        /* a key to be deleted is found */
   else {
     newMe = NONODE;        /* no deletion possible, key not found */
@@ -753,14 +881,14 @@ Nptr descendBalance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr r
   if (get_merge_path( B ) == NONODE)
     newNode = NONODE;
   else {        /* tree rebalancing rules for node merges and shifts */
-    notleft = isntnode(left);
-    notright = isntnode(right);
-    fewleft = isfew(left);        /* only used when defined */
-    fewright = isfew(right);
+    notleft = isnt_node( B, left );
+    notright = isnt_node( B, right );
+    fewleft = is_few(left);        /* only used when defined */
+    fewright = is_few(right);
 
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
-      test = isleaf(curr);        /* check if B+tree has become empty */
+      test = is_leaf(curr);        /* check if B+tree has become empty */
       newNode = test ? NONODE : getfirstnode(curr);
     }
             /* CASE 2:  the merging of two nodes is a must */
@@ -780,7 +908,7 @@ Nptr descendBalance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr r
     }
             /* CASE 5: choose the more effective of two shifts */
     else if (lAnc == rAnc) {         /* => both anchors are the parent */
-      test = (numentries(left) <= numentries(right));
+      test = (num_entries(left) <= num_entries(right));
       newNode = test ? shift(B, curr, right, rAnc) : shift(B, left, curr, lAnc);
     }
             /* CASE 6: choose the shift with more local effect */
@@ -799,17 +927,17 @@ void removeEntry(Tree *B, Nptr curr, int slot)
 {
   int x;
 
-  putFreeNode(B, getnode(curr, slot));    /* return deleted node to free list */
-  for (x = slot; x < numentries(curr); x++)
-    pullentry(curr, x, 1);        /* adjust node with removed key */
-  decentries(curr);
-  clrflag(curr, isFULL);        /* keep flag information up to date */
-  if (isroot(curr)) {
-    if (numentries(curr) == 1)
-      setflag(curr, FEWEST);
+  putFreeNode(B, get_node(curr, slot));    /* return deleted node to free list */
+  for (x = slot; x < num_entries(curr); x++)
+    pull_entry(curr, x, 1);        /* adjust node with removed key */
+  dec_entries(curr);
+  clr_flag(curr, isFULL);        /* keep flag information up to date */
+  if (is_root(curr)) {
+    if (num_entries(curr) == 1)
+      set_flag(curr, FEWEST);
   }
-  else if (numentries(curr) == getminfanout(curr))
-    setflag(curr, FEWEST);
+  else if (num_entries(curr) == getminfanout(curr))
+    set_flag(curr, FEWEST);
 }
 
 
@@ -824,23 +952,23 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   showNode(B, right);
 #endif
 
-  if (isinternal(left)) {
-    incentries(left);            /* copy key separating the nodes */
-    set_fun_key( B, getkey(right, 1) );    /* defined but maybe just deleted */
+  if (is_internal(left)) {
+    inc_entries(left);            /* copy key separating the nodes */
+    set_fun_key( B, get_key(right, 1) );    /* defined but maybe just deleted */
     z = getSlot(B, anchor);        /* needs the just calculated key */
-    set_fun_key( B, getkey(anchor, z) );    /* set slot to delete in anchor */
-    setentry(left, numentries(left), get_fun_key( B ), getfirstnode(right));
+    set_fun_key( B, get_key(anchor, z) );    /* set slot to delete in anchor */
+    set_entry(left, num_entries(left), get_fun_key( B ), getfirstnode(right));
   }
   else
-    setnextnode(left, getnextnode(right));
-  for (x = numentries(left) + 1, y = 1; y <= numentries(right); x++, y++) {
-    incentries(left);
-    xferentry(right, y, left, x);    /* transfer entries to left node */
+    set_next_node(left, get_next_node(right));
+  for (x = num_entries(left) + 1, y = 1; y <= num_entries(right); x++, y++) {
+    inc_entries(left);
+    xfer_entry(right, y, left, x);    /* transfer entries to left node */
   }
-  if (numentries(left) > getminfanout(left))
-    clrflag(left, FEWEST);
-  if (numentries(left) == get_fanout( B ))
-    setflag(left, isFULL);        /* never happens in even size nodes */
+  if (num_entries(left) > getminfanout(left))
+    clr_flag(left, FEWEST);
+  if (num_entries(left) == get_fanout( B ))
+    set_flag(left, isFULL);        /* never happens in even size nodes */
 
   if (get_merge_path( B ) == left || get_merge_path( B ) == right)
     set_merge_path( B, NONODE );        /* indicate rebalancing is complete */
@@ -860,60 +988,60 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   showNode(B, right);
 #endif
 
-  i = isinternal(left);
-  if (numentries(left) < numentries(right)) {    /* shift entries to left */
-    y = (numentries(right) - numentries(left)) >> 1;
-    x = numentries(left) + y;
-    set_fun_key( B, getkey(right, y + 1 - i) );    /* set new anchor key value */
+  i = is_internal(left);
+  if (num_entries(left) < num_entries(right)) {    /* shift entries to left */
+    y = (num_entries(right) - num_entries(left)) >> 1;
+    x = num_entries(left) + y;
+    set_fun_key( B, get_key(right, y + 1 - i) );    /* set new anchor key value */
     z = getSlot(B, anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
-      decentries(right);            /* adjust for shifting anchor */
-      incentries(left);
-      setentry(left, numentries(left), getkey(anchor, z), getfirstnode(right));
-      setfirstnode(right, getnode(right, y + 1 - i));
+      dec_entries(right);            /* adjust for shifting anchor */
+      inc_entries(left);
+      set_entry(left, num_entries(left), get_key(anchor, z), getfirstnode(right));
+      set_first_node(right, get_node(right, y + 1 - i));
     }
-    clrflag(right, isFULL);
-    setkey(anchor, z, get_fun_key( B ));        /* set new anchor value */
+    clr_flag(right, isFULL);
+    set_key(anchor, z, get_fun_key( B ));        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
-      decentries(right);            /* adjust entry count */
-      incentries(left);
-      xferentry(right, y, left, x);        /* transfer entries over */
+      dec_entries(right);            /* adjust entry count */
+      inc_entries(left);
+      xfer_entry(right, y, left, x);        /* transfer entries over */
     }
 
-    for (x = 1; x <= numentries(right); x++)    /* adjust reduced node */
-      pullentry(right, x, z);
+    for (x = 1; x <= num_entries(right); x++)    /* adjust reduced node */
+      pull_entry(right, x, z);
   }
   else {                    /* shift entries to right */
-    y = (numentries(left) - numentries(right)) >> 1;
-    x = numentries(left) - y + 1;
+    y = (num_entries(left) - num_entries(right)) >> 1;
+    x = num_entries(left) - y + 1;
 
-    for (z = numentries(right); z > 0; z--)    /* adjust increased node */
-      pushentry(right, z, y);
+    for (z = num_entries(right); z > 0; z--)    /* adjust increased node */
+      push_entry(right, z, y);
 
-    set_fun_key( B, getkey(left, x) );            /* set new anchor key value */
+    set_fun_key( B, get_key(left, x) );            /* set new anchor key value */
     z = getSlot(B, anchor) + 1;
     if (i) {
-      decentries(left);
-      incentries(right);
-      setentry(right, y, getkey(anchor, z), getfirstnode(right));
-      setfirstnode(right, getnode(left, x));
+      dec_entries(left);
+      inc_entries(right);
+      set_entry(right, y, get_key(anchor, z), getfirstnode(right));
+      set_first_node(right, get_node(left, x));
     }
-    clrflag(left, isFULL);
-    setkey(anchor, z, get_fun_key( B ));
-    for (x = numentries(left) + i, y -= i; y > 0; y--, x--) {
-      decentries(left);
-      incentries(right);
-      xferentry(left, x, right, y);        /* transfer entries over */
+    clr_flag(left, isFULL);
+    set_key(anchor, z, get_fun_key( B ));
+    for (x = num_entries(left) + i, y -= i; y > 0; y--, x--) {
+      dec_entries(left);
+      inc_entries(right);
+      xfer_entry(left, x, right, y);        /* transfer entries over */
     }
   }
-  if (numentries(left) == getminfanout(left))        /* adjust node flags */
-    setflag(left, FEWEST);
+  if (num_entries(left) == getminfanout(left))        /* adjust node flags */
+    set_flag(left, FEWEST);
   else
-    clrflag(left, FEWEST);            /* never happens in 2-3+trees */
-  if (numentries(right) == getminfanout(right))
-    setflag(right, FEWEST);
+    clr_flag(left, FEWEST);            /* never happens in 2-3+trees */
+  if (num_entries(right) == getminfanout(right))
+    set_flag(right, FEWEST);
   else
-    clrflag(right, FEWEST);            /* never happens in 2-3+trees */
+    clr_flag(right, FEWEST);            /* never happens in 2-3+trees */
   set_merge_path( B, NONODE );
 
 #ifdef DEBUG
@@ -939,11 +1067,11 @@ void initFreeNodePool(Tree *B, int quantity)
   set_node_array( B, (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
   set_first_free_node( B, nodearrayhead );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
-    clearflags(n);
-    clearentries(n);
-    setnextnode(n, n + 1);        /* insert node into free node list */
+    clear_flags(n);
+    clear_entries(n);
+    set_next_node(n, n + 1);        /* insert node into free node list */
   }
-  setnextnode(--n, NONODE);        /* indicates end of free node list */
+  set_next_node(--n, NONODE);        /* indicates end of free node list */
 }
 
 
@@ -953,8 +1081,8 @@ Nptr get_free_node(Tree *B)
   Nptr newNode = get_first_free_node( B );
 
   if (newNode != NONODE) {
-    set_first_free_node( B, getnextnode( newNode ) );    /* adjust free node list */
-    setnextnode(newNode, NONODE);        /* remove node from list */
+    set_first_free_node( B, get_next_node( newNode ) );    /* adjust free node list */
+    set_next_node(newNode, NONODE);        /* remove node from list */
   }
   else {
     fprintf(stderr, "Out of tree nodes.");    /* can't recover from this */
@@ -967,9 +1095,9 @@ Nptr get_free_node(Tree *B)
 /*~~~~~~~~~~~~   return a deleted B+tree node to the pool   ~~~~~~~~~~~*/
 void putFreeNode(Tree *B, Nptr self)
 {
-  clearflags(self);
-  clearentries(self);
-  setnextnode( self, get_first_free_node( B ) );        /* add node to list */
+  clear_flags(self);
+  clear_entries(self);
+  set_next_node( self, get_first_free_node( B ) );        /* add node to list */
   set_first_free_node( B, self );            /* set it to be list head */
 }
 
@@ -1035,12 +1163,12 @@ void listBtreeValues(Tree *B, Nptr n, int num)
 {
   int slot, prev = -1;
 
-  for (slot = 1; (n != NONODE) && num && numentries(n); num--) {
-    if (getkey(n, slot) <= prev) fprintf(stderr, "BOMB");
-    prev = getkey(n, slot);
+  for (slot = 1; (n != NONODE) && num && num_entries(n); num--) {
+    if (get_key(n, slot) <= prev) fprintf(stderr, "BOMB");
+    prev = get_key(n, slot);
     fprintf(stderr, "%8d%c", prev, (num & 7 ? ' ' : '\n'));
-    if (++slot > numentries(n))
-      n = getnextnode(n), slot = 1;
+    if (++slot > num_entries(n))
+      n = get_next_node(n), slot = 1;
   }
   fprintf(stderr, "\n\n");
 }

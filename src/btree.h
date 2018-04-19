@@ -36,6 +36,16 @@
 #define MAGIC    0xDEC0
 #define MASK    0xFFF0
 
+/* low level definition of Nptr value usage */
+#ifdef POINTER
+#define nAdr(b) (b)->X
+#define nodearrayhead B->tree
+#else
+#define nAdr(b) B->tree[(b)].X
+#define nodearrayhead 0
+#endif
+
+
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    constants    ~~~~~~~~~~~~~~~~~~~~~~~*/
             /* ARRAY is a place holder value for:  fanout */
