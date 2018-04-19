@@ -4,13 +4,18 @@
 
 TEST( btree, init_free )
 {
-    Tree *tree;
-    tree = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compareKeys );
+    Tree *B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compareKeys );
+    EXPECT_TRUE( B );
 
-    btree_insert( tree, 17 );
-    EXPECT_TRUE( btree_search( tree, 17 ) != nullptr );
+    btree_insert( B, 17 );
+    Nptr na = btree_search( B, 17 );
+    EXPECT_TRUE( na != NONODE );
 
-    EXPECT_NO_THROW( btree_free( tree ) );
+    btree_delete( B, 17 );
+    Nptr nb = btree_search( B, 17 );
+    EXPECT_TRUE( nb == NONODE );
+
+    btree_free( B );
 }
 
 
