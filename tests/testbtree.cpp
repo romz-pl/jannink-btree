@@ -4,7 +4,7 @@
 
 TEST( btree, init_free )
 {
-    Tree *B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compareKeys );
+    Tree *B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
     EXPECT_TRUE( B );
 
     btree_insert( B, 17 );

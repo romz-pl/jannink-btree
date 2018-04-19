@@ -187,10 +187,10 @@ void    showNode(Tree *B, Nptr node);
 void    showBtree(Tree *B);
 #endif
 
-void    listBtreeValues(Tree *B, Nptr start, int count);
-void    listAllBtreeValues(Tree *B);
+void    list_btree_values(Tree *B, Nptr start, int count);
+void    list_all_btree_values(Tree *B);
 
-int    compareKeys(keyT key1, keyT key2);
+int    compare_keys(keyT key1, keyT key2);
 
 Nptr    btree_search(Tree *B, keyT key);
 void    btree_insert(Tree *B, keyT key);
