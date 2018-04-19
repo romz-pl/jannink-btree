@@ -3,6 +3,8 @@
 
 
 Downloaded from Jan Jannink web page:
-
 http://infolab.stanford.edu/pub/jannink/btree/
+
+
+There is the article, where Jan Jannink describes the delete procedure in detail, [PS](http://infolab.stanford.edu/pub/jannink/1995/btree.ps).
 
