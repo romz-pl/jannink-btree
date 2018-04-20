@@ -5,14 +5,17 @@
 #include "key.h"
 
 
-
-/* adapt data type to requirements */
+//
+// adapt data type to requirements
+//
 typedef char        *data_type;
 
 
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~    node status    ~~~~~~~~~~~~~~~~~~~~~~~*/
+//
+// node status
+//
 class State
 {
 public:
@@ -25,86 +28,114 @@ static_assert( sizeof( State ) <= sizeof( Key ), "sizeof(State) must be <= sizeo
 
 
 class Node;
-/*~~~~~~~~~~~~~~    single node entry with key value    ~~~~~~~*/
+
+//
+// single node entry with key value
+//
 class Entry
 {
 public:
-    Key key;            /* can be a hashed value */
+    // can be a hashed value
+    Key key;
+
     Node* downNode;
-};            /* WARNING: entry was a RESERVED word in C */
+};
 
 
-/*~~~~~~~~~~~~~~~~~~~~    special header entry for internal node    ~~~~~~~*/
+//
+// special header entry for internal node
+//
 class Inner
 {
 public:
     State info;
-    Node* firstNode;        /* node of smallest values */
+
+    // node of the smallest values
+    Node* firstNode;
 };
 
 
-/*~~~~~~~~~~~~~~~~~~~~    special header entry for leaf node    ~~~~~~~*/
+//
+// special header entry for leaf node
+//
 class Leaf
 {
 public:
     State info;
-    Node* nextNode;        /* next leaf in sequential scan */
+
+    // next leaf in sequential scan
+    Node* nextNode;
 };
 
 
-/*~~~~~~~~~~~~~~~~~~~~    unstructured data node    ~~~~~~~~~~~~~~~~~~~~~~~*/
+//
+// unstructured data node
+//
 class Data
 {
 public:
-    /* 24 bytes is minimal size for 2-3 trees */
     static constexpr int NODE_SIZE = 72;
+
     char value[ NODE_SIZE ];
 };
 
+static_assert( Data::NODE_SIZE >= 24, "24 bytes is the minimal size for 2-3 trees" );
 
-/*~~~~~~~~~~~~    data node header to handle duplicates    ~~~~~~~~~~~~~~~*/
+
+//
+// data node header to handle duplicates
+//
 class DupData
 {
 public:
-    /*  16 bytes to store a data point */
+    //  16 bytes to store a data point
     static constexpr int DATA_SIZE = 16;
 
-    int   copy;            /* tallies the duplicate keys */
-    Node*  next;            /* next node with same key value */
+    // tallies the duplicate keys
+    int   copy;
+
+    // next node with same key value
+    Node*  next;
+
     char  value[ DATA_SIZE ];
 };
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~    structured tree node    ~~~~~~~~~~~~~~~*\
-|
-|    The structures Entry, Inner and Leaf are all identical in size.
-|    Each node is of size:  fanout * sizeof(Entry).  Through the
-|    union X, it is possible to access the first space in any node
-|    as: X.e[0], X.i, X.l, depending on the algorithms' needs.  The
-|    value of the status flag isLEAF should always determine how the
-|    first node space is used.  The node structure is defined below.
-|
-|    Internal node:            Leaf node:
-|
-|    +---------------+        +---------------+
-|    |Inner: X.i     |        |Leaf: X.l      |
-|    |  info         |        |  info         |
-|    |  firstNode    |        |  nextNode     |
-|    |---------------|        |---------------|
-|    |Entry: X.e[1]  |        |Entry: X.e[1]  |
-|    |  key          |        |  key          |
-|    |  downNode     |        |  downNode     |
-|    |---------------|        |---------------|
-|    |    .          |        |    .          |
-|    |    .          |        |    .          |
-|    |    .          |        |    .          |
-|    |---------------|        |---------------|
-|    |Entry: X.e[n]  |        |Entry: X.e[n]  |
-|    |  key          |        |  key          |
-|    |  downNode     |        |  downNode     |
-|    +---------------+        +---------------+
-|
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+//~~~~~~~~~~~~~~~~~~~~~~~~    structured tree node    ~~~~~~~~~~~~~~~
+//
+//    The structures Entry, Inner and Leaf are all identical in size.
+//    Each node is of size:  fanout * sizeof(Entry).  Through the
+//    union X, it is possible to access the first space in any node
+//    as: X.e[0], X.i, X.l, depending on the algorithms' needs.  The
+//    value of the status flag isLEAF should always determine how the
+//    first node space is used.  The node structure is defined below.
+//
+//    Internal node:            Leaf node:
+//
+//    +---------------+        +---------------+
+//    |Inner: X.i     |        |Leaf: X.l      |
+//    |  info         |        |  info         |
+//    |  firstNode    |        |  nextNode     |
+//    |---------------|        |---------------|
+//    |Entry: X.e[1]  |        |Entry: X.e[1]  |
+//    |  key          |        |  key          |
+//    |  downNode     |        |  downNode     |
+//    |---------------|        |---------------|
+//    |    .          |        |    .          |
+//    |    .          |        |    .          |
+//    |    .          |        |    .          |
+//    |---------------|        |---------------|
+//    |Entry: X.e[n]  |        |Entry: X.e[n]  |
+//    |  key          |        |  key          |
+//    |  downNode     |        |  downNode     |
+//    +---------------+        +---------------+
+//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+static_assert( sizeof( Entry ) <= sizeof( Inner ), "idendical size" );
+static_assert( sizeof( Entry ) <= sizeof( Leaf  ), "idendical size" );
+
+
 class Node
 {
 public:
@@ -112,16 +143,16 @@ public:
     // flag bits (5 of 16 used, 11 for magic value)
     //
 
-    /* bits set at node creation/split/merge */
+    // bits set at node creation/split/merge
     static constexpr int isLEAF = 0x1;
     static constexpr int isROOT = 0x2;
 
-    /* bits set at key insertion/deletion */
+    // bits set at key insertion/deletion
     static constexpr int isFULL = 0x4;
     static constexpr int FEWEST = 0x8;
     static constexpr int FLAGS = 0xF;
 
-    /* identifies data as being a B+tree node */
+    // identifies data as being a B+tree node
     static constexpr int MAGIC = 0xDEC0;
     static constexpr int MASK = 0xFFF0;
 
@@ -165,7 +196,7 @@ public:
     void set_entry( int q, Key v, Node* z );
 
 public:
-    /* ARRAY is a place holder value for:  fanout */
+    // ARRAY is a place holder value for:  fanout
     static constexpr int ARRAY = 1;
     union
     {
