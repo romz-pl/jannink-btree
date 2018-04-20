@@ -88,7 +88,7 @@ Key Tree::get_fun_key( ) const
 }
 
 // #define getfundata B->theData
-dataT Tree::get_fun_data( ) const
+data_type Tree::get_fun_data( ) const
 {
     return theData;
 }

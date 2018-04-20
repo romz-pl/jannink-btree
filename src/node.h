@@ -9,7 +9,7 @@
 
 
 typedef int        Key;    /* adapt key type to requirements */
-typedef char        *dataT;    /* adapt data type to requirements */
+typedef char        *data_type;    /* adapt data type to requirements */
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 |    Sample Key Comparison Function                    |

@@ -24,7 +24,7 @@ public:
     Key get_fun_key( ) const;
     void set_fun_key( Key v );
 
-    dataT get_fun_data( ) const;
+    data_type get_fun_data( ) const;
     void set_fun_data( const char* v );
 
      // define number of B+tree nodes for free node pool
@@ -124,7 +124,7 @@ public:
     int     height;        /* nodes traversed from root to leaves */
     Node*    pool;        /* list of empty nodes */
     Key    theKey;        /*  the key value used in tree operations */
-    dataT   theData;    /*  data used for insertions/deletions */
+    data_type   theData;    /*  data used for insertions/deletions */
 
     union /* nodes to change in insert and delete */
     {
