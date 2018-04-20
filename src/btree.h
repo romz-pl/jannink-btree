@@ -100,6 +100,8 @@ public:
     Nptr merge( Nptr left, Nptr right, Nptr anchor );
     void remove_entry( Nptr curr, int slot );
     Nptr descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent );
+    void collapse_root( Nptr oldRoot, Nptr newRoot );
+    void erase( keyT key );
 
 public:
 

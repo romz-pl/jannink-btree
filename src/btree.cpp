@@ -589,7 +589,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor);
 |    and minimize the need for non-local key manipulation.
 |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-void btree_delete(Tree *B, keyT key)
+void Tree::erase( keyT key )
 {
   Nptr newNode;
 
@@ -597,16 +597,16 @@ void btree_delete(Tree *B, keyT key)
   fprintf(stderr, "DELETE:  key %d.\n", key);
 #endif
 
-  B->set_fun_key( key );            /* set deletion key */
-  B->set_merge_path( B->NONODE() );
-  newNode = B->descend_balance( B->get_root( ), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE());
-  if ( B->is_node( newNode ))
-    collapse_root(B, B->get_root( ), newNode);    /* remove root when superfluous */
+  set_fun_key( key );            /* set deletion key */
+  set_merge_path( NONODE() );
+  newNode = descend_balance( get_root( ), NONODE(), NONODE(), NONODE(), NONODE(), NONODE());
+  if ( is_node( newNode ))
+    collapse_root( get_root( ), newNode);    /* remove root when superfluous */
 }
 
 
 /*~~~~~~~~~~~~~~~~~~~~~   remove old root node   ~~~~~~~~~~~~~~~~~~~~~~*/
-void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
+void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 {
 
 #ifdef DEBUG
@@ -615,10 +615,10 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
   showNode(B, newRoot);
 #endif
 
-  B->set_root( newRoot);
+  set_root( newRoot);
   newRoot->set_flag( isROOT );
-  B->put_free_node( oldRoot );
-  B->dec_tree_height( );            /* the height of the tree decreases */
+  put_free_node( oldRoot );
+  dec_tree_height( );            /* the height of the tree decreases */
 }
 
 

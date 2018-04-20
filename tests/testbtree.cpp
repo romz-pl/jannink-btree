@@ -10,7 +10,7 @@ TEST( btree, init_free )
     Nptr na = B.search( 17 );
     EXPECT_TRUE( na != B.NONODE() );
 
-    btree_delete( &B, 17 );
+    B.erase( 17 );
     Nptr nb = B.search( 17 );
     EXPECT_TRUE( nb == B.NONODE() );
 }
@@ -41,7 +41,7 @@ TEST( btree, insert_search_delete )
 
 /*    for( auto v : sset )
     {
-        btree_delete( &B, v );
+        B.btree_delete( v );
     }
 
     for( auto v : sset )
