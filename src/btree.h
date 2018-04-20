@@ -90,6 +90,7 @@ public:
     Nptr search( keyT key );
 
     void place_entry( Nptr newNode, int slot, Nptr downPtr );
+    void insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr );
 
 public:
 

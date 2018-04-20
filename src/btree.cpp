@@ -435,33 +435,33 @@ Nptr descend_split(Tree *B, Nptr curr)
   if (newMe != B->NONODE()) {        /* insert only where necessary */
     if ( B->get_split_path() != B->NONODE())
       newNode = split(B, curr);        /* a sibling node is prepared */
-    insert_entry(B, curr, slot, newNode, newMe);
+    B->insert_entry( curr, slot, newNode, newMe);
   }
 
   return newNode;
 }
 
 /*~~~~~~~~~~~~~~   determine location of inserted key   ~~~~~~~~~~~~~~~*/
-void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
+void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
 {
   int split, i, j, k, x, y;
 
-  if (sibling == B->NONODE()) {        /* no split occurred */
-    B->place_entry( newNode, slot + 1, downPtr);
+  if (sibling == NONODE()) {        /* no split occurred */
+    place_entry( newNode, slot + 1, downPtr);
     newNode->clr_flag( FEWEST );
   }
   else {                /* split entries between the two */
     i = newNode->is_internal();        /* adjustment values */
-    split = i ? B->get_fanout( ) - B->get_min_fanout( newNode ): B->get_min_fanout( newNode );
+    split = i ? get_fanout( ) - get_min_fanout( newNode ): get_min_fanout( newNode );
     j = (slot != split);
     k = (slot >= split);
 
-    for (x = split + k + j * i, y = 1; x <= B->get_fanout(); x++, y++) {
+    for (x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++) {
       newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
       newNode->dec_entries();
       sibling->inc_entries();
     }
-    if (sibling->num_entries() == B->get_fanout())
+    if (sibling->num_entries() == get_fanout())
       sibling->set_flag( isFULL );        /* only ever happens in 2-3+trees */
 
     if (i) {                /* set first pointer of internal node */
@@ -476,18 +476,18 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     if (j) {                /* insert new entry into correct spot */
       x = newNode->get_key( split + k );
       if (k)
-    B->place_entry( sibling, slot - split + 1 - i, downPtr);
+    place_entry( sibling, slot - split + 1 - i, downPtr);
       else
-    B->place_entry( newNode, slot + 1, downPtr);
-      B->set_fun_key( x );            /* set key separating nodes */
+    place_entry( newNode, slot + 1, downPtr);
+      set_fun_key( x );            /* set key separating nodes */
     }
     else if (!i)
-      B->place_entry( sibling, 1, downPtr);
+      place_entry( sibling, 1, downPtr);
 
     newNode->clr_flag( isFULL );        /* adjust node flags */
-    if (newNode->num_entries() == B->get_min_fanout( newNode ))
+    if (newNode->num_entries() == get_min_fanout( newNode ))
       newNode->set_flag( FEWEST );        /* never happens in even size nodes */
-    if (sibling->num_entries() > B->get_min_fanout( sibling ))
+    if (sibling->num_entries() > get_min_fanout( sibling ))
       sibling->clr_flag( FEWEST );
 
 #ifdef DEBUG
