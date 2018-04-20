@@ -14,8 +14,7 @@
                 /* causes printing of node information */
 #define DEBUG 1
 #undef DEBUG
-                /* pointer vs. array representation of nodes */
-#define POINTER 1
+
                 /* 24 bytes is minimal size for 2-3 trees */
 #define NODE_SIZE 72
                 /*  16 bytes to store a data point */
@@ -37,13 +36,8 @@
 #define MASK    0xFFF0
 
 /* low level definition of Nptr value usage */
-#ifdef POINTER
 #define nAdr(b) (b)->X
 #define nodearrayhead B->tree
-#else
-#define nAdr(b) B->tree[(b)].X
-#define nodearrayhead 0
-#endif
 
 
 
@@ -59,11 +53,8 @@
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
-#ifdef POINTER
 typedef struct node    *Nptr;    /* streamlined pointer representation */
-#else
-typedef int        Nptr;    /* more intuitive array representation */
-#endif
+
 typedef int        keyT;    /* adapt key type to requirements */
 typedef char        *dataT;    /* adapt data type to requirements */
 
