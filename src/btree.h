@@ -9,6 +9,12 @@
 //
 class Tree
 {
+private:
+    /* special node slot values used in key search */
+    static constexpr int ERROR = -1;
+    static constexpr int UPPER = -2;
+    static constexpr int LOWER = -3;
+
 public:
     Tree( int pool_size, KeyCmp keyCmp );
     ~Tree();

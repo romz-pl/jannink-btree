@@ -5,24 +5,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~    constants    ~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-/* special node slot values used in key search */
-const int ERROR = -1;
-const int UPPER = -2;
-const int LOWER = -3;
-
-
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
 class Node;
 typedef Node    *Nptr;    /* streamlined pointer representation */
