@@ -48,13 +48,13 @@ void Tree::set_fun_data( const char* v )
 // #define getpoolsize B->poolsize
 int Tree::get_pool_size( ) const
 {
-    return poolsize;
+    return pool_size;
 }
 
 // #define setpoolsize(v) (B->poolsize = (v))
-void set_pool_size( Tree* B, int v)
+void Tree::set_pool_size( int v )
 {
-    B->poolsize = v;
+    pool_size = v;
 }
 
 /* access memory region containing B+tree nodes */
@@ -893,7 +893,7 @@ void init_free_node_pool(Tree *B, int quantity)
   int    i;
   Nptr    n;
 
-  set_pool_size( B, quantity );
+  B->set_pool_size( quantity );
   set_node_array( B, (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
   set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {

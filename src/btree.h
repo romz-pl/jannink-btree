@@ -21,12 +21,13 @@ public:
 
      // define number of B+tree nodes for free node pool
     int get_pool_size( ) const;
+    void set_pool_size( int v );
 
 
 public:
 
     /* `private' variables */
-    int     poolsize;    /* # of nodes allocated for tree */
+    int     pool_size;    /* # of nodes allocated for tree */
     Node    *tree;        /* pointer to array of nodes (NOT Nptr !) */
     Nptr    root;        /* pointer to root node */
     Nptr    leaf;        /* pointer to first leaf node in B+tree */
