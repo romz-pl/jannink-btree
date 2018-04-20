@@ -69,13 +69,15 @@ public:
 
     void put_free_node( Nptr self );
 
-    Nptr get_data_node( keyT key ) const;
+    Nptr get_data_node( keyT key );
 
     Nptr NONODE() const;
     Nptr node_array_head( ) const;
 
     void list_all_btree_values( ) const;
     void list_btree_values( Nptr n, int num ) const;
+
+    Nptr get_free_node();
 
 public:
 

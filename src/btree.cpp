@@ -225,7 +225,7 @@ int compare_keys(keyT key1, keyT key2)
 
 /*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
 void init_free_node_pool(Tree *B, int quantity);
-Nptr get_free_node(Tree *B);
+
 
 
 /*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
@@ -238,7 +238,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   B->set_min_fanout( (fan + 1) >> 1 );
   init_free_node_pool( B, poolsz );
 
-  B->set_leaf( get_free_node( B ) );        /* set up the first leaf node */
+  B->set_leaf( B->get_free_node() );        /* set up the first leaf node */
   B->set_root( B->get_leaf( ) );            /* the root is initially the leaf */
   B->get_root( )->set_flag( isLEAF );
   B->get_root( )->set_flag( isROOT );
@@ -549,7 +549,7 @@ Nptr split(Tree *B, Nptr newNode)
 {
   Nptr sibling;
 
-  sibling = get_free_node(B);
+  sibling = B->get_free_node();
 
   sibling->set_flag( FEWEST );            /* set up node flags */
 
@@ -568,7 +568,7 @@ Nptr split(Tree *B, Nptr newNode)
 /*~~~~~~~~~~~~~~~~~~~~~   build new root node   ~~~~~~~~~~~~~~~~~~~~~~~*/
 void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
 {
-  B->set_root( get_free_node(B));
+  B->set_root( B->get_free_node() );
 
   B->get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
   B->get_root( )->set_entry( 1, B->get_fun_key( ), newNode);    /* old root's sibling also */
@@ -911,13 +911,13 @@ void init_free_node_pool(Tree *B, int quantity)
 
 
 /*~~~~~~~~~~~~~   take a free B+tree node from the pool   ~~~~~~~~~~~~~*/
-Nptr get_free_node( Tree *B )
+Nptr Tree::get_free_node( )
 {
-  Nptr newNode = B->get_first_free_node( );
+  Nptr newNode = get_first_free_node( );
 
-  if (newNode != B->NONODE()) {
-    B->set_first_free_node( newNode->get_next_node( ) );    /* adjust free node list */
-    newNode->set_next_node( B->NONODE());        /* remove node from list */
+  if (newNode != NONODE()) {
+    set_first_free_node( newNode->get_next_node( ) );    /* adjust free node list */
+    newNode->set_next_node( NONODE());        /* remove node from list */
   }
   else {
     fprintf(stderr, "Out of tree nodes.");    /* can't recover from this */
@@ -940,9 +940,9 @@ void Tree::put_free_node( Nptr self )
 // fill a free data node with a key and associated data
 // can add data parameter
 //
-Nptr Tree::get_data_node( keyT key ) const
+Nptr Tree::get_data_node( keyT key )
 {
-    Nptr newNode = get_free_node( const_cast<Tree*>( this ) );
+    Nptr newNode = get_free_node( );
     keyT* value;
 
     value = (keyT *) &newNode->X.d;
