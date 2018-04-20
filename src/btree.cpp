@@ -150,9 +150,9 @@ Nptr Tree::get_first_free_node( ) const
 }
 
 // #define setfirstfreenode(v) (B->pool = (v))
-void set_first_free_node( Tree* B, Nptr v )
+void Tree::set_first_free_node( Nptr v )
 {
-    B->pool = v;
+    pool = v;
 }
 
 /* handle split/merge points during insert/delete */
@@ -890,7 +890,7 @@ void init_free_node_pool(Tree *B, int quantity)
 
   B->set_pool_size( quantity );
   B->set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-  set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
+  B->set_first_free_node( node_array_head( B ) );    /* start a list of free nodes */
   for (n = B->get_first_free_node(), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
     n->clear_entries();
@@ -906,7 +906,7 @@ Nptr get_free_node(Tree *B)
   Nptr newNode = B->get_first_free_node( );
 
   if (newNode != NONODE) {
-    set_first_free_node( B, newNode->get_next_node( ) );    /* adjust free node list */
+    B->set_first_free_node( newNode->get_next_node( ) );    /* adjust free node list */
     newNode->set_next_node( NONODE);        /* remove node from list */
   }
   else {
@@ -923,7 +923,7 @@ void put_free_node(Tree *B, Nptr self)
   self->clear_flags();
   self->clear_entries();
   self->set_next_node(  B->get_first_free_node() );        /* add node to list */
-  set_first_free_node( B, self );            /* set it to be list head */
+  B->set_first_free_node( self );            /* set it to be list head */
 }
 
 

@@ -49,6 +49,7 @@ public:
 
     // access pool of free nodes
     Nptr get_first_free_node( ) const;
+    void set_first_free_node( Nptr v );
 
 
 public:
