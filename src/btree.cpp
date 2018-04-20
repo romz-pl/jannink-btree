@@ -174,9 +174,9 @@ Nptr Tree::get_merge_path( ) const
 }
 
 // #define setmergepath(v) (B->branch.merge = (v))
-void set_merge_path( Tree* B, Nptr v )
+void Tree::set_merge_path( Nptr v )
 {
-    B->branch.merge = v;
+    branch.merge = v;
 }
 
 /* exploit function to compare two B+tree keys */
@@ -608,7 +608,7 @@ void btree_delete(Tree *B, keyT key)
 #endif
 
   B->set_fun_key( key );            /* set deletion key */
-  set_merge_path( B, NONODE );
+  B->set_merge_path( NONODE );
   newNode = descend_balance(B, B->get_root( ), NONODE, NONODE, NONODE, NONODE, NONODE);
   if (is_node( B, newNode ))
     collapse_root(B, B->get_root( ), newNode);    /* remove root when superfluous */
@@ -639,9 +639,9 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   int    slot, notleft, notright, fewleft, fewright, test;
 
   if (!curr->is_few())
-    set_merge_path( B, NONODE );
+    B->set_merge_path( NONODE );
   else if ( B->get_merge_path() == NONODE)
-    set_merge_path( B, curr );        /* mark which nodes may need rebalancing */
+    B->set_merge_path( curr );        /* mark which nodes may need rebalancing */
 
   slot = get_slot(B, curr);
   newNode = curr->get_node( slot );
@@ -668,7 +668,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
     newMe = newNode;        /* a key to be deleted is found */
   else {
     newMe = NONODE;        /* no deletion possible, key not found */
-    set_merge_path( B, NONODE );
+    B->set_merge_path( NONODE );
   }
 
 /*~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~*\
@@ -795,7 +795,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     left->set_flag( isFULL );        /* never happens in even size nodes */
 
   if ( B->get_merge_path() == left || B->get_merge_path() == right)
-    set_merge_path( B, NONODE );        /* indicate rebalancing is complete */
+    B->set_merge_path( NONODE );        /* indicate rebalancing is complete */
 
   return right;
 }
@@ -866,7 +866,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     right->set_flag( FEWEST );
   else
     right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
-  set_merge_path( B, NONODE );
+  B->set_merge_path( NONODE );
 
 #ifdef DEBUG
   showNode(B, left);

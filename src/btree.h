@@ -56,6 +56,7 @@ public:
     void set_split_path( Nptr v );
 
     Nptr get_merge_path( ) const;
+    void set_merge_path( Nptr v );
 
 
 public:
