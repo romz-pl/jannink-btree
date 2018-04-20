@@ -5,15 +5,16 @@
 TEST( btree, init_free )
 {
     const int pool_size = 100;
+    const Key k( 17 );
 
-    Tree B( pool_size, compare_keys );
+    Tree B( pool_size );
 
-    EXPECT_NO_THROW( B.insert( 17 ) );
-    Node* na = B.search( 17 );
+    EXPECT_NO_THROW( B.insert( k ) );
+    Node* na = B.search( k );
     EXPECT_TRUE( na != B.NONODE() );
 
-    B.erase( 17 );
-    Node* nb = B.search( 17 );
+    B.erase( k );
+    Node* nb = B.search( k );
     EXPECT_TRUE( nb == B.NONODE() );
 }
 
@@ -21,15 +22,15 @@ TEST( btree, insert_search_delete )
 {
     const int item_no = 2000;
     const unsigned seed = 12345;
-    std::set< int > sset;
+    std::set< Key > sset;
     std::srand( seed );
     const int pool_size = 10000;
 
-    Tree B( pool_size, compare_keys );
+    Tree B( pool_size );
 
     for( int i = 0; i < item_no; i++ )
     {
-        const int key = std::rand();
+        const Key key = Key( std::rand() );
         auto ret = sset.insert( key );
         if( ret.second )
         {

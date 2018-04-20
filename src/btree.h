@@ -16,7 +16,7 @@ private:
     static constexpr int LOWER = -3;
 
 public:
-    Tree( int pool_size, KeyCmp keyCmp );
+    Tree( int pool_size );
     ~Tree();
 
 
@@ -67,8 +67,8 @@ public:
     void set_merge_path( Node* v );
 
     // exploit function to compare two B+tree keys
-    KeyCmp compare_keys( ) const;
-    void set_compare_keys( KeyCmp v );
+    // KeyCmp compare_keys( ) const;
+    // void set_compare_keys( KeyCmp v );
 
     bool is_node( Node* j ) const;
     bool isnt_node( Node* j ) const;
@@ -132,7 +132,7 @@ public:
         Node*    merge;
     } branch;
 
-    KeyCmp    keycmp;        /* pointer to function comparing two keys */
+    // KeyCmp    keycmp;        /* pointer to function comparing two keys */
 };
 
 

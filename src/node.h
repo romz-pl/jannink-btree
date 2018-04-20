@@ -2,24 +2,20 @@
 #define ROMZ_JANNINK_NODE_H
 
 
-
+#include "key.h"
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
 
 
-typedef int        Key;    /* adapt key type to requirements */
+
 typedef char        *data_type;    /* adapt data type to requirements */
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 |    Sample Key Comparison Function                    |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-// int compare_keys(keyT key1, keyT key2);
-inline int compare_keys(Key key1, Key key2)
-{
-  return key1 - key2;        /* this is the case when keys are integer */
-}
+
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    key comparison function type    ~~~~~~~*/
 typedef int (*KeyCmp)(Key, Key);
