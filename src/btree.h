@@ -53,6 +53,7 @@ public:
 
     // handle split/merge points during insert/delete
     Nptr get_split_path( ) const;
+    void set_split_path( Nptr v );
 
 
 public:

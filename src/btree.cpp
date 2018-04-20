@@ -162,9 +162,9 @@ Nptr Tree::get_split_path( ) const
 }
 
 // #define setsplitpath(v) (B->branch.split = (v))
-void set_split_path( Tree* B, Nptr v )
+void Tree::set_split_path( Nptr v )
 {
-    B->branch.split = v;
+    branch.split = v;
 }
 
 // #define getmergepath B->branch.merge
@@ -421,7 +421,7 @@ void btree_insert(Tree *B, keyT key)
 
   B->set_fun_key( key );            /* set insertion key */
   B->set_fun_data( "data" );            /* a node containing data */
-  set_split_path( B, NONODE );
+  B->set_split_path( NONODE );
   newNode = descend_split(B, B->get_root( ));    /* insertion point search from root */
   if (newNode != B->get_split_path() )        /* indicates the root node has split */
     make_new_root(B, B->get_root( ), newNode);
@@ -435,16 +435,16 @@ Nptr descend_split(Tree *B, Nptr curr)
   int    slot;
 
   if (!curr->is_full())
-    set_split_path( B, NONODE );
+    B->set_split_path( NONODE );
   else if ( B->get_split_path() == NONODE)
-    set_split_path( B, curr );            /* indicates where nodes must split */
+    B->set_split_path( curr );            /* indicates where nodes must split */
 
   slot = get_slot(B, curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split(B, curr->get_node( slot ));
   else if ((slot > 0) && !compare_keys( B )( B->get_fun_key( ), curr->get_key( slot ))) {
     newMe = NONODE;            /* this code discards duplicates */
-    set_split_path( B, NONODE );
+    B->set_split_path( NONODE );
   }
   else
     newMe = get_data_node(B, B ->get_fun_key( ));    /* an insertion takes place */
@@ -548,7 +548,7 @@ Nptr split(Tree *B, Nptr newNode)
     newNode->set_next_node( sibling);
   }
   if ( B->get_split_path() == newNode)
-    set_split_path( B, NONODE );            /* no more splitting needed */
+    B->set_split_path( NONODE );            /* no more splitting needed */
 
   return sibling;
 }
