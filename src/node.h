@@ -172,6 +172,9 @@ public:
     void set_next_node( Nptr v );
     Nptr get_next_node( ) const;
 
+    // shift/transfer entries for insertion/deletion
+    void push_entry( int q, int v );
+
 public:
     union
     {
@@ -187,7 +190,7 @@ public:
 
 
 
-void push_entry( Node* j, int q, int v );
+
 void pull_entry( Node* j, int q, int v );
 void xfer_entry( Node* j, int q, Node* v, int z );
 void set_entry( Node* j, int q, keyT v, Nptr z );

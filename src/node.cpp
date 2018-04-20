@@ -136,11 +136,11 @@ Nptr Node::get_next_node( ) const
     return this->X.l.nextNode;
 }
 
-/* shift/transfer entries for insertion/deletion */
+
 // #define pushentry(j, q, v) (nAdr(j).e[(q) + (v)] = nAdr(j).e[(q)])
-void push_entry( Node* j, int q, int v )
+void Node::push_entry( int q, int v )
 {
-    j->X.e[ q + v ] = j->X.e[ q ];
+    this->X.e[ q + v ] = this->X.e[ q ];
 }
 
 // #define pullentry(j, q, v) (nAdr(j).e[(q)] = nAdr(j).e[(q) + (v)])

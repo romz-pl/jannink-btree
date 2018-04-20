@@ -531,7 +531,7 @@ void place_entry(Tree *B, Nptr newNode, int slot, Nptr downPtr)
   int x;
 
   for (x = newNode->num_entries(); x >= slot; x--)    /* make room for new entry */
-    push_entry(newNode, x, 1);
+    newNode->push_entry( x, 1);
   set_entry(newNode, slot, get_fun_key( B ), downPtr);    /* place it in correct slot */
 
   newNode->inc_entries();                /* adjust entry counter */
@@ -847,7 +847,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     x = left->num_entries() - y + 1;
 
     for (z = right->num_entries(); z > 0; z--)    /* adjust increased node */
-      push_entry(right, z, y);
+      right->push_entry( z, y);
 
     set_fun_key( B, left->get_key( x ) );            /* set new anchor key value */
     z = get_slot(B, anchor) + 1;
