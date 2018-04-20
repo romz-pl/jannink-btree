@@ -245,8 +245,14 @@ void Tree::set_compare_keys( KeyCmp v )
 }
 
 
-/* representation independent node numbering */
+//
+// representation independent node numbering
+//
 // #define getnodenumber(v) ((v) - nodearrayhead)
+int Tree::get_node_number( Nptr v ) const
+{
+    return (v - node_array_head() );
+}
 
 
 
@@ -560,35 +566,23 @@ void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Delete data from tree                        |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
-Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent);
-void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot);
-void remove_entry(Tree *B, Nptr curr, int slot);
-Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor);
-Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor);
-
-/*~~~~~~~~~~~~~~~~~~~~~   top level delete call   ~~~~~~~~~~~~~~~~~~~~~*\
-|
-|    The recursive call for deletion carries 5 additional parameters
-|    which may be needed to rebalance the B+tree when removing the key.
-|    These parameters are:
-|        1. immediate left neighbor of the current node
-|        2. immediate right neighbor of the current node
-|        3. the anchor of the current node and left neighbor
-|        4. the anchor of the current node and right neighbor
-|        5. the parent of the current node
-|
-|    All of these parameters are simple to calculate going along the
-|    recursive path to the leaf nodes and the point of key deletion.
-|    At that time, the algorithm determines which node manipulations
-|    are most efficient, that is, cause the least rearranging of data,
-|    and minimize the need for non-local key manipulation.
-|
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+//~~~~~~~~~~~~~~~~~~~~~   top level delete call   ~~~~~~~~~~~~~~~~~~~~~
+//
+//    The recursive call for deletion carries 5 additional parameters
+//    which may be needed to rebalance the B+tree when removing the key.
+//    These parameters are:
+//        1. immediate left neighbor of the current node
+//        2. immediate right neighbor of the current node
+//        3. the anchor of the current node and left neighbor
+//        4. the anchor of the current node and right neighbor
+//        5. the parent of the current node
+//
+//    All of these parameters are simple to calculate going along the
+//    recursive path to the leaf nodes and the point of key deletion.
+//    At that time, the algorithm determines which node manipulations
+//    are most efficient, that is, cause the least rearranging of data,
+//    and minimize the need for non-local key manipulation.
+//
 void Tree::erase( keyT key )
 {
   Nptr newNode;
@@ -605,7 +599,9 @@ void Tree::erase( keyT key )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~   remove old root node   ~~~~~~~~~~~~~~~~~~~~~~*/
+//
+// remove old root node
+//
 void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 {
 
@@ -622,7 +618,9 @@ void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 }
 
 
-/*~~~~~~~~~~~~~~~   recurse down and balance back up   ~~~~~~~~~~~~~~~~*/
+//
+// recurse down and balance back up
+//
 Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent )
 {
   Nptr    newMe, myLeft, myRight, lAnchor, rAnchor, newNode;
@@ -661,28 +659,30 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
     set_merge_path( NONODE() );
   }
 
-/*~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~*\
-|
-|    The simplest B+tree rebalancing consists of the following rules.
-|
-|    If a node underflows:
-|    CASE 1 check if it is the root, and collapse it if it is,
-|    CASE 2 otherwise, check if both of its neighbors are minimum
-|        sized and merge the underflowing node with one of them,
-|    CASE 3 otherwise shift surplus entries to the underflowing node.
-|
-|    The choice of which neighbor to use is optional.  However, the
-|    rebalancing rules that follow also ensure whenever possible
-|    that the merges and shifts which do occur use a neighbor whose
-|    anchor is the parent of the underflowing node.
-|
-|    Cases 3, 4, 5 below are more an optimization than a requirement,
-|    and can be omitted, with a change of the action value in case 6,
-|    which actually corresponds to the third case described above.
-|
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+//~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
+//
+//    The simplest B+tree rebalancing consists of the following rules.
+//
+//    If a node underflows:
+//    CASE 1 check if it is the root, and collapse it if it is,
+//    CASE 2 otherwise, check if both of its neighbors are minimum
+//        sized and merge the underflowing node with one of them,
+//    CASE 3 otherwise shift surplus entries to the underflowing node.
+//
+//    The choice of which neighbor to use is optional.  However, the
+//    rebalancing rules that follow also ensure whenever possible
+//    that the merges and shifts which do occur use a neighbor whose
+//    anchor is the parent of the underflowing node.
+//
+//    Cases 3, 4, 5 below are more an optimization than a requirement,
+//    and can be omitted, with a change of the action value in case 6,
+//    which actually corresponds to the third case described above.
+//
+//
 
-/*             begin deletion, working upwards from leaves */
+//
+// begin deletion, working upwards from leaves
+//
 
   if (newMe != NONODE())    /* this node removal doesn't consider duplicates */
     remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
@@ -736,7 +736,9 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
 }
 
 
-/*~~~~~~~~~~~~~~~   remove key and pointer from node   ~~~~~~~~~~~~~~~~*/
+//
+// remove key and pointer from node
+//
 void Tree::remove_entry( Nptr curr, int slot )
 {
   int x;
@@ -755,7 +757,9 @@ void Tree::remove_entry( Nptr curr, int slot )
 }
 
 
-/*~~~~~~   merge a node pair & set emptied node up for removal   ~~~~~~*/
+//
+// merge a node pair & set emptied node up for removal
+//
 Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
 {
   int    x, y, z;
@@ -791,7 +795,9 @@ Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
 }
 
 
-/*~~~~~   shift entries in a node pair & adjust anchor key value   ~~~~*/
+//
+// shift entries in a node pair & adjust anchor key value
+//
 Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
 {
   int    i, x, y, z;
@@ -867,11 +873,9 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Empty Node Utilities                        |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*~~~~~~~~~~~~~~~~~~~~   Set up pool of free nodes   ~~~~~~~~~~~~~~~~~~*/
+//
+// Set up pool of free nodes
+//
 void Tree::init_free_node_pool( int quantity )
 {
   int    i;
@@ -889,7 +893,9 @@ void Tree::init_free_node_pool( int quantity )
 }
 
 
-/*~~~~~~~~~~~~~   take a free B+tree node from the pool   ~~~~~~~~~~~~~*/
+//
+// take a free B+tree node from the pool
+//
 Nptr Tree::get_free_node( )
 {
   Nptr newNode = get_first_free_node( );
@@ -906,7 +912,9 @@ Nptr Tree::get_free_node( )
 }
 
 
-/*~~~~~~~~~~~~   return a deleted B+tree node to the pool   ~~~~~~~~~~~*/
+//
+// return a deleted B+tree node to the pool
+//
 void Tree::put_free_node( Nptr self )
 {
   self->clear_flags();
@@ -933,50 +941,58 @@ Nptr Tree::get_data_node( keyT key )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    B+tree Printing Utilities                    |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-#ifdef DEBUG
-/*~~~~~~~~~~~~~~~~~~~~~~   B+tree node printer   ~~~~~~~~~~~~~~~~~~~~~~*/
-void showNode(Tree *B, Nptr n)
+//
+// B+tree node printer
+//
+void Tree::show_node( Nptr n ) const
 {
   int x;
 
-  fprintf(stderr, "-  --  --  --  --  --  --  --  --  --  --  --  -\n");
-  fprintf(stderr, "| node %6d                 ", getnodenumber(n));
-  fprintf(stderr, "  magic    %4x  |\n", getflags(n) & MASK);
-  fprintf(stderr, "-  --  --  --  --  --  --  --  --  --  --  --  -\n");
-  fprintf(stderr, "| flags   %1d%1d%1d%1d ", isfew(n), isfull(n), isroot(n), isleaf(n));
-  fprintf(stderr, "| keys = %5d ", numentries(n));
-  fprintf(stderr, "| node = %6d  |\n", getnodenumber(getfirstnode(n)));
-  for (x = 1; x <= numentries(n); x++) {
+  fprintf(stderr, "------------------------------------------------\n");
+  fprintf(stderr, "| node %6d                 ", get_node_number(n));
+  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & MASK);
+  fprintf(stderr, "|- - - - - - - - - - - - - - - - - - - - - - - |\n");
+  fprintf(stderr, "| flags   %1d%1d%1d%1d ", n->is_few(), n->is_full(), n->is_root(), n->is_leaf());
+  fprintf(stderr, "| keys = %5d ", n->num_entries());
+  fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_first_node()));
+  for (x = 1; x <= n->num_entries(); x++) {
     fprintf(stderr, "| entry %6d ", x);
-    fprintf(stderr, "| key = %6d ", getkey(n, x) & 0xFFFF);
-    fprintf(stderr, "| node = %6d  |\n", getnodenumber(getnode(n, x)));
+    fprintf(stderr, "| key = %6d ", n->get_key( x ) & 0xFFFF);
+    fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_node( x )));
   }
-  fprintf(stderr, "-  --  --  --  --  --  --  --  --  --  --  --  -\n");
+  fprintf(stderr, "------------------------------------------------\n\n");
 }
 
-/*~~~~~~~~~~~~~~~~~   B+tree class variable printer   ~~~~~~~~~~~~~~~~~*/
-void showBtree(Tree *B)
+//
+// B+tree class variable printer
+//
+void Tree::show_btree( ) const
 {
   fprintf(stderr, "-  --  --  --  --  --  -\n");
-  fprintf(stderr, "|  B+tree  %10p  |\n", (void *) B);
+  fprintf(stderr, "|  B+tree  %10p  |\n", (void *) this);
   fprintf(stderr, "-  --  --  --  --  --  -\n");
-  fprintf(stderr, "|  root        %6d  |\n", getnodenumber(getroot));
-  fprintf(stderr, "|  leaf        %6d  |\n", getnodenumber(getleaf));
-  fprintf(stderr, "|  fanout         %3d  |\n", getfanout + 1);
-  fprintf(stderr, "|  minfanout      %3d  |\n", getminfanout(getroot) + 1);
-  fprintf(stderr, "|  height         %3d  |\n", gettreeheight);
-  fprintf(stderr, "|  freenode    %6d  |\n", getnodenumber(getfirstfreenode));
-  fprintf(stderr, "|  theKey      %6d  |\n", getfunkey);
-  fprintf(stderr, "|  theData     %6s  |\n", getfundata( B ));
+  fprintf(stderr, "|  root        %6d  |\n", get_node_number( get_root() ));
+  fprintf(stderr, "|  leaf        %6d  |\n", get_node_number( get_leaf() ));
+  fprintf(stderr, "|  fanout         %3d  |\n", get_fanout() + 1);
+  fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
+  fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
+  fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
+  fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key() );
+  fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
   fprintf(stderr, "-  --  --  --  --  --  -\n");
-}
-#endif
 
-/*~~~~~~~~~~~~~~~~~~~~~~   B+tree data printer   ~~~~~~~~~~~~~~~~~~~~~~*/
+   Nptr n = get_root();
+   while( n != NONODE() )
+   {
+       show_node( n );
+       n = n->get_next_node();
+   }
+}
+
+
+//
+// B+tree data printer
+//
 void Tree::list_btree_values( Nptr n, int num ) const
 {
     int slot, prev = -1;
@@ -1000,7 +1016,9 @@ void Tree::list_btree_values( Nptr n, int num ) const
     fprintf( stderr, "\n\n" );
 }
 
-/*~~~~~~~~~~~~~~~~~~~   entire B+tree data printer   ~~~~~~~~~~~~~~~~~~*/
+//
+// entire B+tree data printer
+//
 void Tree::list_all_btree_values( ) const
 {
   list_btree_values( get_leaf( ), ERROR );

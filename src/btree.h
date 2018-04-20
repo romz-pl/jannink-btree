@@ -69,6 +69,8 @@ public:
     bool is_node( Node* j ) const;
     bool isnt_node( Node* j ) const;
 
+    int get_node_number( Nptr v ) const;
+
 
     void put_free_node( Nptr self );
 
@@ -102,6 +104,9 @@ public:
     Nptr descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent );
     void collapse_root( Nptr oldRoot, Nptr newRoot );
     void erase( keyT key );
+
+    void show_node( Nptr n ) const;
+    void show_btree( ) const;
 
 public:
 
