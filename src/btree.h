@@ -25,6 +25,7 @@ public:
 
     // access memory region containing B+tree nodes
     Node* get_node_array( ) const;
+    void set_node_array( Node* v );
 
 
 public:

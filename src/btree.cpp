@@ -64,9 +64,9 @@ Node* Tree::get_node_array( ) const
 }
 
 // #define setnodearray(v) (B->tree = (Node *)(v))
-void set_node_array( Tree* B, Node* v)
+void Tree::set_node_array( Node* v )
 {
-    B->tree = v;
+    tree = v;
 }
 
 /* locations from which tree access begins */
@@ -893,7 +893,7 @@ void init_free_node_pool(Tree *B, int quantity)
   Nptr    n;
 
   B->set_pool_size( quantity );
-  set_node_array( B, (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
+  B->set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
   set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
