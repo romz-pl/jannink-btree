@@ -60,6 +60,7 @@ public:
 
     // exploit function to compare two B+tree keys
     KeyCmp compare_keys( ) const;
+    void set_compare_keys( KeyCmp v );
 
 
 public:

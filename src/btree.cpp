@@ -186,9 +186,9 @@ KeyCmp Tree::compare_keys( ) const
 }
 
 // #define setcomparekeys(v) (B->keycmp = (v))
-void set_compare_keys( Tree* B, KeyCmp v )
+void Tree::set_compare_keys( KeyCmp v )
 {
-    B->keycmp = v;
+    keycmp = v;
 }
 
 
@@ -235,7 +235,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 
   B->set_fun_key( 0 );
   B->set_fun_data( "0" );
-  set_compare_keys( B, keyCmp );
+  B->set_compare_keys( keyCmp );
 
 #ifdef DEBUG
   fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
