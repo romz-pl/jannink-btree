@@ -126,9 +126,9 @@ void Tree::init_tree_height( )
 }
 
 // #define inctreeheight B->height++
-void inc_tree_height( Tree* B )
+void Tree::inc_tree_height( )
 {
-    B->height++;
+    height++;
 }
 
 // #define dectreeheight B->height--
@@ -569,7 +569,7 @@ void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
   oldRoot->clr_flag( isROOT );
   B->get_root( )->set_flag( isROOT );
   B->get_root( )->set_flag( FEWEST );
-  inc_tree_height( B );
+  B->inc_tree_height( );
 }
 
 
