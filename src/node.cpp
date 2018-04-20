@@ -14,9 +14,9 @@ Nptr Node::get_node( int q ) const
 }
 
 // #define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
-void set_key( Node* j, int q, keyT v )
+void Node::set_key( int q, keyT v )
 {
-    j->X.e[ q ].key = v;
+    this->X.e[ q ].key = v;
 }
 
 // #define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))

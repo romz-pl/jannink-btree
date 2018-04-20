@@ -832,7 +832,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       set_first_node(right, right->get_node( y + 1 - i ));
     }
     clr_flag(right, isFULL);
-    set_key(anchor, z, get_fun_key( B ));        /* set new anchor value */
+    anchor->set_key( z, get_fun_key( B ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
       dec_entries(right);            /* adjust entry count */
       inc_entries(left);
@@ -858,7 +858,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       set_first_node(right, left->get_node( x ));
     }
     clr_flag(left, isFULL);
-    set_key(anchor, z, get_fun_key( B ));
+    anchor->set_key( z, get_fun_key( B ) );
     for (x = num_entries(left) + i, y -= i; y > 0; y--, x--) {
       dec_entries(left);
       inc_entries(right);
