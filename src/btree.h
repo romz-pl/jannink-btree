@@ -71,6 +71,9 @@ public:
 
     Nptr get_data_node( keyT key ) const;
 
+    Nptr NONODE() const;
+    Nptr node_array_head( ) const;
+
 public:
 
     /* `private' variables */
@@ -116,15 +119,6 @@ void btree_delete(Tree *B, keyT key);
 
 
 
-/* low level definition of Nptr value usage */
-// #define nodearrayhead B->tree
-inline Node* node_array_head( Tree *B )
-{
-    return B->tree;
-}
-
-/* corresponds to a NULL node pointer value */
-#define NONODE    (node_array_head( B ) - 1)
 
 
 #endif

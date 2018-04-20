@@ -9,11 +9,11 @@ TEST( btree, init_free )
 
     btree_insert( B, 17 );
     Nptr na = btree_search( B, 17 );
-    EXPECT_TRUE( na != NONODE );
+    EXPECT_TRUE( na != B->NONODE() );
 
     btree_delete( B, 17 );
     Nptr nb = btree_search( B, 17 );
-    EXPECT_TRUE( nb == NONODE );
+    EXPECT_TRUE( nb == B->NONODE() );
 
     btree_free( B );
 }
@@ -40,7 +40,7 @@ TEST( btree, insert_search_delete )
     for( auto v : sset )
     {
         Nptr na = btree_search( B, v );
-        EXPECT_TRUE( na != NONODE );
+        EXPECT_TRUE( na != B->NONODE() );
     }
 
 /*    for( auto v : sset )
