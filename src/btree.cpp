@@ -19,9 +19,9 @@ Nptr Tree::node_array_head( ) const
 
 /* check that a node is in fact a node */
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
-bool is_node( Tree* B, Node* j )
+bool Tree::is_node( Node* j ) const
 {
-    return ( j != B->NONODE() && ( ( j->X.i.info.flags & MASK ) == MAGIC ) );
+    return ( j != NONODE() && ( ( j->X.i.info.flags & MASK ) == MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
@@ -619,7 +619,7 @@ void btree_delete(Tree *B, keyT key)
   B->set_fun_key( key );            /* set deletion key */
   B->set_merge_path( B->NONODE() );
   newNode = descend_balance(B, B->get_root( ), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE());
-  if (is_node( B, newNode ))
+  if ( B->is_node( newNode ))
     collapse_root(B, B->get_root( ), newNode);    /* remove root when superfluous */
 }
 
