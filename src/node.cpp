@@ -113,9 +113,9 @@ void Node::set_first_node( Nptr v )
 }
 
 // #define getfirstnode(j) nAdr(j).i.firstNode
-Nptr getfirstnode( Node* j )
+Nptr Node::get_first_node( ) const
 {
-    return j->X.i.firstNode;
+    return this->X.i.firstNode;
 }
 
 // #define getlastnode(j) nAdr(j).e[nAdr(j).i.info.pairs].downNode

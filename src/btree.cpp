@@ -662,7 +662,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
       lAnchor = curr;
     }
     if (slot == curr->num_entries()) {
-      myRight = isnt_node( B, right ) ? NONODE : getfirstnode(right);
+      myRight = isnt_node( B, right ) ? NONODE : right->get_first_node();
       rAnchor = rAnc;
     }
     else {
@@ -720,7 +720,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
       test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? NONODE : getfirstnode(curr);
+      newNode = test ? NONODE : curr->get_first_node();
     }
             /* CASE 2:  the merging of two nodes is a must */
     else if ((notleft || fewleft) && (notright || fewright)) {
@@ -788,7 +788,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     set_fun_key( B, right->get_key( 1 ) );    /* defined but maybe just deleted */
     z = get_slot(B, anchor);        /* needs the just calculated key */
     set_fun_key( B, anchor->get_key( z ) );    /* set slot to delete in anchor */
-    set_entry(left, left->num_entries(), get_fun_key( B ), getfirstnode(right));
+    set_entry(left, left->num_entries(), get_fun_key( B ), right->get_first_node());
   }
   else
     set_next_node(left, get_next_node(right));
@@ -828,7 +828,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     if (i) {                    /* move out old anchor value */
       right->dec_entries();            /* adjust for shifting anchor */
       left->inc_entries();
-      set_entry(left, left->num_entries(), anchor->get_key( z ), getfirstnode(right));
+      set_entry(left, left->num_entries(), anchor->get_key( z ), right->get_first_node());
       right->set_first_node( right->get_node( y + 1 - i ));
     }
     right->clr_flag( isFULL );
@@ -854,7 +854,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     if (i) {
       left->dec_entries();
       right->inc_entries();
-      set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
+      set_entry(right, y, anchor->get_key( z ), right->get_first_node());
       right->set_first_node( left->get_node( x ));
     }
     left->clr_flag( isFULL );
