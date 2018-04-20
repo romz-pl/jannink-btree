@@ -6,7 +6,7 @@ TEST( btree, init_free )
 {
     const int pool_size = 100;
 
-    Tree B( pool_size, NODE_SIZE / sizeof( Entry ), compare_keys );
+    Tree B( pool_size, compare_keys );
 
     EXPECT_NO_THROW( B.insert( 17 ) );
     Nptr na = B.search( 17 );
@@ -25,7 +25,7 @@ TEST( btree, insert_search_delete )
     std::srand( seed );
     const int pool_size = 10000;
 
-    Tree B( pool_size, NODE_SIZE / sizeof( Entry ), compare_keys );
+    Tree B( pool_size, compare_keys );
 
     for( int i = 0; i < item_no; i++ )
     {

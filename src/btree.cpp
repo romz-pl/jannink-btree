@@ -13,10 +13,12 @@
 //
 //
 //
-Tree::Tree( int pool_size, int fan, KeyCmp keyCmp )
+Tree::Tree( int pool_size, KeyCmp keyCmp )
 {
-    set_fanout( fan );
-    set_min_fanout( (fan + 1) >> 1 );
+    const int fanout = Data::NODE_SIZE / sizeof( Entry );
+
+    set_fanout( fanout );
+    set_min_fanout( (fanout + 1) >> 1 );
     init_free_node_pool( pool_size );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */

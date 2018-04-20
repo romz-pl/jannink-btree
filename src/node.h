@@ -1,8 +1,7 @@
 #ifndef ROMZ_JANNINK_NODE_H
 #define ROMZ_JANNINK_NODE_H
 
-/* 24 bytes is minimal size for 2-3 trees */
-const int NODE_SIZE = 72;
+
 
 /*  16 bytes to store a data point */
 const int DATA_SIZE = 16;
@@ -99,6 +98,8 @@ public:
 class Data
 {
 public:
+    /* 24 bytes is minimal size for 2-3 trees */
+    static constexpr int NODE_SIZE = 72;
     char value[ NODE_SIZE ];
 };
 

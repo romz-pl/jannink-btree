@@ -10,7 +10,7 @@
 class Tree
 {
 public:
-    Tree( int pool_size, int fan, KeyCmp keyCmp );
+    Tree( int pool_size, KeyCmp keyCmp );
     ~Tree();
 
 
