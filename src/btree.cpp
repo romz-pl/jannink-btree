@@ -82,9 +82,9 @@ void Tree::set_root( Nptr v )
 }
 
 // #define getleaf B->leaf
-Nptr get_leaf( Tree* B )
+Nptr Tree::get_leaf( ) const
 {
-    return B->leaf;
+    return leaf;
 }
 
 // #define setleaf(v) (B->leaf = (v))
@@ -232,7 +232,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   init_free_node_pool( B, poolsz );
 
   set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
-  B->set_root( get_leaf( B ) );            /* the root is initially the leaf */
+  B->set_root( B->get_leaf( ) );            /* the root is initially the leaf */
   B->get_root( )->set_flag( isLEAF );
   B->get_root( )->set_flag( isROOT );
   B->get_root( )->set_flag( FEWEST );
@@ -1004,5 +1004,5 @@ void list_btree_values(Tree *B, Nptr n, int num)
 /*~~~~~~~~~~~~~~~~~~~   entire B+tree data printer   ~~~~~~~~~~~~~~~~~~*/
 void list_all_btree_values( Tree *B )
 {
-  list_btree_values( B, get_leaf( B ), ERROR );
+  list_btree_values( B, B->get_leaf( ), ERROR );
 }

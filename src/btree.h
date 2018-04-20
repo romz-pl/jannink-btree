@@ -31,6 +31,8 @@ public:
     Nptr get_root( ) const;
     void set_root( Nptr v );
 
+    Nptr get_leaf( ) const;
+
 
 public:
 
