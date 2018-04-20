@@ -441,7 +441,7 @@ Nptr descend_split(Tree *B, Nptr curr)
   Nptr    newMe, newNode;
   int    slot;
 
-  if (!is_full(curr))
+  if (!curr->is_full())
     set_split_path( B, NONODE );
   else if (get_split_path( B ) == NONODE)
     set_split_path( B, curr );            /* indicates where nodes must split */

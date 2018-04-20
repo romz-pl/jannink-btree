@@ -69,9 +69,9 @@ bool Node::is_root( ) const
 }
 
 // #define isfull(j) ((nAdr(j).i.info.flags & isFULL) == isFULL)
-bool is_full( Node* j )
+bool Node::is_full( ) const
 {
-    return ( ( j->X.i.info.flags & isFULL ) == isFULL );
+    return ( ( this->X.i.info.flags & isFULL ) == isFULL );
 }
 
 // #define isfew(j) ((nAdr(j).i.info.flags & FEWEST) == FEWEST)
