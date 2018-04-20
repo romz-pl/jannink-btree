@@ -94,6 +94,7 @@ public:
     Nptr split( Nptr newNode );
     void make_new_root( Nptr oldRoot, Nptr newNode );
     Nptr descend_split( Nptr curr );
+    void insert( keyT key );
 
 public:
 

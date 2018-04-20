@@ -6,7 +6,7 @@ TEST( btree, init_free )
 {
     Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
 
-    btree_insert( &B, 17 );
+    B.insert( 17 );
     Nptr na = B.search( 17 );
     EXPECT_TRUE( na != B.NONODE() );
 
@@ -29,7 +29,7 @@ TEST( btree, insert_search_delete )
         auto ret = sset.insert( key );
         if( ret.second )
         {
-            btree_insert( &B, key );
+            B.insert( key );
         }
     }
 

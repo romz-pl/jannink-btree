@@ -392,7 +392,7 @@ Nptr split(Tree *B, Nptr node);
 void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode);
 
 /*~~~~~~~~~~~~~~~~~~~~~   top level insert call   ~~~~~~~~~~~~~~~~~~~~~*/
-void btree_insert(Tree *B, keyT key)
+void Tree::insert( keyT key )
 {
   Nptr newNode;
 
@@ -400,12 +400,12 @@ void btree_insert(Tree *B, keyT key)
   fprintf(stderr, "INSERT:  key %d.\n", key);
 #endif
 
-  B->set_fun_key( key );            /* set insertion key */
-  B->set_fun_data( "data" );            /* a node containing data */
-  B->set_split_path( B->NONODE() );
-  newNode = B->descend_split( B->get_root( ));    /* insertion point search from root */
-  if (newNode != B->get_split_path() )        /* indicates the root node has split */
-    B->make_new_root( B->get_root( ), newNode);
+  set_fun_key( key );            /* set insertion key */
+  set_fun_data( "data" );            /* a node containing data */
+  set_split_path( NONODE() );
+  newNode = descend_split( get_root( ));    /* insertion point search from root */
+  if (newNode != get_split_path() )        /* indicates the root node has split */
+    make_new_root( get_root( ), newNode);
 }
 
 
