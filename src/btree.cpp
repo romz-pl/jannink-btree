@@ -645,7 +645,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   Nptr    newMe, myLeft, myRight, lAnchor, rAnchor, newNode;
   int    slot, notleft, notright, fewleft, fewright, test;
 
-  if (!is_few(curr))
+  if (!curr->is_few())
     set_merge_path( B, NONODE );
   else if (get_merge_path( B ) == NONODE)
     set_merge_path( B, curr );        /* mark which nodes may need rebalancing */
@@ -714,8 +714,8 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   else {        /* tree rebalancing rules for node merges and shifts */
     notleft = isnt_node( B, left );
     notright = isnt_node( B, right );
-    fewleft = is_few(left);        /* only used when defined */
-    fewright = is_few(right);
+    fewleft = left->is_few();        /* only used when defined */
+    fewright = right->is_few();
 
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {

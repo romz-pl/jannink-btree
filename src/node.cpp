@@ -75,9 +75,9 @@ bool Node::is_full( ) const
 }
 
 // #define isfew(j) ((nAdr(j).i.info.flags & FEWEST) == FEWEST)
-bool is_few( Node* j )
+bool Node::is_few( ) const
 {
-    return ( ( j->X.i.info.flags & FEWEST ) == FEWEST );
+    return ( ( this->X.i.info.flags & FEWEST ) == FEWEST );
 }
 
 /* manage number of keys in a node */

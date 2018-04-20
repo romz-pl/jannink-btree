@@ -156,6 +156,7 @@ public:
     bool is_leaf( ) const;
     bool is_root( ) const;
     bool is_full( ) const;
+    bool is_few( ) const;
 
 public:
     union
@@ -169,10 +170,6 @@ public:
 } ;
 
 
-
-
-
-bool is_few( Node* j );
 short num_entries( Node* j );
 void clear_entries( Node* j );
 void inc_entries( Node * j );
