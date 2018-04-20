@@ -7,11 +7,11 @@ TEST( btree, init_free )
     Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
 
     btree_insert( &B, 17 );
-    Nptr na = btree_search( &B, 17 );
+    Nptr na = B.search( 17 );
     EXPECT_TRUE( na != B.NONODE() );
 
     btree_delete( &B, 17 );
-    Nptr nb = btree_search( &B, 17 );
+    Nptr nb = B.search( 17 );
     EXPECT_TRUE( nb == B.NONODE() );
 }
 
@@ -35,7 +35,7 @@ TEST( btree, insert_search_delete )
 
     for( auto v : sset )
     {
-        Nptr na = btree_search( &B, v );
+        Nptr na = B.search( v );
         EXPECT_TRUE( na != B.NONODE() );
     }
 
@@ -46,7 +46,7 @@ TEST( btree, insert_search_delete )
 
     for( auto v : sset )
     {
-        Nptr na = btree_search( &B, v );
+        Nptr na = B.btree_search( v );
         EXPECT_TRUE( na == B.NONODE() );
     }
     */

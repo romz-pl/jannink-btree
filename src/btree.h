@@ -86,6 +86,9 @@ public:
     int best_match( Nptr curr, int slot );
     int find_key( Nptr curr, int lo, int hi );
     int get_slot( Nptr curr );
+    Nptr descend_to_leaf( Nptr curr );
+
+    Nptr search( keyT key );
 
 public:
 
@@ -121,8 +124,6 @@ void    showBtree(Tree *B);
 
 
 
-
-Nptr btree_search(Tree *B, keyT key);
 void btree_insert(Tree *B, keyT key);
 void btree_delete(Tree *B, keyT key);
 

@@ -250,18 +250,8 @@ void Tree::set_compare_keys( KeyCmp v )
 
 
 
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Find location for data                        |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
-Nptr descend_to_leaf(Tree *B, Nptr curr);
-
-
-
 /*~~~~~~~~~~~~~~~~~~~~~   top level search call   ~~~~~~~~~~~~~~~~~~~~~*/
-Nptr btree_search(Tree *B, keyT key)
+Nptr Tree::search( keyT key )
 {
   Nptr    findNode;
 
@@ -269,8 +259,8 @@ Nptr btree_search(Tree *B, keyT key)
   fprintf(stderr, "SEARCH:  key %d.\n", key);
 #endif
 
-  B->set_fun_key( key );            /* set search key */
-  findNode = descend_to_leaf(B, B->get_root( ));    /* start search from root node */
+  set_fun_key( key );            /* set search key */
+  findNode = descend_to_leaf( get_root() );    /* start search from root node */
 
 #ifdef DEBUG
   fprintf(stderr, "SEARCH:  found on page %d.\n", getnodenumber(findNode));
@@ -280,17 +270,17 @@ Nptr btree_search(Tree *B, keyT key)
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~   `recurse' down B+tree   ~~~~~~~~~~~~~~~~~~~~~*/
-Nptr descend_to_leaf(Tree *B, Nptr curr)
+Nptr Tree::descend_to_leaf( Nptr curr )
 {
   int    slot;
   Nptr    findNode;
 
-  for (slot = B->get_slot( curr); curr->is_internal(); slot = B->get_slot( curr))
+  for (slot = get_slot( curr); curr->is_internal(); slot = get_slot( curr))
     curr = curr->get_node( slot );
-  if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ) ) )
+  if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
   else
-    findNode = B->NONODE();            /* key value not in tree */
+    findNode = NONODE();            /* key value not in tree */
 
   return findNode;
 }
