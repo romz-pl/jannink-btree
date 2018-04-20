@@ -1,18 +1,16 @@
 #ifndef ROMZ_JANNINEK_BTREE_H
 #define ROMZ_JANNINEK_BTREE_H
 
-/*~~~~~~~~~~~~~~~~    sample B+tree parametrization    ~~~~~~~~~~~~~~~*/
-                /* causes printing of node information */
-#define DEBUG 1
-#undef DEBUG
 
 #include "node.h"
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~    tree definitions    ~~~~~~~~~~~~~~~*/
+//
+// tree definitions
+//
 class Tree
 {
 public:
-    Tree( int poolsz, int fan, KeyCmp keyCmp );
+    Tree( int pool_size, int fan, KeyCmp keyCmp );
     ~Tree();
 
 
@@ -130,23 +128,6 @@ public:
 
     KeyCmp    keycmp;        /* pointer to function comparing two keys */
 };
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~    B+tree methods        ~~~~~~~~~~~~~~~*/
-/* Tree    *remakeBtree(Tree * B, int fillfactor); */
-
-#ifdef DEBUG
-void    showNode(Tree *B, Nptr node);
-void    showBtree(Tree *B);
-#endif
-
-
-
-void btree_insert(Tree *B, keyT key);
-void btree_delete(Tree *B, keyT key);
-
-
-
 
 
 #endif

@@ -1,16 +1,23 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 #include "btree.h"
+
+
+// causes printing of node information
+#define DEBUG 1
+#undef DEBUG
+
 
 //
 //
 //
-Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
+Tree::Tree( int pool_size, int fan, KeyCmp keyCmp )
 {
     set_fanout( fan );
     set_min_fanout( (fan + 1) >> 1 );
-    init_free_node_pool( poolsz );
+    init_free_node_pool( pool_size );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
     set_root( get_leaf( ) );            /* the root is initially the leaf */
@@ -25,8 +32,8 @@ Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
 
 #ifdef DEBUG
     fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
-    showBtree();
-    showNode( get_root() );
+    show_btree();
+    show_node( get_root() );
 #endif
 }
 
@@ -36,7 +43,7 @@ Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
 Tree::~Tree()
 {
 #ifdef DEBUG
-    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
+    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) this);
 #endif
 
   free( (void *)get_node_array( ) );
@@ -271,7 +278,7 @@ Nptr Tree::search( keyT key )
   findNode = descend_to_leaf( get_root() );    /* start search from root node */
 
 #ifdef DEBUG
-  fprintf(stderr, "SEARCH:  found on page %d.\n", getnodenumber(findNode));
+  fprintf(stderr, "SEARCH:  found on page %d.\n", get_node_number(findNode) );
 #endif
 
   return findNode;
@@ -321,7 +328,7 @@ int Tree::find_key( Nptr curr, int lo, int hi )
 
 #ifdef DEBUG
   fprintf(stderr, "GETSLOT:  lo %d, hi %d.\n", lo, hi);
-  showNode(B, curr);
+  show_node( curr );
 #endif
 
   if (hi == lo) {
@@ -329,7 +336,7 @@ int Tree::find_key( Nptr curr, int lo, int hi )
 
 #ifdef DEBUG
     if (findslot == ERROR)
-      fprintf(stderr, "Bad key ordering on node %d\n", getnodenumber(curr));
+      fprintf(stderr, "Bad key ordering on node %d\n", get_node_number(curr));
 #endif
 
   }
@@ -345,7 +352,7 @@ int Tree::find_key( Nptr curr, int lo, int hi )
 
 #ifdef DEBUG
     case ERROR:
-      fprintf(stderr, "Bad key ordering on node %d\n", getnodenumber(curr));
+      fprintf(stderr, "Bad key ordering on node %d\n", get_node_number(curr));
 #endif
 
     }
@@ -500,9 +507,9 @@ void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
       sibling->clr_flag( FEWEST );
 
 #ifdef DEBUG
-  fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, getnodenumber(downPtr));
-  showNode(B, newNode);
-  showNode(B, sibling);
+  fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, get_node_number(downPtr));
+  show_node( newNode);
+  show_node( sibling);
 #endif
 
   }
@@ -606,9 +613,9 @@ void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 {
 
 #ifdef DEBUG
-  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", getnodenumber(oldRoot), getnodenumber(newRoot));
-  showNode(B, oldRoot);
-  showNode(B, newRoot);
+  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", get_node_number(oldRoot), get_node_number(newRoot));
+  show_node( oldRoot);
+  show_node( newRoot);
 #endif
 
   set_root( newRoot);
@@ -688,8 +695,8 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
     remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, getnodenumber(newMe));
-  showNode(B, curr);
+  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number(newMe));
+  show_node( curr);
 #endif
 
   if ( get_merge_path() == NONODE())
@@ -765,9 +772,9 @@ Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
   int    x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "MERGE:  left %d, right %d.\n", getnodenumber(left), getnodenumber(right));
-  showNode(B, left);
-  showNode(B, right);
+  fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+  show_node( left);
+  show_node( right);
 #endif
 
   if (left->is_internal()) {
@@ -803,9 +810,9 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
   int    i, x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "SHIFT:  left %d, right %d.\n", getnodenumber(left), getnodenumber(right));
-  showNode(B, left);
-  showNode(B, right);
+  fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+  show_node( left);
+  show_node( right);
 #endif
 
   i = left->is_internal();
@@ -865,8 +872,8 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
   set_merge_path( NONODE() );
 
 #ifdef DEBUG
-  showNode(B, left);
-  showNode(B, right);
+  show_node( left);
+  show_node( right);
 #endif
 
   return NONODE();
@@ -898,17 +905,21 @@ void Tree::init_free_node_pool( int quantity )
 //
 Nptr Tree::get_free_node( )
 {
-  Nptr newNode = get_first_free_node( );
+    Nptr newNode = get_first_free_node( );
 
-  if (newNode != NONODE()) {
-    set_first_free_node( newNode->get_next_node( ) );    /* adjust free node list */
-    newNode->set_next_node( NONODE());        /* remove node from list */
-  }
-  else {
-    fprintf(stderr, "Out of tree nodes.");    /* can't recover from this */
-    exit(0);
-  }
-  return newNode;
+    if( newNode == NONODE() )
+    {
+          // can't recover from this
+          throw std::runtime_error( "Out of tree nodes." );
+    }
+
+    // adjust free node list
+    set_first_free_node( newNode->get_next_node( ) );
+
+    // remove node from list
+    newNode->set_next_node( NONODE() );
+
+    return newNode;
 }
 
 

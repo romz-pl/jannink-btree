@@ -7,9 +7,6 @@ const int NODE_SIZE = 72;
 /*  16 bytes to store a data point */
 const int DATA_SIZE = 16;
 
-/* maximum number of available nodes */
-const int ARRAY_SIZE = 24576;
-
 
 /*~~~~~~~    flag bits (5 of 16 used, 11 for magic value)    ~~~~~~~*/
 /* bits set at node creation/split/merge */
