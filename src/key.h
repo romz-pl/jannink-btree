@@ -1,23 +1,13 @@
 #ifndef ROMZ_JANNINK_KEY_H
 #define ROMZ_JANNINK_KEY_H
 
-// #include "totally_ordered.h"
-
 //
-// typedef int        Key;
-// adapt key type to requirements
+// Represents key
 //
 
-// int compare_keys(keyT key1, keyT key2);
-//inline int compare_keys(Key key1, Key key2)
-//{
-//  return key1 - key2;        /* this is the case when keys are integer */
-//}
-
-class Key // : totally_ordered< Key >
+class Key
 {
 public:
-    Key();
     explicit Key( int value );
 
     static int compare( const Key& k1, const Key& k2 );

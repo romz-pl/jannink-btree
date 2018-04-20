@@ -1,17 +1,11 @@
 #include "key.h"
 
-//
-//
-//
-Key::Key( ) : m_value( 0 )
-{
-
-}
 
 //
 //
 //
-Key::Key( int value ) : m_value( value )
+Key::Key( int value )
+    : m_value( value )
 {
 
 }

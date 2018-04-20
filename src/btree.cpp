@@ -13,7 +13,8 @@
 //
 //
 //
-Tree::Tree(int pool_size )
+Tree::Tree( int pool_size )
+    : theKey( 0 )
 {
     const int fanout = Data::NODE_SIZE / sizeof( Entry );
 
@@ -28,9 +29,8 @@ Tree::Tree(int pool_size )
     get_root( )->set_flag( Node::Node::FEWEST );
     init_tree_height( );
 
-    set_fun_key( Key( 0 ) );
     set_fun_data( "0" );
-    // set_compare_keys( keyCmp );
+
 
 #ifdef DEBUG
     fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
@@ -241,20 +241,6 @@ void Tree::set_merge_path( Node* v )
 {
     branch.merge = v;
 }
-
-/*
-// #define comparekeys (*B->keycmp)
-KeyCmp Tree::compare_keys( ) const
-{
-    return *keycmp;
-}
-
-// #define setcomparekeys(v) (B->keycmp = (v))
-void Tree::set_compare_keys( KeyCmp v )
-{
-    keycmp = v;
-}
-*/
 
 //
 // representation independent node numbering

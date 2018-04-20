@@ -5,20 +5,11 @@
 #include "key.h"
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
+
+/* adapt data type to requirements */
+typedef char        *data_type;
 
 
-
-typedef char        *data_type;    /* adapt data type to requirements */
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Sample Key Comparison Function                    |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~    key comparison function type    ~~~~~~~*/
-typedef int (*KeyCmp)(Key, Key);
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node status    ~~~~~~~~~~~~~~~~~~~~~~~*/

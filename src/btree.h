@@ -66,10 +66,6 @@ public:
     Node* get_merge_path( ) const;
     void set_merge_path( Node* v );
 
-    // exploit function to compare two B+tree keys
-    // KeyCmp compare_keys( ) const;
-    // void set_compare_keys( KeyCmp v );
-
     bool is_node( Node* j ) const;
     bool isnt_node( Node* j ) const;
 
@@ -116,14 +112,14 @@ public:
 
     /* `private' variables */
     int     pool_size;    /* # of nodes allocated for tree */
-    Node    *tree;        /* pointer to array of nodes (NOT Nptr !) */
-    Node*    root;        /* pointer to root node */
-    Node*    leaf;        /* pointer to first leaf node in B+tree */
+    Node*   tree;        /* pointer to array of nodes (NOT Nptr !) */
+    Node*   root;        /* pointer to root node */
+    Node*   leaf;        /* pointer to first leaf node in B+tree */
     int     fanout;        /* # of pointers to other nodes */
     int     minfanout;    /* usually minfanout == ceil(fanout/2) */
     int     height;        /* nodes traversed from root to leaves */
-    Node*    pool;        /* list of empty nodes */
-    Key    theKey;        /*  the key value used in tree operations */
+    Node*     pool;        /* list of empty nodes */
+    Key       theKey;        /*  the key value used in tree operations */
     data_type   theData;    /*  data used for insertions/deletions */
 
     union /* nodes to change in insert and delete */
