@@ -12,6 +12,10 @@
 class Tree
 {
 public:
+    Tree();
+    ~Tree();
+
+
     // access key and data values for B+tree methods
     keyT get_fun_key( ) const;
     void set_fun_key( keyT v );
@@ -62,6 +66,8 @@ public:
     KeyCmp compare_keys( ) const;
     void set_compare_keys( KeyCmp v );
 
+
+    void put_free_node( Nptr self );
 
 public:
 

@@ -214,7 +214,7 @@ int compare_keys(keyT key1, keyT key2)
 /*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
 void init_free_node_pool(Tree *B, int quantity);
 Nptr get_free_node(Tree *B);
-void put_free_node(Tree *B, Nptr self);
+
 
 /*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
 Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
@@ -626,7 +626,7 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
 
   B->set_root( newRoot);
   newRoot->set_flag( isROOT );
-  put_free_node(B, oldRoot);
+  B->put_free_node( oldRoot );
   B->dec_tree_height( );            /* the height of the tree decreases */
 }
 
@@ -750,7 +750,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
 {
   int x;
 
-  put_free_node(B, curr->get_node( slot ));    /* return deleted node to free list */
+  B->put_free_node( curr->get_node( slot ));    /* return deleted node to free list */
   for (x = slot; x < curr->num_entries(); x++)
     curr->pull_entry( x, 1);        /* adjust node with removed key */
   curr->dec_entries();
@@ -916,12 +916,12 @@ Nptr get_free_node(Tree *B)
 
 
 /*~~~~~~~~~~~~   return a deleted B+tree node to the pool   ~~~~~~~~~~~*/
-void put_free_node(Tree *B, Nptr self)
+void Tree::put_free_node( Nptr self )
 {
   self->clear_flags();
   self->clear_entries();
-  self->set_next_node(  B->get_first_free_node() );        /* add node to list */
-  B->set_first_free_node( self );            /* set it to be list head */
+  self->set_next_node(  get_first_free_node() );        /* add node to list */
+  set_first_free_node( self );            /* set it to be list head */
 }
 
 
