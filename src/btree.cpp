@@ -405,7 +405,7 @@ void btree_insert(Tree *B, keyT key)
   B->set_split_path( B->NONODE() );
   newNode = descend_split(B, B->get_root( ));    /* insertion point search from root */
   if (newNode != B->get_split_path() )        /* indicates the root node has split */
-    make_new_root(B, B->get_root( ), newNode);
+    B->make_new_root( B->get_root( ), newNode);
 }
 
 
@@ -536,18 +536,18 @@ Nptr Tree::split( Nptr newNode )
 
 
 /*~~~~~~~~~~~~~~~~~~~~~   build new root node   ~~~~~~~~~~~~~~~~~~~~~~~*/
-void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
+void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
 {
-  B->set_root( B->get_free_node() );
+  set_root( get_free_node() );
 
-  B->get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
-  B->get_root( )->set_entry( 1, B->get_fun_key( ), newNode);    /* old root's sibling also */
-  B->get_root( )->inc_entries();
+  get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
+  get_root( )->set_entry( 1, get_fun_key( ), newNode);    /* old root's sibling also */
+  get_root( )->inc_entries();
 
   oldRoot->clr_flag( isROOT );
-  B->get_root( )->set_flag( isROOT );
-  B->get_root( )->set_flag( FEWEST );
-  B->inc_tree_height( );
+  get_root( )->set_flag( isROOT );
+  get_root( )->set_flag( FEWEST );
+  inc_tree_height( );
 }
 
 
