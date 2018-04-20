@@ -483,7 +483,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     k = (slot >= split);
 
     for (x = split + k + j * i, y = 1; x <= get_fanout( B ); x++, y++) {
-      xfer_entry(newNode, x, sibling, y);    /* copy entries to sibling */
+      newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
       newNode->dec_entries();
       sibling->inc_entries();
     }
@@ -794,7 +794,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     left->set_next_node( right->get_next_node());
   for (x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++) {
     left->inc_entries();
-    xfer_entry(right, y, left, x);    /* transfer entries to left node */
+    right->xfer_entry( y, left, x);    /* transfer entries to left node */
   }
   if (left->num_entries() > get_min_fanout( B, left ))
     left->clr_flag( FEWEST );
@@ -836,7 +836,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     for (z = y, y -= i; y > 0; y--, x--) {
       right->dec_entries();            /* adjust entry count */
       left->inc_entries();
-      xfer_entry(right, y, left, x);        /* transfer entries over */
+      right->xfer_entry( y, left, x);        /* transfer entries over */
     }
 
     for (x = 1; x <= right->num_entries(); x++)    /* adjust reduced node */
@@ -862,7 +862,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
       left->dec_entries();
       right->inc_entries();
-      xfer_entry(left, x, right, y);        /* transfer entries over */
+      left->xfer_entry( x, right, y);        /* transfer entries over */
     }
   }
   if (left->num_entries() == get_min_fanout( B, left ))        /* adjust node flags */

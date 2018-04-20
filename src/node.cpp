@@ -151,9 +151,9 @@ void Node::pull_entry( int q, int v )
 
 
 // #define xferentry(j, q, v, z) (nAdr(v).e[(z)] = nAdr(j).e[(q)])
-void xfer_entry( Node* j, int q, Node* v, int z )
+void Node::xfer_entry( int q, Node* v, int z ) const
 {
-    v->X.e[ z ] = j->X.e[ q ];
+    v->X.e[ z ] = this->X.e[ q ];
 }
 
 

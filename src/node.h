@@ -175,6 +175,7 @@ public:
     // shift/transfer entries for insertion/deletion
     void push_entry( int q, int v );
     void pull_entry( int q, int v );
+    void xfer_entry( int q, Node* v, int z ) const;
 
 public:
     union
@@ -193,7 +194,7 @@ public:
 
 
 
-void xfer_entry( Node* j, int q, Node* v, int z );
+
 void set_entry( Node* j, int q, keyT v, Nptr z );
 
 
