@@ -551,7 +551,7 @@ Nptr split(Tree *B, Nptr newNode)
 
   if ( newNode->is_leaf()) {
     sibling->set_flag( isLEAF );
-    sibling->set_next_node( get_next_node(newNode));    /* adjust leaf pointers */
+    sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
     newNode->set_next_node( sibling);
   }
   if (get_split_path( B ) == newNode)
@@ -791,7 +791,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     set_entry(left, left->num_entries(), get_fun_key( B ), right->get_first_node());
   }
   else
-    left->set_next_node( get_next_node(right));
+    left->set_next_node( right->get_next_node());
   for (x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++) {
     left->inc_entries();
     xfer_entry(right, y, left, x);    /* transfer entries to left node */
@@ -912,7 +912,7 @@ Nptr get_free_node(Tree *B)
   Nptr newNode = get_first_free_node( B );
 
   if (newNode != NONODE) {
-    set_first_free_node( B, get_next_node( newNode ) );    /* adjust free node list */
+    set_first_free_node( B, newNode->get_next_node( ) );    /* adjust free node list */
     newNode->set_next_node( NONODE);        /* remove node from list */
   }
   else {
@@ -999,7 +999,7 @@ void list_btree_values(Tree *B, Nptr n, int num)
     prev = n->get_key( slot );
     fprintf(stderr, "%8d%c", prev, (num & 7 ? ' ' : '\n'));
     if (++slot > n->num_entries())
-      n = get_next_node(n), slot = 1;
+      n = n->get_next_node(), slot = 1;
   }
   fprintf(stderr, "\n\n");
 }

@@ -131,9 +131,9 @@ void Node::set_next_node( Nptr v )
 }
 
 // #define getnextnode(j) nAdr(j).l.nextNode
-Nptr get_next_node( Node* j )
+Nptr Node::get_next_node( ) const
 {
-    return j->X.l.nextNode;
+    return this->X.l.nextNode;
 }
 
 /* shift/transfer entries for insertion/deletion */

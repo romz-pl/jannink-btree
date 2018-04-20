@@ -170,6 +170,7 @@ public:
 
     // manage pointers to next nodes in leaf nodes
     void set_next_node( Nptr v );
+    Nptr get_next_node( ) const;
 
 public:
     union
@@ -185,7 +186,7 @@ public:
 
 
 
-Nptr get_next_node( Node* j );
+
 void push_entry( Node* j, int q, int v );
 void pull_entry( Node* j, int q, int v );
 void xfer_entry( Node* j, int q, Node* v, int z );
