@@ -41,6 +41,9 @@ public:
     int get_min_fanout( const Node* j ) const;
     void set_min_fanout( int v );
 
+    // manage B+tree height
+    void init_tree_height( );
+
 
 public:
 

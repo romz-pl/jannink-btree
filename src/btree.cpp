@@ -119,11 +119,10 @@ void Tree::set_min_fanout( int v )
     minfanout = v - 1;
 }
 
-/* manage B+tree height */
 // #define inittreeheight (B->height = 0)
-void init_tree_height( Tree* B )
+void Tree::init_tree_height( )
 {
-    B->height = 0;
+    height = 0;
 }
 
 // #define inctreeheight B->height++
@@ -236,7 +235,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   B->get_root( )->set_flag( isLEAF );
   B->get_root( )->set_flag( isROOT );
   B->get_root( )->set_flag( FEWEST );
-  init_tree_height( B );
+  B->init_tree_height( );
 
   B->set_fun_key( 0 );
   B->set_fun_data( "0" );
