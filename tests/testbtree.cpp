@@ -18,6 +18,46 @@ TEST( btree, init_free )
     btree_free( B );
 }
 
+TEST( btree, insert_search_delete )
+{
+    const int item_no = 2000;
+    const unsigned seed = 12345;
+    std::set< int > sset;
+    std::srand( seed );
+    Tree *B;
+    B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        const int key = std::rand();
+        auto ret = sset.insert( key );
+        if( ret.second )
+        {
+            btree_insert( B, key );
+        }
+    }
+
+    for( auto v : sset )
+    {
+        Nptr na = btree_search( B, v );
+        EXPECT_TRUE( na != NONODE );
+    }
+
+/*    for( auto v : sset )
+    {
+        btree_delete( B, v );
+    }
+
+    for( auto v : sset )
+    {
+        Nptr na = btree_search( B, v );
+        EXPECT_TRUE( na == NONODE );
+    }
+    */
+
+    btree_free( B );
+}
+
 
 //int main(void)
 //{
