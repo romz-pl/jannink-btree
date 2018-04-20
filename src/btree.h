@@ -78,7 +78,7 @@ public:
     Nptr node_array_head( ) const;
 
     void list_all_btree_values( ) const;
-    void list_btree_values( Nptr n, int num ) const;
+    void list_btree_values( Nptr n ) const;
 
     Nptr get_free_node();
     void init_free_node_pool( int quantity );

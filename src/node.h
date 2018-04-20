@@ -31,7 +31,6 @@ const int MASK = 0xFFF0;
 const int ARRAY = 1;
 
 /* special node slot values used in key search */
-const int ERROR = -1;
 const int UPPER = -2;
 const int LOWER = -3;
 

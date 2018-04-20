@@ -1004,11 +1004,12 @@ void Tree::show_btree( ) const
 //
 // B+tree data printer
 //
-void Tree::list_btree_values( Nptr n, int num ) const
+void Tree::list_btree_values( Nptr n ) const
 {
     int slot, prev = -1;
+    int num = 0;
 
-    for( slot = 1; ( n != NONODE() ) && num && n->num_entries(); num-- )
+    for( slot = 1; ( n != NONODE() ) && n->num_entries(); num++ )
     {
         if( n->get_key( slot ) <= prev)
         {
@@ -1032,5 +1033,5 @@ void Tree::list_btree_values( Nptr n, int num ) const
 //
 void Tree::list_all_btree_values( ) const
 {
-  list_btree_values( get_leaf( ), ERROR );
+  list_btree_values( get_leaf( ) );
 }
