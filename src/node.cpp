@@ -33,9 +33,9 @@ void Node::set_flag( short v )
 }
 
 // #define clrflag(j, v) (nAdr(j).i.info.flags &= ~(v))
-void clr_flag( Node* j, short v )
+void Node::clr_flag( short v )
 {
-    j->X.i.info.flags &= ~v;
+    this->X.i.info.flags &= ~v;
 }
 
 // #define getflags(j) nAdr(j).i.info.flags

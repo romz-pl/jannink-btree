@@ -474,7 +474,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
   if (sibling == NONODE) {        /* no split occurred */
     place_entry(B, newNode, slot + 1, downPtr);
-    clr_flag(newNode, FEWEST);
+    newNode->clr_flag( FEWEST );
   }
   else {                /* split entries between the two */
     i = is_internal(newNode);        /* adjustment values */
@@ -510,11 +510,11 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     else if (!i)
       place_entry(B, sibling, 1, downPtr);
 
-    clr_flag(newNode, isFULL);        /* adjust node flags */
+    newNode->clr_flag( isFULL );        /* adjust node flags */
     if (num_entries(newNode) == get_min_fanout( B, newNode ))
       newNode->set_flag( FEWEST );        /* never happens in even size nodes */
     if (num_entries(sibling) > get_min_fanout( B, sibling ))
-      clr_flag(sibling, FEWEST);
+      sibling->clr_flag( FEWEST );
 
 #ifdef DEBUG
   fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, getnodenumber(downPtr));
@@ -570,7 +570,7 @@ void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
   set_entry(get_root( B ), 1, get_fun_key( B ), newNode);    /* old root's sibling also */
   inc_entries(get_root( B ));
 
-  clr_flag(oldRoot, isROOT);
+  oldRoot->clr_flag( isROOT );
   get_root( B )->set_flag( isROOT );
   get_root( B )->set_flag( FEWEST );
   inc_tree_height( B );
@@ -762,7 +762,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
   for (x = slot; x < num_entries(curr); x++)
     pull_entry(curr, x, 1);        /* adjust node with removed key */
   dec_entries(curr);
-  clr_flag(curr, isFULL);        /* keep flag information up to date */
+  curr->clr_flag( isFULL );        /* keep flag information up to date */
   if (is_root(curr)) {
     if (num_entries(curr) == 1)
       curr->set_flag( FEWEST );
@@ -797,7 +797,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     xfer_entry(right, y, left, x);    /* transfer entries to left node */
   }
   if (num_entries(left) > get_min_fanout( B, left ))
-    clr_flag(left, FEWEST);
+    left->clr_flag( FEWEST );
   if (num_entries(left) == get_fanout( B ))
     left->set_flag( isFULL );        /* never happens in even size nodes */
 
@@ -831,7 +831,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       set_entry(left, num_entries(left), anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, right->get_node( y + 1 - i ));
     }
-    clr_flag(right, isFULL);
+    right->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
       dec_entries(right);            /* adjust entry count */
@@ -857,7 +857,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, left->get_node( x ));
     }
-    clr_flag(left, isFULL);
+    left->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );
     for (x = num_entries(left) + i, y -= i; y > 0; y--, x--) {
       dec_entries(left);
@@ -868,11 +868,11 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (num_entries(left) == get_min_fanout( B, left ))        /* adjust node flags */
     left->set_flag( FEWEST );
   else
-    clr_flag(left, FEWEST);            /* never happens in 2-3+trees */
+    left->clr_flag( FEWEST );            /* never happens in 2-3+trees */
   if (num_entries(right) == get_min_fanout( B, right ))
     right->set_flag( FEWEST );
   else
-    clr_flag(right, FEWEST);            /* never happens in 2-3+trees */
+    right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
   set_merge_path( B, NONODE );
 
 #ifdef DEBUG

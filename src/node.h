@@ -147,6 +147,7 @@ public:
     void set_node( int q, Nptr v );
 
     void set_flag( short v );
+    void clr_flag( short v );
 
 public:
     union
@@ -163,7 +164,7 @@ public:
 
 
 
-void clr_flag( Node* j, short v );
+
 short get_flags( const Node* j );
 void clear_flags( Node* j );
 bool is_internal( Node* j);
