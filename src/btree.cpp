@@ -143,12 +143,10 @@ int Tree::get_tree_height( ) const
     return height;
 }
 
-
-/* access pool of free nodes */
 // #define getfirstfreenode B->pool
-Nptr get_first_free_node( Tree* B )
+Nptr Tree::get_first_free_node( ) const
 {
-    return B->pool;
+    return pool;
 }
 
 // #define setfirstfreenode(v) (B->pool = (v))
@@ -893,7 +891,7 @@ void init_free_node_pool(Tree *B, int quantity)
   B->set_pool_size( quantity );
   B->set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
   set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
-  for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
+  for (n = B->get_first_free_node(), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
     n->clear_entries();
     n->set_next_node( n + 1);        /* insert node into free node list */
@@ -905,7 +903,7 @@ void init_free_node_pool(Tree *B, int quantity)
 /*~~~~~~~~~~~~~   take a free B+tree node from the pool   ~~~~~~~~~~~~~*/
 Nptr get_free_node(Tree *B)
 {
-  Nptr newNode = get_first_free_node( B );
+  Nptr newNode = B->get_first_free_node( );
 
   if (newNode != NONODE) {
     set_first_free_node( B, newNode->get_next_node( ) );    /* adjust free node list */
@@ -924,7 +922,7 @@ void put_free_node(Tree *B, Nptr self)
 {
   self->clear_flags();
   self->clear_entries();
-  self->set_next_node(  get_first_free_node( B ) );        /* add node to list */
+  self->set_next_node(  B->get_first_free_node() );        /* add node to list */
   set_first_free_node( B, self );            /* set it to be list head */
 }
 

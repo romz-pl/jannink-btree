@@ -47,6 +47,9 @@ public:
     void dec_tree_height( );
     int get_tree_height( ) const;
 
+    // access pool of free nodes
+    Nptr get_first_free_node( ) const;
+
 
 public:
 
