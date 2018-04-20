@@ -141,6 +141,7 @@ class Node
 {
 public:
     keyT get_key( int q ) const;
+    Nptr get_node( int q ) const;
 
 public:
     union
@@ -153,7 +154,7 @@ public:
     } X;
 } ;
 
-Nptr get_node( const Node* j, int q );
+
 void set_key( Node* j, int q, keyT v );
 void set_node( Node* j, int q, Nptr v );
 void set_flag( Node* j, short v );

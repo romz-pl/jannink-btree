@@ -302,7 +302,7 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
   Nptr    findNode;
 
   for (slot = get_slot(B, curr); is_internal(curr); slot = get_slot(B, curr))
-    curr = get_node(curr, slot);
+    curr = curr->get_node( slot );
   if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
   else
@@ -448,7 +448,7 @@ Nptr descend_split(Tree *B, Nptr curr)
 
   slot = get_slot(B, curr);        /* is null only if the root is empty */
   if (is_internal(curr))            /* continue recursion to leaves */
-    newMe = descend_split(B, get_node(curr, slot));
+    newMe = descend_split(B, curr->get_node( slot ));
   else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), curr->get_key( slot ))) {
     newMe = NONODE;            /* this code discards duplicates */
     set_split_path( B, NONODE );
@@ -492,7 +492,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
     if (i) {                /* set first pointer of internal node */
       if (j) {
-        set_first_node(sibling, get_node(newNode, split + k));
+        set_first_node(sibling, newNode->get_node( split + k));
         dec_entries(newNode);
       }
       else
@@ -651,14 +651,14 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
     set_merge_path( B, curr );        /* mark which nodes may need rebalancing */
 
   slot = get_slot(B, curr);
-  newNode = get_node(curr, slot);
+  newNode = curr->get_node( slot );
   if (is_internal(curr)) {    /* set up next recursion call's parameters */
     if (slot == 0) {
       myLeft = isnt_node( B, left ) ? NONODE : get_last_node(left);
       lAnchor = lAnc;
     }
     else {
-      myLeft = get_node(curr, slot - 1);
+      myLeft = curr->get_node( slot - 1 );
       lAnchor = curr;
     }
     if (slot == num_entries(curr)) {
@@ -666,7 +666,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
       rAnchor = rAnc;
     }
     else {
-      myRight = get_node(curr, slot + 1);
+      myRight = curr->get_node( slot + 1 );
       rAnchor = curr;
     }
     newMe = descend_balance(B, newNode, myLeft, myRight, lAnchor, rAnchor, curr);
@@ -758,7 +758,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
 {
   int x;
 
-  put_free_node(B, get_node(curr, slot));    /* return deleted node to free list */
+  put_free_node(B, curr->get_node( slot ));    /* return deleted node to free list */
   for (x = slot; x < num_entries(curr); x++)
     pull_entry(curr, x, 1);        /* adjust node with removed key */
   dec_entries(curr);
@@ -829,7 +829,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       dec_entries(right);            /* adjust for shifting anchor */
       inc_entries(left);
       set_entry(left, num_entries(left), anchor->get_key( z ), getfirstnode(right));
-      set_first_node(right, get_node(right, y + 1 - i));
+      set_first_node(right, right->get_node( y + 1 - i ));
     }
     clr_flag(right, isFULL);
     set_key(anchor, z, get_fun_key( B ));        /* set new anchor value */
@@ -855,7 +855,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       dec_entries(left);
       inc_entries(right);
       set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
-      set_first_node(right, get_node(left, x));
+      set_first_node(right, left->get_node( x ));
     }
     clr_flag(left, isFULL);
     set_key(anchor, z, get_fun_key( B ));

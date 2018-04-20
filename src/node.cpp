@@ -8,9 +8,9 @@ keyT Node::get_key( int q ) const
 }
 
 // #define getnode(j, q) nAdr(j).e[(q)].downNode
-Nptr get_node( const Node* j, int q )
+Nptr Node::get_node( int q ) const
 {
-    return j->X.e[ q ].downNode;
+    return this->X.e[ q ].downNode;
 }
 
 // #define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
