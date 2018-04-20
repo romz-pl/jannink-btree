@@ -161,6 +161,7 @@ public:
     short num_entries( ) const;
     void clear_entries( );
     void inc_entries( );
+    void dec_entries( );
 
 public:
     union
@@ -177,7 +178,7 @@ public:
 
 
 
-void dec_entries( Node* j );
+
 void set_first_node( Node* j, Nptr v );
 Nptr getfirstnode( Node* j );
 Nptr get_last_node( Node* j );

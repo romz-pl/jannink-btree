@@ -484,7 +484,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
     for (x = split + k + j * i, y = 1; x <= get_fanout( B ); x++, y++) {
       xfer_entry(newNode, x, sibling, y);    /* copy entries to sibling */
-      dec_entries(newNode);
+      newNode->dec_entries();
       sibling->inc_entries();
     }
     if (sibling->num_entries() == get_fanout( B ))
@@ -493,7 +493,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     if (i) {                /* set first pointer of internal node */
       if (j) {
         set_first_node(sibling, newNode->get_node( split + k));
-        dec_entries(newNode);
+        newNode->dec_entries();
       }
       else
         set_first_node(sibling, downPtr);
@@ -761,7 +761,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
   put_free_node(B, curr->get_node( slot ));    /* return deleted node to free list */
   for (x = slot; x < curr->num_entries(); x++)
     pull_entry(curr, x, 1);        /* adjust node with removed key */
-  dec_entries(curr);
+  curr->dec_entries();
   curr->clr_flag( isFULL );        /* keep flag information up to date */
   if (curr->is_root()) {
     if (curr->num_entries() == 1)
@@ -826,7 +826,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     set_fun_key( B, right->get_key( y + 1 - i ) );    /* set new anchor key value */
     z = get_slot(B, anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
-      dec_entries(right);            /* adjust for shifting anchor */
+      right->dec_entries();            /* adjust for shifting anchor */
       left->inc_entries();
       set_entry(left, left->num_entries(), anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, right->get_node( y + 1 - i ));
@@ -834,7 +834,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     right->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
-      dec_entries(right);            /* adjust entry count */
+      right->dec_entries();            /* adjust entry count */
       left->inc_entries();
       xfer_entry(right, y, left, x);        /* transfer entries over */
     }
@@ -852,7 +852,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     set_fun_key( B, left->get_key( x ) );            /* set new anchor key value */
     z = get_slot(B, anchor) + 1;
     if (i) {
-      dec_entries(left);
+      left->dec_entries();
       right->inc_entries();
       set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, left->get_node( x ));
@@ -860,7 +860,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     left->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );
     for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
-      dec_entries(left);
+      left->dec_entries();
       right->inc_entries();
       xfer_entry(left, x, right, y);        /* transfer entries over */
     }
