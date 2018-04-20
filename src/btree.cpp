@@ -223,8 +223,6 @@ int compare_keys(keyT key1, keyT key2)
 |    B+tree Initialization Utilities                    |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-/*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
-void init_free_node_pool(Tree *B, int quantity);
 
 
 
@@ -236,7 +234,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   B = (Tree *)( malloc( sizeof( Tree ) ) );
   B->set_fanout( fan );
   B->set_min_fanout( (fan + 1) >> 1 );
-  init_free_node_pool( B, poolsz );
+  B->init_free_node_pool( poolsz );
 
   B->set_leaf( B->get_free_node() );        /* set up the first leaf node */
   B->set_root( B->get_leaf( ) );            /* the root is initially the leaf */
@@ -893,20 +891,20 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 /*~~~~~~~~~~~~~~~~~~~~   Set up pool of free nodes   ~~~~~~~~~~~~~~~~~~*/
-void init_free_node_pool(Tree *B, int quantity)
+void Tree::init_free_node_pool( int quantity )
 {
   int    i;
   Nptr    n;
 
-  B->set_pool_size( quantity );
-  B->set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-  B->set_first_free_node( B->node_array_head() );    /* start a list of free nodes */
-  for (n = B->get_first_free_node(), i = 0; i < quantity; n++, i++) {
+  set_pool_size( quantity );
+  set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
+  set_first_free_node( node_array_head() );    /* start a list of free nodes */
+  for (n = get_first_free_node(), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
     n->clear_entries();
     n->set_next_node( n + 1);        /* insert node into free node list */
   }
-  (--n)->set_next_node( B->NONODE() );        /* indicates end of free node list */
+  (--n)->set_next_node( NONODE() );        /* indicates end of free node list */
 }
 
 

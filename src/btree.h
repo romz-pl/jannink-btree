@@ -78,6 +78,7 @@ public:
     void list_btree_values( Nptr n, int num ) const;
 
     Nptr get_free_node();
+    void init_free_node_pool( int quantity );
 
 public:
 
