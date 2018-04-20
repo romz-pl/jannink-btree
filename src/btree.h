@@ -15,12 +15,14 @@
 #define DEBUG 1
 #undef DEBUG
 
-                /* 24 bytes is minimal size for 2-3 trees */
-#define NODE_SIZE 72
-                /*  16 bytes to store a data point */
-#define DATA_SIZE 16
-                /* maximum number of available nodes */
-#define ARRAY_SIZE 24576
+/* 24 bytes is minimal size for 2-3 trees */
+const int NODE_SIZE = 72;
+
+/*  16 bytes to store a data point */
+const int DATA_SIZE = 16;
+
+/* maximum number of available nodes */
+const int ARRAY_SIZE = 24576;
 
 
 /*~~~~~~~    flag bits (5 of 16 used, 11 for magic value)    ~~~~~~~*/
