@@ -17,6 +17,7 @@ public:
     void set_fun_key( keyT v );
 
     dataT get_fun_data( ) const;
+    void set_fun_data( const char* v );
 
 
 public:

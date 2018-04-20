@@ -39,9 +39,9 @@ void Tree::set_fun_key( keyT v )
 
 // #define setfundata(v) (B->theData = strdup(v))
 // void setfundata( Tree* B, dataT v )
-void set_fun_data( Tree* B, const char* v )
+void Tree::set_fun_data( const char* v )
 {
-    B->theData = strdup( v );
+    theData = strdup( v );
 }
 
             /* define number of B+tree nodes for free node pool */
@@ -241,7 +241,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   init_tree_height( B );
 
   B->set_fun_key( 0 );
-  set_fun_data( B, "0" );
+  B->set_fun_data( "0" );
   set_compare_keys( B, keyCmp );
 
 #ifdef DEBUG
@@ -426,7 +426,7 @@ void btree_insert(Tree *B, keyT key)
 #endif
 
   B->set_fun_key( key );            /* set insertion key */
-  set_fun_data( B, "data" );            /* a node containing data */
+  B->set_fun_data( "data" );            /* a node containing data */
   set_split_path( B, NONODE );
   newNode = descend_split(B, get_root( B ));    /* insertion point search from root */
   if (newNode != get_split_path( B ) )        /* indicates the root node has split */
