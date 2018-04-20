@@ -447,7 +447,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
   int split, i, j, k, x, y;
 
   if (sibling == B->NONODE()) {        /* no split occurred */
-    place_entry(B, newNode, slot + 1, downPtr);
+    B->place_entry( newNode, slot + 1, downPtr);
     newNode->clr_flag( FEWEST );
   }
   else {                /* split entries between the two */
@@ -476,13 +476,13 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     if (j) {                /* insert new entry into correct spot */
       x = newNode->get_key( split + k );
       if (k)
-    place_entry(B, sibling, slot - split + 1 - i, downPtr);
+    B->place_entry( sibling, slot - split + 1 - i, downPtr);
       else
-    place_entry(B, newNode, slot + 1, downPtr);
+    B->place_entry( newNode, slot + 1, downPtr);
       B->set_fun_key( x );            /* set key separating nodes */
     }
     else if (!i)
-      place_entry(B, sibling, 1, downPtr);
+      B->place_entry( sibling, 1, downPtr);
 
     newNode->clr_flag( isFULL );        /* adjust node flags */
     if (newNode->num_entries() == B->get_min_fanout( newNode ))
@@ -500,16 +500,16 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 }
 
 /*~~~~~~~~~~~   place key into appropriate node & slot   ~~~~~~~~~~~~~~*/
-void place_entry(Tree *B, Nptr newNode, int slot, Nptr downPtr)
+void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 {
   int x;
 
   for (x = newNode->num_entries(); x >= slot; x--)    /* make room for new entry */
     newNode->push_entry( x, 1);
-  newNode->set_entry( slot, B->get_fun_key( ), downPtr);    /* place it in correct slot */
+  newNode->set_entry( slot, get_fun_key( ), downPtr);    /* place it in correct slot */
 
   newNode->inc_entries();                /* adjust entry counter */
-  if (newNode->num_entries() == B->get_fanout())
+  if (newNode->num_entries() == get_fanout())
     newNode->set_flag( isFULL );
 }
 

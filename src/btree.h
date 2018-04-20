@@ -87,8 +87,9 @@ public:
     int find_key( Nptr curr, int lo, int hi );
     int get_slot( Nptr curr );
     Nptr descend_to_leaf( Nptr curr );
-
     Nptr search( keyT key );
+
+    void place_entry( Nptr newNode, int slot, Nptr downPtr );
 
 public:
 
