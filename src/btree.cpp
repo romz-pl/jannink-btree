@@ -57,11 +57,10 @@ void Tree::set_pool_size( int v )
     pool_size = v;
 }
 
-/* access memory region containing B+tree nodes */
 // #define getnodearray B->tree
-Node* get_node_array( Tree* B )
+Node* Tree::get_node_array( ) const
 {
-    return B->tree;
+    return tree;
 }
 
 // #define setnodearray(v) (B->tree = (Node *)(v))
@@ -260,7 +259,7 @@ void btree_free(Tree *B)
   fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
 #endif
 
-  free((void *) get_node_array( B ) );
+  free((void *) B->get_node_array( ) );
   free((void *) B);
 }
 

@@ -23,6 +23,9 @@ public:
     int get_pool_size( ) const;
     void set_pool_size( int v );
 
+    // access memory region containing B+tree nodes
+    Node* get_node_array( ) const;
+
 
 public:
 
