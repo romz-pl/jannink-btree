@@ -107,9 +107,9 @@ void Tree::set_fanout( int v )
 }
 
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
-int get_min_fanout( Tree* B, Node* j )
+int Tree::get_min_fanout( const Node* j ) const
 {
-    return ( j->X.i.info.flags & isLEAF ) ? B->fanout - B->minfanout : B->minfanout;
+    return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
 }
 
 
@@ -475,7 +475,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
   }
   else {                /* split entries between the two */
     i = newNode->is_internal();        /* adjustment values */
-    split = i ? B->get_fanout( ) - get_min_fanout( B, newNode ): get_min_fanout( B, newNode );
+    split = i ? B->get_fanout( ) - B->get_min_fanout( newNode ): B->get_min_fanout( newNode );
     j = (slot != split);
     k = (slot >= split);
 
@@ -508,9 +508,9 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
       place_entry(B, sibling, 1, downPtr);
 
     newNode->clr_flag( isFULL );        /* adjust node flags */
-    if (newNode->num_entries() == get_min_fanout( B, newNode ))
+    if (newNode->num_entries() == B->get_min_fanout( newNode ))
       newNode->set_flag( FEWEST );        /* never happens in even size nodes */
-    if (sibling->num_entries() > get_min_fanout( B, sibling ))
+    if (sibling->num_entries() > B->get_min_fanout( sibling ))
       sibling->clr_flag( FEWEST );
 
 #ifdef DEBUG
@@ -764,7 +764,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
     if (curr->num_entries() == 1)
       curr->set_flag( FEWEST );
   }
-  else if (curr->num_entries() == get_min_fanout( B, curr ))
+  else if (curr->num_entries() == B->get_min_fanout( curr ))
     curr->set_flag( FEWEST );
 }
 
@@ -793,7 +793,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     left->inc_entries();
     right->xfer_entry( y, left, x);    /* transfer entries to left node */
   }
-  if (left->num_entries() > get_min_fanout( B, left ))
+  if (left->num_entries() > B->get_min_fanout( left ))
     left->clr_flag( FEWEST );
   if (left->num_entries() == B->get_fanout())
     left->set_flag( isFULL );        /* never happens in even size nodes */
@@ -862,11 +862,11 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       left->xfer_entry( x, right, y);        /* transfer entries over */
     }
   }
-  if (left->num_entries() == get_min_fanout( B, left ))        /* adjust node flags */
+  if (left->num_entries() == B->get_min_fanout( left ))        /* adjust node flags */
     left->set_flag( FEWEST );
   else
     left->clr_flag( FEWEST );            /* never happens in 2-3+trees */
-  if (right->num_entries() == get_min_fanout( B, right ))
+  if (right->num_entries() == B->get_min_fanout( right ))
     right->set_flag( FEWEST );
   else
     right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
