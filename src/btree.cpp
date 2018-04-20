@@ -492,11 +492,11 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
     if (i) {                /* set first pointer of internal node */
       if (j) {
-        set_first_node(sibling, newNode->get_node( split + k));
+        sibling->set_first_node( newNode->get_node( split + k));
         newNode->dec_entries();
       }
       else
-        set_first_node(sibling, downPtr);
+        sibling->set_first_node( downPtr);
     }
 
     if (j) {                /* insert new entry into correct spot */
@@ -566,7 +566,7 @@ void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
 {
   set_root( B, get_free_node(B));
 
-  set_first_node(get_root( B ), oldRoot);    /* old root becomes new root's child */
+  get_root( B )->set_first_node( oldRoot);    /* old root becomes new root's child */
   set_entry(get_root( B ), 1, get_fun_key( B ), newNode);    /* old root's sibling also */
   get_root( B )->inc_entries();
 
@@ -829,7 +829,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       right->dec_entries();            /* adjust for shifting anchor */
       left->inc_entries();
       set_entry(left, left->num_entries(), anchor->get_key( z ), getfirstnode(right));
-      set_first_node(right, right->get_node( y + 1 - i ));
+      right->set_first_node( right->get_node( y + 1 - i ));
     }
     right->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );        /* set new anchor value */
@@ -855,7 +855,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       left->dec_entries();
       right->inc_entries();
       set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
-      set_first_node(right, left->get_node( x ));
+      right->set_first_node( left->get_node( x ));
     }
     left->clr_flag( isFULL );
     anchor->set_key( z, get_fun_key( B ) );

@@ -105,11 +105,11 @@ void Node::dec_entries( )
     this->X.i.info.pairs--;
 }
 
-/* manage first/last node pointers in internal nodes */
+
 // #define setfirstnode(j, v) (nAdr(j).i.firstNode = (v))
-void set_first_node( Node* j, Nptr v )
+void Node::set_first_node( Nptr v )
 {
-    j->X.i.firstNode = v;
+    this->X.i.firstNode = v;
 }
 
 // #define getfirstnode(j) nAdr(j).i.firstNode
