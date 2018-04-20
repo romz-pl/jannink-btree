@@ -141,10 +141,12 @@ class Node
 {
 public:
     keyT get_key( int q ) const;
-    Nptr get_node( int q ) const;
-
     void set_key( int q, keyT v );
+
+    Nptr get_node( int q ) const;
     void set_node( int q, Nptr v );
+
+    void set_flag( short v );
 
 public:
     union
@@ -160,7 +162,7 @@ public:
 
 
 
-void set_flag( Node* j, short v );
+
 void clr_flag( Node* j, short v );
 short get_flags( const Node* j );
 void clear_flags( Node* j );

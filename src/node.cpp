@@ -27,9 +27,9 @@ void Node::set_node( int q, Nptr v )
 
 /* access node flag values */
 // #define setflag(j, v) (nAdr(j).i.info.flags |= (v))
-void set_flag( Node* j, short v )
+void Node::set_flag( short v )
 {
-    j->X.i.info.flags |= v;
+    this->X.i.info.flags |= v;
 }
 
 // #define clrflag(j, v) (nAdr(j).i.info.flags &= ~(v))

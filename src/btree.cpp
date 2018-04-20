@@ -236,9 +236,9 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 
   set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
   set_root( B, get_leaf( B ) );            /* the root is initially the leaf */
-  set_flag( get_root( B ), isLEAF );
-  set_flag( get_root( B ), isROOT );
-  set_flag( get_root( B ), FEWEST );
+  get_root( B )->set_flag( isLEAF );
+  get_root( B )->set_flag( isROOT );
+  get_root( B )->set_flag( FEWEST );
   init_tree_height( B );
 
   set_fun_key( B, 0 );
@@ -488,7 +488,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
       inc_entries(sibling);
     }
     if (num_entries(sibling) == get_fanout( B ))
-      set_flag(sibling, isFULL);        /* only ever happens in 2-3+trees */
+      sibling->set_flag( isFULL );        /* only ever happens in 2-3+trees */
 
     if (i) {                /* set first pointer of internal node */
       if (j) {
@@ -512,7 +512,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
 
     clr_flag(newNode, isFULL);        /* adjust node flags */
     if (num_entries(newNode) == get_min_fanout( B, newNode ))
-      set_flag(newNode, FEWEST);        /* never happens in even size nodes */
+      newNode->set_flag( FEWEST );        /* never happens in even size nodes */
     if (num_entries(sibling) > get_min_fanout( B, sibling ))
       clr_flag(sibling, FEWEST);
 
@@ -536,7 +536,7 @@ void place_entry(Tree *B, Nptr newNode, int slot, Nptr downPtr)
 
   inc_entries(newNode);                /* adjust entry counter */
   if (num_entries(newNode) == get_fanout( B ))
-    set_flag(newNode, isFULL);
+    newNode->set_flag( isFULL );
 }
 
 
@@ -547,10 +547,10 @@ Nptr split(Tree *B, Nptr newNode)
 
   sibling = get_free_node(B);
 
-  set_flag(sibling, FEWEST);            /* set up node flags */
+  sibling->set_flag( FEWEST );            /* set up node flags */
 
   if (is_leaf(newNode)) {
-    set_flag(sibling, isLEAF);
+    sibling->set_flag( isLEAF );
     set_next_node(sibling, get_next_node(newNode));    /* adjust leaf pointers */
     set_next_node(newNode, sibling);
   }
@@ -571,8 +571,8 @@ void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
   inc_entries(get_root( B ));
 
   clr_flag(oldRoot, isROOT);
-  set_flag(get_root( B ), isROOT);
-  set_flag(get_root( B ), FEWEST);
+  get_root( B )->set_flag( isROOT );
+  get_root( B )->set_flag( FEWEST );
   inc_tree_height( B );
 }
 
@@ -633,7 +633,7 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
 #endif
 
   set_root( B, newRoot);
-  set_flag(newRoot, isROOT);
+  newRoot->set_flag( isROOT );
   put_free_node(B, oldRoot);
   dec_tree_height( B );            /* the height of the tree decreases */
 }
@@ -765,10 +765,10 @@ void remove_entry(Tree *B, Nptr curr, int slot)
   clr_flag(curr, isFULL);        /* keep flag information up to date */
   if (is_root(curr)) {
     if (num_entries(curr) == 1)
-      set_flag(curr, FEWEST);
+      curr->set_flag( FEWEST );
   }
   else if (num_entries(curr) == get_min_fanout( B, curr ))
-    set_flag(curr, FEWEST);
+    curr->set_flag( FEWEST );
 }
 
 
@@ -799,7 +799,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (num_entries(left) > get_min_fanout( B, left ))
     clr_flag(left, FEWEST);
   if (num_entries(left) == get_fanout( B ))
-    set_flag(left, isFULL);        /* never happens in even size nodes */
+    left->set_flag( isFULL );        /* never happens in even size nodes */
 
   if (get_merge_path( B ) == left || get_merge_path( B ) == right)
     set_merge_path( B, NONODE );        /* indicate rebalancing is complete */
@@ -866,11 +866,11 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     }
   }
   if (num_entries(left) == get_min_fanout( B, left ))        /* adjust node flags */
-    set_flag(left, FEWEST);
+    left->set_flag( FEWEST );
   else
     clr_flag(left, FEWEST);            /* never happens in 2-3+trees */
   if (num_entries(right) == get_min_fanout( B, right ))
-    set_flag(right, FEWEST);
+    right->set_flag( FEWEST );
   else
     clr_flag(right, FEWEST);            /* never happens in 2-3+trees */
   set_merge_path( B, NONODE );
