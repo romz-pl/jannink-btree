@@ -83,6 +83,8 @@ public:
     Nptr get_free_node();
     void init_free_node_pool( int quantity );
 
+    int best_match( Nptr curr, int slot );
+
 public:
 
     /* `private' variables */
@@ -116,7 +118,7 @@ void    showBtree(Tree *B);
 #endif
 
 
-int compare_keys(keyT key1, keyT key2);
+
 
 Nptr btree_search(Tree *B, keyT key);
 void btree_insert(Tree *B, keyT key);

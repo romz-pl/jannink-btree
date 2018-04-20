@@ -46,6 +46,16 @@ typedef Node    *Nptr;    /* streamlined pointer representation */
 typedef int        keyT;    /* adapt key type to requirements */
 typedef char        *dataT;    /* adapt data type to requirements */
 
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
+|    Sample Key Comparison Function                    |
+\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+// int compare_keys(keyT key1, keyT key2);
+inline int compare_keys(keyT key1, keyT key2)
+{
+  return key1 - key2;        /* this is the case when keys are integer */
+}
+
 /*~~~~~~~~~~~~~~~~~~~~~~~~    key comparison function type    ~~~~~~~*/
 typedef int (*KeyCmp)(keyT, keyT);
 

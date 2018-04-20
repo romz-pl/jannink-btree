@@ -3,7 +3,9 @@
 #include <cstring>
 #include "btree.h"
 
-/*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
+//
+//
+//
 Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
 {
     set_fanout( fan );
@@ -28,6 +30,9 @@ Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
 #endif
 }
 
+//
+//
+//
 Tree::~Tree()
 {
 #ifdef DEBUG
@@ -37,8 +42,9 @@ Tree::~Tree()
   free( (void *)get_node_array( ) );
 }
 
-
-/* corresponds to a NULL node pointer value */
+//
+/// corresponds to a NULL node pointer value
+//
 Nptr Tree::NONODE() const
 {
     return node_array_head( ) - 1;
@@ -50,8 +56,9 @@ Nptr Tree::node_array_head( ) const
     return tree;
 }
 
-
-/* check that a node is in fact a node */
+//
+// check that a node is in fact a node
+//
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
 bool Tree::is_node( Node* j ) const
 {
@@ -243,27 +250,6 @@ void Tree::set_compare_keys( KeyCmp v )
 
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Sample Key Comparison Function                    |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-int compare_keys(keyT key1, keyT key2)
-{
-  return key1 - key2;        /* this is the case when keys are integer */
-}
-
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    B+tree Initialization Utilities                    |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-
-
-
-
-
-
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 |    Find location for data                        |
@@ -273,7 +259,7 @@ int compare_keys(keyT key1, keyT key2)
 Nptr descend_to_leaf(Tree *B, Nptr curr);
 int get_slot(Tree *B, Nptr curr);
 int find_key(Tree *B, Nptr curr, int lo, int hi);
-int best_match(Tree *B, Nptr curr, int slot);
+
 
 /*~~~~~~~~~~~~~~~~~~~~~   top level search call   ~~~~~~~~~~~~~~~~~~~~~*/
 Nptr btree_search(Tree *B, keyT key)
@@ -337,7 +323,7 @@ int find_key(Tree *B, Nptr curr, int lo, int hi)
 #endif
 
   if (hi == lo) {
-    findslot = best_match(B, curr, lo);        /* recursion base case */
+    findslot = B->best_match( curr, lo);        /* recursion base case */
 
 #ifdef DEBUG
     if (findslot == ERROR)
@@ -347,7 +333,7 @@ int find_key(Tree *B, Nptr curr, int lo, int hi)
   }
   else {
     mid = (lo + hi) >> 1;
-    switch (findslot = best_match(B, curr, mid)) {
+    switch (findslot = B->best_match( curr, mid)) {
     case LOWER:                /* check lower half of range */
       findslot = find_key(B, curr, lo, mid - 1);        /* never in 2-3+trees */
     break;
@@ -367,14 +353,14 @@ int find_key(Tree *B, Nptr curr, int lo, int hi)
 
 
 /*~~~~~~~~~~~   comparison of key with a target key slot   ~~~~~~~~~~~~*/
-int best_match(Tree *B, Nptr curr, int slot)
+int Tree::best_match( Nptr curr, int slot )
 {
   int diff, comp, findslot;
 
-  diff = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ));
+  diff = compare_keys()( get_fun_key( ), curr->get_key( slot ));
   if (diff < 0) {        /* also check previous slot */
     if ((slot == 1) ||
-        ((comp = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot - 1 ))) >= 0))
+        ((comp = compare_keys()( get_fun_key( ), curr->get_key( slot - 1 ))) >= 0))
       findslot = slot - 1;
 
 #ifdef DEBUG
@@ -387,7 +373,7 @@ int best_match(Tree *B, Nptr curr, int slot)
   }
   else {            /* or check following slot */
     if ((slot == curr->num_entries()) ||
-        ((comp = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot + 1 ))) < 0))
+        ((comp = compare_keys()( get_fun_key( ), curr->get_key( slot + 1 ))) < 0))
       findslot = slot;
     else if (comp == 0)
       findslot = slot + 1;
