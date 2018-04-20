@@ -1,14 +1,5 @@
-/***********************************************************************\
-|                                    |
-|    B+tree data structures & external interface            |
-|                                    |
-|                                    |
-|    Jan Jannink    created 5/27/94        revised 6/16/95        |
-|                                    |
-\***********************************************************************/
-
-#ifndef BPLUSTREE
-#define BPLUSTREE 1
+#ifndef ROMZ_JANNINEK_BTREE_H
+#define ROMZ_JANNINEK_BTREE_H
 
 /*~~~~~~~~~~~~~~~~    sample B+tree parametrization    ~~~~~~~~~~~~~~~*/
                 /* causes printing of node information */
@@ -38,7 +29,6 @@ const int ARRAY_SIZE = 24576;
 #define MASK    0xFFF0
 
 /* low level definition of Nptr value usage */
-#define nAdr(b) (b)->X
 #define nodearrayhead B->tree
 
 

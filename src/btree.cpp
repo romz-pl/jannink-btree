@@ -1104,7 +1104,7 @@ Nptr get_data_node(Tree *B, keyT key)        /* can add data parameter */
   Nptr    newNode = get_free_node(B);
   keyT    *value;
 
-  value = (keyT *) &nAdr(newNode).d;
+  value = (keyT *) &newNode->X.d;
   *value = key;                    /* can add code to fill node */
 
   return newNode;
