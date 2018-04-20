@@ -82,7 +82,7 @@ bool Tree::isnt_node( Node* j ) const
 
 
 // #define getfunkey B->theKey
-keyT Tree::get_fun_key( ) const
+Key Tree::get_fun_key( ) const
 {
     return theKey;
 }
@@ -94,7 +94,7 @@ dataT Tree::get_fun_data( ) const
 }
 
 // #define setfunkey(v) (B->theKey = (v))
-void Tree::set_fun_key( keyT v )
+void Tree::set_fun_key( Key v )
 {
     theKey = v;
 }
@@ -269,7 +269,7 @@ int Tree::get_node_number( Node* v ) const
 //
 // top level search call
 //
-Node* Tree::search( keyT key )
+Node* Tree::search( Key key )
 {
   Node*    findNode;
 
@@ -407,7 +407,7 @@ int Tree::best_match( Node* curr, int slot )
 //
 // top level insert call
 //
-void Tree::insert( keyT key )
+void Tree::insert( Key key )
 {
   Node* newNode;
 
@@ -593,7 +593,7 @@ void Tree::make_new_root( Node* oldRoot, Node* newNode )
 //    are most efficient, that is, cause the least rearranging of data,
 //    and minimize the need for non-local key manipulation.
 //
-void Tree::erase( keyT key )
+void Tree::erase( Key key )
 {
   Node* newNode;
 
@@ -941,12 +941,12 @@ void Tree::put_free_node( Node* self )
 // fill a free data node with a key and associated data
 // can add data parameter
 //
-Node* Tree::get_data_node( keyT key )
+Node* Tree::get_data_node( Key key )
 {
     Node* newNode = get_free_node( );
-    keyT* value;
+    Key* value;
 
-    value = (keyT *) &newNode->X.d;
+    value = (Key *) &newNode->X.d;
 
     // can add code to fill node
     *value = key;

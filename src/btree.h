@@ -21,8 +21,8 @@ public:
 
 
     // access key and data values for B+tree methods
-    keyT get_fun_key( ) const;
-    void set_fun_key( keyT v );
+    Key get_fun_key( ) const;
+    void set_fun_key( Key v );
 
     dataT get_fun_data( ) const;
     void set_fun_data( const char* v );
@@ -78,7 +78,7 @@ public:
 
     void put_free_node( Node* self );
 
-    Node* get_data_node( keyT key );
+    Node* get_data_node( Key key );
 
     Node* NONODE() const;
     Node* node_array_head( ) const;
@@ -93,21 +93,21 @@ public:
     int find_key( Node* curr, int lo, int hi );
     int get_slot( Node* curr );
     Node* descend_to_leaf( Node* curr );
-    Node* search( keyT key );
+    Node* search( Key key );
 
     void place_entry( Node* newNode, int slot, Node* downPtr );
     void insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr );
     Node* split( Node* newNode );
     void make_new_root( Node* oldRoot, Node* newNode );
     Node* descend_split( Node* curr );
-    void insert( keyT key );
+    void insert( Key key );
 
     Node* shift( Node* left, Node* right, Node* anchor );
     Node* merge( Node* left, Node* right, Node* anchor );
     void remove_entry( Node* curr, int slot );
     Node* descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, Node* rAnc, Node* parent );
     void collapse_root( Node* oldRoot, Node* newRoot );
-    void erase( keyT key );
+    void erase( Key key );
 
     void show_node( Node* n ) const;
     void show_btree( ) const;
@@ -123,7 +123,7 @@ public:
     int     minfanout;    /* usually minfanout == ceil(fanout/2) */
     int     height;        /* nodes traversed from root to leaves */
     Node*    pool;        /* list of empty nodes */
-    keyT    theKey;        /*  the key value used in tree operations */
+    Key    theKey;        /*  the key value used in tree operations */
     dataT   theData;    /*  data used for insertions/deletions */
 
     union /* nodes to change in insert and delete */

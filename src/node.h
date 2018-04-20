@@ -8,7 +8,7 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
 
 
-typedef int        keyT;    /* adapt key type to requirements */
+typedef int        Key;    /* adapt key type to requirements */
 typedef char        *dataT;    /* adapt data type to requirements */
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
@@ -16,13 +16,13 @@ typedef char        *dataT;    /* adapt data type to requirements */
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 // int compare_keys(keyT key1, keyT key2);
-inline int compare_keys(keyT key1, keyT key2)
+inline int compare_keys(Key key1, Key key2)
 {
   return key1 - key2;        /* this is the case when keys are integer */
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    key comparison function type    ~~~~~~~*/
-typedef int (*KeyCmp)(keyT, keyT);
+typedef int (*KeyCmp)(Key, Key);
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node status    ~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -34,7 +34,7 @@ public:
 };
 
 
-static_assert( sizeof( State ) <= sizeof( keyT ), "sizeof(State) must be <= sizeof(keyT)" );
+static_assert( sizeof( State ) <= sizeof( Key ), "sizeof(State) must be <= sizeof(keyT)" );
 
 
 class Node;
@@ -42,7 +42,7 @@ class Node;
 class Entry
 {
 public:
-    keyT key;            /* can be a hashed value */
+    Key key;            /* can be a hashed value */
     Node* downNode;
 };            /* WARNING: entry was a RESERVED word in C */
 
@@ -139,8 +139,8 @@ public:
     static constexpr int MASK = 0xFFF0;
 
 public:
-    keyT get_key( int q ) const;
-    void set_key( int q, keyT v );
+    Key get_key( int q ) const;
+    void set_key( int q, Key v );
 
     Node* get_node( int q ) const;
     void set_node( int q, Node* v );
@@ -175,7 +175,7 @@ public:
     void push_entry( int q, int v );
     void pull_entry( int q, int v );
     void xfer_entry( int q, Node* v, int z ) const;
-    void set_entry( int q, keyT v, Node* z );
+    void set_entry( int q, Key v, Node* z );
 
 public:
     /* ARRAY is a place holder value for:  fanout */

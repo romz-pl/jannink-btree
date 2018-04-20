@@ -2,7 +2,7 @@
 
 /* access keys and pointers in a node */
 // #define getkey(j, q) nAdr(j).e[(q)].key
-keyT Node::get_key( int q ) const
+Key Node::get_key( int q ) const
 {
     return this->X.e[ q ].key;
 }
@@ -14,7 +14,7 @@ Node* Node::get_node( int q ) const
 }
 
 // #define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
-void Node::set_key( int q, keyT v )
+void Node::set_key( int q, Key v )
 {
     this->X.e[ q ].key = v;
 }
@@ -158,7 +158,7 @@ void Node::xfer_entry( int q, Node* v, int z ) const
 
 
 // #define setentry(j, q, v, z) (nAdr(j).e[(q)].key = (v), nAdr(j).e[(q)].downNode = (z))
-void Node::set_entry( int q, keyT v, Node* z )
+void Node::set_entry( int q, Key v, Node* z )
 {
     this->X.e[ q ].key = v;
     this->X.e[ q ].downNode = z;
