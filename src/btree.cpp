@@ -760,7 +760,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
 
   put_free_node(B, curr->get_node( slot ));    /* return deleted node to free list */
   for (x = slot; x < curr->num_entries(); x++)
-    pull_entry(curr, x, 1);        /* adjust node with removed key */
+    curr->pull_entry( x, 1);        /* adjust node with removed key */
   curr->dec_entries();
   curr->clr_flag( isFULL );        /* keep flag information up to date */
   if (curr->is_root()) {
@@ -840,7 +840,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     }
 
     for (x = 1; x <= right->num_entries(); x++)    /* adjust reduced node */
-      pull_entry(right, x, z);
+      right->pull_entry( x, z);
   }
   else {                    /* shift entries to right */
     y = (left->num_entries() - right->num_entries()) >> 1;

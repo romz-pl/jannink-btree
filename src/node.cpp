@@ -144,9 +144,9 @@ void Node::push_entry( int q, int v )
 }
 
 // #define pullentry(j, q, v) (nAdr(j).e[(q)] = nAdr(j).e[(q) + (v)])
-void pull_entry( Node* j, int q, int v )
+void Node::pull_entry( int q, int v )
 {
-    j->X.e[ q ] = j->X.e[ q + v ];
+    this->X.e[ q ] = this->X.e[ q + v ];
 }
 
 
