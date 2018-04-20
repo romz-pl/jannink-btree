@@ -148,6 +148,8 @@ public:
 
     void set_flag( short v );
     void clr_flag( short v );
+    void clear_flags( );
+    short get_flags( ) const;
 
 public:
     union
@@ -165,8 +167,8 @@ public:
 
 
 
-short get_flags( const Node* j );
-void clear_flags( Node* j );
+
+
 bool is_internal( Node* j);
 bool is_leaf( Node* j );
 bool is_root( Node* j );

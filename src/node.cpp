@@ -39,15 +39,15 @@ void Node::clr_flag( short v )
 }
 
 // #define getflags(j) nAdr(j).i.info.flags
-short get_flags( const Node* j )
+short Node::get_flags( ) const
 {
-    return j->X.i.info.flags;
+    return this->X.i.info.flags;
 }
 
 // #define clearflags(j) (nAdr(j).i.info.flags = (short) MAGIC)
-void clear_flags( Node* j )
+void Node::clear_flags( )
 {
-    j->X.i.info.flags = static_cast< short >( MAGIC );
+    this->X.i.info.flags = static_cast< short >( MAGIC );
 }
 
 

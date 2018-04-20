@@ -898,7 +898,7 @@ void init_free_node_pool(Tree *B, int quantity)
   set_node_array( B, (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
   set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
-    clear_flags(n);
+    n->clear_flags();
     clear_entries(n);
     set_next_node(n, n + 1);        /* insert node into free node list */
   }
@@ -926,7 +926,7 @@ Nptr get_free_node(Tree *B)
 /*~~~~~~~~~~~~   return a deleted B+tree node to the pool   ~~~~~~~~~~~*/
 void put_free_node(Tree *B, Nptr self)
 {
-  clear_flags(self);
+  self->clear_flags();
   clear_entries(self);
   set_next_node( self, get_first_free_node( B ) );        /* add node to list */
   set_first_free_node( B, self );            /* set it to be list head */
