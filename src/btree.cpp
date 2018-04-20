@@ -1061,7 +1061,7 @@ void init_free_node_pool(Tree *B, int quantity)
 
   set_pool_size( B, quantity );
   set_node_array( B, (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-  set_first_free_node( B, nodearrayhead );    /* start a list of free nodes */
+  set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
     clear_flags(n);
     clear_entries(n);

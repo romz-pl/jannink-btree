@@ -17,31 +17,31 @@ const int ARRAY_SIZE = 24576;
 
 
 /*~~~~~~~    flag bits (5 of 16 used, 11 for magic value)    ~~~~~~~*/
-                /* bits set at node creation/split/merge */
-#define isLEAF    0x1
-#define isROOT    0x2
-                /* bits set at key insertion/deletion */
-#define isFULL    0x4
-#define FEWEST    0x8
-#define FLAGS    0xF
-                /* identifies data as being a B+tree node */
-#define MAGIC    0xDEC0
-#define MASK    0xFFF0
+/* bits set at node creation/split/merge */
+const int isLEAF = 0x1;
+const int isROOT = 0x2;
 
-/* low level definition of Nptr value usage */
-#define nodearrayhead B->tree
+/* bits set at key insertion/deletion */
+const int isFULL = 0x4;
+const int FEWEST = 0x8;
+const int FLAGS = 0xF;
+
+/* identifies data as being a B+tree node */
+const int MAGIC = 0xDEC0;
+const int MASK = 0xFFF0;
+
+
 
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    constants    ~~~~~~~~~~~~~~~~~~~~~~~*/
-            /* ARRAY is a place holder value for:  fanout */
-#define ARRAY    1
-            /* corresponds to a NULL node pointer value */
-#define NONODE    (nodearrayhead - 1)
-            /* special node slot values used in key search */
-#define ERROR    -1
-#define UPPER    -2
-#define LOWER    -3
+/* ARRAY is a place holder value for:  fanout */
+const int ARRAY = 1;
+
+/* special node slot values used in key search */
+const int ERROR = -1;
+const int UPPER = -2;
+const int LOWER = -3;
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
@@ -178,6 +178,19 @@ int    compare_keys(keyT key1, keyT key2);
 Nptr    btree_search(Tree *B, keyT key);
 void    btree_insert(Tree *B, keyT key);
 void    btree_delete(Tree *B, keyT key);
+
+
+
+/* low level definition of Nptr value usage */
+// #define nodearrayhead B->tree
+inline Node* node_array_head( Tree *B )
+{
+    return B->tree;
+}
+
+/* corresponds to a NULL node pointer value */
+#define NONODE    (node_array_head( B ) - 1)
+
 
 #endif
 
