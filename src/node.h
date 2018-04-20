@@ -3,8 +3,7 @@
 
 
 
-/*  16 bytes to store a data point */
-const int DATA_SIZE = 16;
+
 
 
 /*~~~~~~~    flag bits (5 of 16 used, 11 for magic value)    ~~~~~~~*/
@@ -108,6 +107,9 @@ public:
 class DupData
 {
 public:
+    /*  16 bytes to store a data point */
+    static constexpr int DATA_SIZE = 16;
+
     int   copy;            /* tallies the duplicate keys */
     Nptr  next;            /* next node with same key value */
     char  value[ DATA_SIZE ];
