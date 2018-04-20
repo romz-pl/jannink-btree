@@ -94,9 +94,9 @@ void Node::clear_entries( )
 }
 
 // #define incentries(j) (nAdr(j).i.info.pairs++)
-void inc_entries( Node * j )
+void Node::inc_entries( )
 {
-    j->X.i.info.pairs++;
+    this->X.i.info.pairs++;
 }
 
 // #define decentries(j) (nAdr(j).i.info.pairs--)

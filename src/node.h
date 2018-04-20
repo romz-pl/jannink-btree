@@ -160,6 +160,7 @@ public:
 
     short num_entries( ) const;
     void clear_entries( );
+    void inc_entries( );
 
 public:
     union
@@ -175,7 +176,7 @@ public:
 
 
 
-void inc_entries( Node * j );
+
 void dec_entries( Node* j );
 void set_first_node( Node* j, Nptr v );
 Nptr getfirstnode( Node* j );
