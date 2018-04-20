@@ -151,6 +151,9 @@ public:
     void clear_flags( );
     short get_flags( ) const;
 
+    // test individual flag values
+    bool is_internal( ) const;
+
 public:
     union
     {
@@ -163,13 +166,6 @@ public:
 } ;
 
 
-
-
-
-
-
-
-bool is_internal( Node* j);
 bool is_leaf( Node* j );
 bool is_root( Node* j );
 bool is_full( Node* j );

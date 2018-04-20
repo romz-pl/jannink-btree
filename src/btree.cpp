@@ -301,7 +301,7 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
   int    slot;
   Nptr    findNode;
 
-  for (slot = get_slot(B, curr); is_internal(curr); slot = get_slot(B, curr))
+  for (slot = get_slot(B, curr); curr->is_internal(); slot = get_slot(B, curr))
     curr = curr->get_node( slot );
   if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
@@ -447,7 +447,7 @@ Nptr descend_split(Tree *B, Nptr curr)
     set_split_path( B, curr );            /* indicates where nodes must split */
 
   slot = get_slot(B, curr);        /* is null only if the root is empty */
-  if (is_internal(curr))            /* continue recursion to leaves */
+  if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split(B, curr->get_node( slot ));
   else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), curr->get_key( slot ))) {
     newMe = NONODE;            /* this code discards duplicates */
@@ -477,7 +477,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     newNode->clr_flag( FEWEST );
   }
   else {                /* split entries between the two */
-    i = is_internal(newNode);        /* adjustment values */
+    i = newNode->is_internal();        /* adjustment values */
     split = i ? get_fanout( B ) - get_min_fanout( B, newNode ): get_min_fanout( B, newNode );
     j = (slot != split);
     k = (slot >= split);
@@ -652,7 +652,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 
   slot = get_slot(B, curr);
   newNode = curr->get_node( slot );
-  if (is_internal(curr)) {    /* set up next recursion call's parameters */
+  if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
       myLeft = isnt_node( B, left ) ? NONODE : get_last_node(left);
       lAnchor = lAnc;
@@ -783,7 +783,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   showNode(B, right);
 #endif
 
-  if (is_internal(left)) {
+  if (left->is_internal()) {
     inc_entries(left);            /* copy key separating the nodes */
     set_fun_key( B, right->get_key( 1 ) );    /* defined but maybe just deleted */
     z = get_slot(B, anchor);        /* needs the just calculated key */
@@ -819,7 +819,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   showNode(B, right);
 #endif
 
-  i = is_internal(left);
+  i = left->is_internal();
   if (num_entries(left) < num_entries(right)) {    /* shift entries to left */
     y = (num_entries(right) - num_entries(left)) >> 1;
     x = num_entries(left) + y;

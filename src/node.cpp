@@ -50,13 +50,10 @@ void Node::clear_flags( )
     this->X.i.info.flags = static_cast< short >( MAGIC );
 }
 
-
-
-/* test individual flag values */
 // #define isinternal(j) ((nAdr(j).i.info.flags & isLEAF) == 0)
-bool is_internal( Node* j)
+bool Node::is_internal( ) const
 {
-    return ( ( j->X.i.info.flags & isLEAF ) == 0 );
+    return ( ( this->X.i.info.flags & isLEAF ) == 0 );
 }
 
 // #define isleaf(j) ((nAdr(j).i.info.flags & isLEAF) == isLEAF)
