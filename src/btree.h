@@ -45,52 +45,68 @@ const int LOWER = -3;
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
-typedef struct node    *Nptr;    /* streamlined pointer representation */
+class Node;
+typedef Node    *Nptr;    /* streamlined pointer representation */
 
 typedef int        keyT;    /* adapt key type to requirements */
 typedef char        *dataT;    /* adapt data type to requirements */
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node status    ~~~~~~~~~~~~~~~~~~~~~~~*/
-typedef struct state {
-  short    flags;
-  short    pairs;
-} State;            /* sizeof(State) must be <= sizeof(keyT) */
+class State
+{
+public:
+    short flags;
+    short pairs;
+};
+
+
+static_assert( sizeof( State ) <= sizeof( keyT ), "sizeof(State) must be <= sizeof(keyT)" );
 
 
 /*~~~~~~~~~~~~~~    single node entry with key value    ~~~~~~~*/
-typedef struct entrY {
-  keyT    key;            /* can be a hashed value */
-  Nptr    downNode;
-} Entry;            /* WARNING: entry was a RESERVED word in C */
+class Entry
+{
+public:
+    keyT key;            /* can be a hashed value */
+    Nptr downNode;
+};            /* WARNING: entry was a RESERVED word in C */
 
 
 /*~~~~~~~~~~~~~~~~~~~~    special header entry for internal node    ~~~~~~~*/
-typedef struct inner {
-  State info;
-  Nptr    firstNode;        /* node of smallest values */
-} Inner;
+class Inner
+{
+public:
+    State info;
+    Nptr firstNode;        /* node of smallest values */
+};
 
 
 /*~~~~~~~~~~~~~~~~~~~~    special header entry for leaf node    ~~~~~~~*/
-typedef struct leaf {
-  State info;
-  Nptr    nextNode;        /* next leaf in sequential scan */
-} Leaf;
+class Leaf
+{
+public:
+    State info;
+    Nptr nextNode;        /* next leaf in sequential scan */
+};
 
 
 /*~~~~~~~~~~~~~~~~~~~~    unstructured data node    ~~~~~~~~~~~~~~~~~~~~~~~*/
-typedef struct data {
-  char    value[NODE_SIZE];
-} Data;
+class Data
+{
+public:
+    char value[ NODE_SIZE ];
+};
 
 
 /*~~~~~~~~~~~~    data node header to handle duplicates    ~~~~~~~~~~~~~~~*/
-typedef struct dupdata {
-  int    copy;            /* tallies the duplicate keys */
-  Nptr    next;            /* next node with same key value */
-  char  value[DATA_SIZE];
-} DupData;
+class DupData
+{
+public:
+    int   copy;            /* tallies the duplicate keys */
+    Nptr  next;            /* next node with same key value */
+    char  value[ DATA_SIZE ];
+};
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    structured tree node    ~~~~~~~~~~~~~~~*\
@@ -123,15 +139,18 @@ typedef struct dupdata {
 |    +---------------+        +---------------+
 |
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-typedef struct node {
-  union {
-    Entry    e[ARRAY];    /* allows access to entry array */
-    Inner    i;
-    Leaf    l;
-    Data    d;
-    DupData    dd;
-  } X;
-} Node;
+class Node
+{
+public:
+    union
+    {
+        Entry   e[ ARRAY ];    /* allows access to entry array */
+        Inner   i;
+        Leaf    l;
+        Data    d;
+        DupData dd;
+    } X;
+} ;
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    key comparison function type    ~~~~~~~*/
@@ -139,45 +158,50 @@ typedef int (*KeyCmp)(keyT, keyT);
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    tree definitions    ~~~~~~~~~~~~~~~*/
-class Tree {
+class Tree
+{
 public:
-            /* `private' variables */
-  int         poolsize;    /* # of nodes allocated for tree */
-  Node        *tree;        /* pointer to array of nodes (NOT Nptr !) */
-  Nptr        root;        /* pointer to root node */
-  Nptr        leaf;        /* pointer to first leaf node in B+tree */
-  int         fanout;        /* # of pointers to other nodes */
-  int         minfanout;    /* usually minfanout == ceil(fanout/2) */
-  int         height;        /* nodes traversed from root to leaves */
-  Nptr        pool;        /* list of empty nodes */
-  keyT        theKey;        /*  the key value used in tree operations */
-  dataT        theData;    /*  data used for insertions/deletions */
-  union {            /* nodes to change in insert and delete */
-    Nptr    split;
-    Nptr    merge;
-  } branch;
-  KeyCmp    keycmp;        /* pointer to function comparing two keys */
+
+    /* `private' variables */
+    int     poolsize;    /* # of nodes allocated for tree */
+    Node    *tree;        /* pointer to array of nodes (NOT Nptr !) */
+    Nptr    root;        /* pointer to root node */
+    Nptr    leaf;        /* pointer to first leaf node in B+tree */
+    int     fanout;        /* # of pointers to other nodes */
+    int     minfanout;    /* usually minfanout == ceil(fanout/2) */
+    int     height;        /* nodes traversed from root to leaves */
+    Nptr    pool;        /* list of empty nodes */
+    keyT    theKey;        /*  the key value used in tree operations */
+    dataT   theData;    /*  data used for insertions/deletions */
+
+    union /* nodes to change in insert and delete */
+    {
+        Nptr    split;
+        Nptr    merge;
+    } branch;
+
+    KeyCmp    keycmp;        /* pointer to function comparing two keys */
 };
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    B+tree methods        ~~~~~~~~~~~~~~~*/
-Tree    *btree_init(int poolsz, int fan, KeyCmp keyCmp);
+Tree* btree_init( int poolsz, int fan, KeyCmp keyCmp );
 /* Tree    *remakeBtree(Tree * B, int fillfactor); */
-void    btree_free(Tree *B);
+void btree_free(Tree *B);
 
 #ifdef DEBUG
 void    showNode(Tree *B, Nptr node);
 void    showBtree(Tree *B);
 #endif
 
-void    list_btree_values(Tree *B, Nptr start, int count);
-void    list_all_btree_values(Tree *B);
+void list_btree_values(Tree *B, Nptr start, int count);
+void list_all_btree_values(Tree *B);
 
-int    compare_keys(keyT key1, keyT key2);
+int compare_keys(keyT key1, keyT key2);
 
-Nptr    btree_search(Tree *B, keyT key);
-void    btree_insert(Tree *B, keyT key);
-void    btree_delete(Tree *B, keyT key);
+Nptr btree_search(Tree *B, keyT key);
+void btree_insert(Tree *B, keyT key);
+void btree_delete(Tree *B, keyT key);
 
 
 
