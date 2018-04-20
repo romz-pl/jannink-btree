@@ -6,8 +6,7 @@
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    node pointer and key type    ~~~~~~~*/
-class Node;
-typedef Node    *Nptr;    /* streamlined pointer representation */
+
 
 typedef int        keyT;    /* adapt key type to requirements */
 typedef char        *dataT;    /* adapt data type to requirements */
@@ -38,12 +37,13 @@ public:
 static_assert( sizeof( State ) <= sizeof( keyT ), "sizeof(State) must be <= sizeof(keyT)" );
 
 
+class Node;
 /*~~~~~~~~~~~~~~    single node entry with key value    ~~~~~~~*/
 class Entry
 {
 public:
     keyT key;            /* can be a hashed value */
-    Nptr downNode;
+    Node* downNode;
 };            /* WARNING: entry was a RESERVED word in C */
 
 
@@ -52,7 +52,7 @@ class Inner
 {
 public:
     State info;
-    Nptr firstNode;        /* node of smallest values */
+    Node* firstNode;        /* node of smallest values */
 };
 
 
@@ -61,7 +61,7 @@ class Leaf
 {
 public:
     State info;
-    Nptr nextNode;        /* next leaf in sequential scan */
+    Node* nextNode;        /* next leaf in sequential scan */
 };
 
 
@@ -83,7 +83,7 @@ public:
     static constexpr int DATA_SIZE = 16;
 
     int   copy;            /* tallies the duplicate keys */
-    Nptr  next;            /* next node with same key value */
+    Node*  next;            /* next node with same key value */
     char  value[ DATA_SIZE ];
 };
 
@@ -142,8 +142,8 @@ public:
     keyT get_key( int q ) const;
     void set_key( int q, keyT v );
 
-    Nptr get_node( int q ) const;
-    void set_node( int q, Nptr v );
+    Node* get_node( int q ) const;
+    void set_node( int q, Node* v );
 
     void set_flag( short v );
     void clr_flag( short v );
@@ -163,19 +163,19 @@ public:
     void dec_entries( );
 
     // manage first/last node pointers in internal nodes
-    void set_first_node( Nptr v );
-    Nptr get_first_node( ) const;
-    Nptr get_last_node( ) const;
+    void set_first_node( Node* v );
+    Node* get_first_node( ) const;
+    Node* get_last_node( ) const;
 
     // manage pointers to next nodes in leaf nodes
-    void set_next_node( Nptr v );
-    Nptr get_next_node( ) const;
+    void set_next_node( Node* v );
+    Node* get_next_node( ) const;
 
     // shift/transfer entries for insertion/deletion
     void push_entry( int q, int v );
     void pull_entry( int q, int v );
     void xfer_entry( int q, Node* v, int z ) const;
-    void set_entry( int q, keyT v, Nptr z );
+    void set_entry( int q, keyT v, Node* z );
 
 public:
     /* ARRAY is a place holder value for:  fanout */

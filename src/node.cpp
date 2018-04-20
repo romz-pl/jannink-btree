@@ -8,7 +8,7 @@ keyT Node::get_key( int q ) const
 }
 
 // #define getnode(j, q) nAdr(j).e[(q)].downNode
-Nptr Node::get_node( int q ) const
+Node* Node::get_node( int q ) const
 {
     return this->X.e[ q ].downNode;
 }
@@ -20,7 +20,7 @@ void Node::set_key( int q, keyT v )
 }
 
 // #define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))
-void Node::set_node( int q, Nptr v )
+void Node::set_node( int q, Node* v )
 {
     this->X.e[ q ].downNode =  v;
 }
@@ -107,31 +107,31 @@ void Node::dec_entries( )
 
 
 // #define setfirstnode(j, v) (nAdr(j).i.firstNode = (v))
-void Node::set_first_node( Nptr v )
+void Node::set_first_node( Node* v )
 {
     this->X.i.firstNode = v;
 }
 
 // #define getfirstnode(j) nAdr(j).i.firstNode
-Nptr Node::get_first_node( ) const
+Node* Node::get_first_node( ) const
 {
     return this->X.i.firstNode;
 }
 
 // #define getlastnode(j) nAdr(j).e[nAdr(j).i.info.pairs].downNode
-Nptr Node::get_last_node( ) const
+Node* Node::get_last_node( ) const
 {
     return this->X.e[ this->X.i.info.pairs ].downNode;
 }
 
 // #define setnextnode(j, v) (nAdr(j).l.nextNode = (v))
-void Node::set_next_node( Nptr v )
+void Node::set_next_node( Node* v )
 {
     this->X.l.nextNode = v;
 }
 
 // #define getnextnode(j) nAdr(j).l.nextNode
-Nptr Node::get_next_node( ) const
+Node* Node::get_next_node( ) const
 {
     return this->X.l.nextNode;
 }
@@ -158,7 +158,7 @@ void Node::xfer_entry( int q, Node* v, int z ) const
 
 
 // #define setentry(j, q, v, z) (nAdr(j).e[(q)].key = (v), nAdr(j).e[(q)].downNode = (z))
-void Node::set_entry( int q, keyT v, Nptr z )
+void Node::set_entry( int q, keyT v, Node* z )
 {
     this->X.e[ q ].key = v;
     this->X.e[ q ].downNode = z;

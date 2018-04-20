@@ -9,11 +9,11 @@ TEST( btree, init_free )
     Tree B( pool_size, compare_keys );
 
     EXPECT_NO_THROW( B.insert( 17 ) );
-    Nptr na = B.search( 17 );
+    Node* na = B.search( 17 );
     EXPECT_TRUE( na != B.NONODE() );
 
     B.erase( 17 );
-    Nptr nb = B.search( 17 );
+    Node* nb = B.search( 17 );
     EXPECT_TRUE( nb == B.NONODE() );
 }
 
@@ -39,7 +39,7 @@ TEST( btree, insert_search_delete )
 
     for( auto v : sset )
     {
-        Nptr na = B.search( v );
+        Node* na = B.search( v );
         ASSERT_TRUE( na != B.NONODE() );
     }
 
