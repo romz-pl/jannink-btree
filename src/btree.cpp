@@ -23,9 +23,9 @@ Tree::Tree( int pool_size, KeyCmp keyCmp )
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
     set_root( get_leaf( ) );            /* the root is initially the leaf */
-    get_root( )->set_flag( isLEAF );
-    get_root( )->set_flag( isROOT );
-    get_root( )->set_flag( FEWEST );
+    get_root( )->set_flag( Node::isLEAF );
+    get_root( )->set_flag( Node::isROOT );
+    get_root( )->set_flag( Node::Node::FEWEST );
     init_tree_height( );
 
     set_fun_key( 0 );
@@ -68,10 +68,10 @@ Nptr Tree::node_array_head( ) const
 //
 // check that a node is in fact a node
 //
-// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
+// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != NONODE() && ( ( j->X.i.info.flags & MASK ) == MAGIC ) );
+    return ( j != NONODE() && ( ( j->X.i.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
@@ -171,7 +171,8 @@ void Tree::set_fanout( int v )
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
 int Tree::get_min_fanout( const Node* j ) const
 {
-    return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
+    // return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
+    return j->is_leaf() ? fanout - minfanout : minfanout;
 }
 
 
@@ -466,7 +467,7 @@ void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
 
   if (sibling == NONODE()) {        /* no split occurred */
     place_entry( newNode, slot + 1, downPtr);
-    newNode->clr_flag( FEWEST );
+    newNode->clr_flag( Node::Node::FEWEST );
   }
   else {                /* split entries between the two */
     i = newNode->is_internal();        /* adjustment values */
@@ -480,7 +481,7 @@ void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
       sibling->inc_entries();
     }
     if (sibling->num_entries() == get_fanout())
-      sibling->set_flag( isFULL );        /* only ever happens in 2-3+trees */
+      sibling->set_flag( Node::isFULL );        /* only ever happens in 2-3+trees */
 
     if (i) {                /* set first pointer of internal node */
       if (j) {
@@ -502,11 +503,11 @@ void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
     else if (!i)
       place_entry( sibling, 1, downPtr);
 
-    newNode->clr_flag( isFULL );        /* adjust node flags */
+    newNode->clr_flag( Node::isFULL );        /* adjust node flags */
     if (newNode->num_entries() == get_min_fanout( newNode ))
-      newNode->set_flag( FEWEST );        /* never happens in even size nodes */
+      newNode->set_flag( Node::FEWEST );        /* never happens in even size nodes */
     if (sibling->num_entries() > get_min_fanout( sibling ))
-      sibling->clr_flag( FEWEST );
+      sibling->clr_flag( Node::FEWEST );
 
 #ifdef DEBUG
   fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, get_node_number(downPtr));
@@ -530,7 +531,7 @@ void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 
   newNode->inc_entries();                /* adjust entry counter */
   if (newNode->num_entries() == get_fanout())
-    newNode->set_flag( isFULL );
+    newNode->set_flag( Node::isFULL );
 }
 
 
@@ -543,10 +544,10 @@ Nptr Tree::split( Nptr newNode )
 
   sibling = get_free_node();
 
-  sibling->set_flag( FEWEST );            /* set up node flags */
+  sibling->set_flag( Node::FEWEST );            /* set up node flags */
 
   if ( newNode->is_leaf()) {
-    sibling->set_flag( isLEAF );
+    sibling->set_flag( Node::isLEAF );
     sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
     newNode->set_next_node( sibling);
   }
@@ -568,9 +569,9 @@ void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
   get_root( )->set_entry( 1, get_fun_key( ), newNode);    /* old root's sibling also */
   get_root( )->inc_entries();
 
-  oldRoot->clr_flag( isROOT );
-  get_root( )->set_flag( isROOT );
-  get_root( )->set_flag( FEWEST );
+  oldRoot->clr_flag( Node::isROOT );
+  get_root( )->set_flag( Node::isROOT );
+  get_root( )->set_flag( Node::FEWEST );
   inc_tree_height( );
 }
 
@@ -621,7 +622,7 @@ void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 #endif
 
   set_root( newRoot);
-  newRoot->set_flag( isROOT );
+  newRoot->set_flag( Node::isROOT );
   put_free_node( oldRoot );
   dec_tree_height( );            /* the height of the tree decreases */
 }
@@ -756,13 +757,13 @@ void Tree::remove_entry( Nptr curr, int slot )
   for (x = slot; x < curr->num_entries(); x++)
     curr->pull_entry( x, 1);        /* adjust node with removed key */
   curr->dec_entries();
-  curr->clr_flag( isFULL );        /* keep flag information up to date */
+  curr->clr_flag( Node::isFULL );        /* keep flag information up to date */
   if (curr->is_root()) {
     if (curr->num_entries() == 1)
-      curr->set_flag( FEWEST );
+      curr->set_flag( Node::FEWEST );
   }
   else if (curr->num_entries() == get_min_fanout( curr ))
-    curr->set_flag( FEWEST );
+    curr->set_flag( Node::FEWEST );
 }
 
 
@@ -793,9 +794,9 @@ Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
     right->xfer_entry( y, left, x);    /* transfer entries to left node */
   }
   if (left->num_entries() > get_min_fanout( left ))
-    left->clr_flag( FEWEST );
+    left->clr_flag( Node::FEWEST );
   if (left->num_entries() == get_fanout())
-    left->set_flag( isFULL );        /* never happens in even size nodes */
+    left->set_flag( Node::isFULL );        /* never happens in even size nodes */
 
   if ( get_merge_path() == left || get_merge_path() == right)
     set_merge_path( NONODE() );        /* indicate rebalancing is complete */
@@ -829,7 +830,7 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
       left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node());
       right->set_first_node( right->get_node( y + 1 - i ));
     }
-    right->clr_flag( isFULL );
+    right->clr_flag( Node::isFULL );
     anchor->set_key( z, get_fun_key( ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
       right->dec_entries();            /* adjust entry count */
@@ -855,7 +856,7 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
       right->set_entry( y, anchor->get_key( z ), right->get_first_node());
       right->set_first_node( left->get_node( x ));
     }
-    left->clr_flag( isFULL );
+    left->clr_flag( Node::isFULL );
     anchor->set_key( z, get_fun_key( ) );
     for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
       left->dec_entries();
@@ -864,13 +865,13 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
     }
   }
   if (left->num_entries() == get_min_fanout( left ))        /* adjust node flags */
-    left->set_flag( FEWEST );
+    left->set_flag( Node::FEWEST );
   else
-    left->clr_flag( FEWEST );            /* never happens in 2-3+trees */
+    left->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
   if (right->num_entries() == get_min_fanout( right ))
-    right->set_flag( FEWEST );
+    right->set_flag( Node::FEWEST );
   else
-    right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
+    right->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
   set_merge_path( NONODE() );
 
 #ifdef DEBUG
@@ -963,7 +964,7 @@ void Tree::show_node( Nptr n ) const
 
   fprintf(stderr, "------------------------------------------------\n");
   fprintf(stderr, "| node %6d                 ", get_node_number(n));
-  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & MASK);
+  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & Node::MASK);
   fprintf(stderr, "|- - - - - - - - - - - - - - - - - - - - - - - |\n");
   fprintf(stderr, "| flags   %1d%1d%1d%1d ", n->is_few(), n->is_full(), n->is_root(), n->is_leaf());
   fprintf(stderr, "| keys = %5d ", n->num_entries());

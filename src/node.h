@@ -6,19 +6,9 @@
 
 
 
-/*~~~~~~~    flag bits (5 of 16 used, 11 for magic value)    ~~~~~~~*/
-/* bits set at node creation/split/merge */
-const int isLEAF = 0x1;
-const int isROOT = 0x2;
 
-/* bits set at key insertion/deletion */
-const int isFULL = 0x4;
-const int FEWEST = 0x8;
-const int FLAGS = 0xF;
 
-/* identifies data as being a B+tree node */
-const int MAGIC = 0xDEC0;
-const int MASK = 0xFFF0;
+
 
 
 
@@ -148,6 +138,24 @@ public:
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 class Node
 {
+public:
+    //
+    // flag bits (5 of 16 used, 11 for magic value)
+    //
+
+    /* bits set at node creation/split/merge */
+    static constexpr int isLEAF = 0x1;
+    static constexpr int isROOT = 0x2;
+
+    /* bits set at key insertion/deletion */
+    static constexpr int isFULL = 0x4;
+    static constexpr int FEWEST = 0x8;
+    static constexpr int FLAGS = 0xF;
+
+    /* identifies data as being a B+tree node */
+    static constexpr int MAGIC = 0xDEC0;
+    static constexpr int MASK = 0xFFF0;
+
 public:
     keyT get_key( int q ) const;
     void set_key( int q, keyT v );
