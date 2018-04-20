@@ -63,9 +63,9 @@ bool Node::is_leaf( ) const
 }
 
 // #define isroot(j) ((nAdr(j).i.info.flags & isROOT) == isROOT)
-bool is_root( Node* j )
+bool Node::is_root( ) const
 {
-    return ( ( j->X.i.info.flags & isROOT ) == isROOT );
+    return ( ( this->X.i.info.flags & isROOT ) == isROOT );
 }
 
 // #define isfull(j) ((nAdr(j).i.info.flags & isFULL) == isFULL)

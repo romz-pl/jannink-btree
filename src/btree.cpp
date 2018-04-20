@@ -763,7 +763,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
     pull_entry(curr, x, 1);        /* adjust node with removed key */
   dec_entries(curr);
   curr->clr_flag( isFULL );        /* keep flag information up to date */
-  if (is_root(curr)) {
+  if (curr->is_root()) {
     if (num_entries(curr) == 1)
       curr->set_flag( FEWEST );
   }
