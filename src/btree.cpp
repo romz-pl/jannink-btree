@@ -25,9 +25,9 @@ bool Tree::is_node( Node* j ) const
 }
 
 // #define isntnode(j) ((j) == NONODE)
-bool isnt_node( Tree* B, Node* j )
+bool Tree::isnt_node( Node* j ) const
 {
-    return ( j == B->NONODE() );
+    return ( j == NONODE() );
 }
 
 
@@ -656,7 +656,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = isnt_node( B, left ) ? B->NONODE() : left->get_last_node();
+      myLeft = B->isnt_node( left ) ? B->NONODE() : left->get_last_node();
       lAnchor = lAnc;
     }
     else {
@@ -664,7 +664,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
       lAnchor = curr;
     }
     if (slot == curr->num_entries()) {
-      myRight = isnt_node( B, right ) ? B->NONODE() : right->get_first_node();
+      myRight = B->isnt_node( right ) ? B->NONODE() : right->get_first_node();
       rAnchor = rAnc;
     }
     else {
@@ -714,8 +714,8 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   if ( B->get_merge_path() == B->NONODE())
     newNode = B->NONODE();
   else {        /* tree rebalancing rules for node merges and shifts */
-    notleft = isnt_node( B, left );
-    notright = isnt_node( B, right );
+    notleft = B->isnt_node( left );
+    notright = B->isnt_node( right );
     fewleft = left->is_few();        /* only used when defined */
     fewright = right->is_few();
 

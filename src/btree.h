@@ -67,6 +67,7 @@ public:
     void set_compare_keys( KeyCmp v );
 
     bool is_node( Node* j ) const;
+    bool isnt_node( Node* j ) const;
 
 
     void put_free_node( Nptr self );
