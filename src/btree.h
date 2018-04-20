@@ -96,6 +96,8 @@ public:
     Nptr descend_split( Nptr curr );
     void insert( keyT key );
 
+    Nptr shift( Nptr left, Nptr right, Nptr anchor );
+
 public:
 
     /* `private' variables */

@@ -250,7 +250,9 @@ void Tree::set_compare_keys( KeyCmp v )
 
 
 
-/*~~~~~~~~~~~~~~~~~~~~~   top level search call   ~~~~~~~~~~~~~~~~~~~~~*/
+//
+// top level search call
+//
 Nptr Tree::search( keyT key )
 {
   Nptr    findNode;
@@ -269,7 +271,9 @@ Nptr Tree::search( keyT key )
   return findNode;
 }
 
-/*~~~~~~~~~~~~~~~~~~~~~   `recurse' down B+tree   ~~~~~~~~~~~~~~~~~~~~~*/
+//
+// `recurse' down B+tree
+//
 Nptr Tree::descend_to_leaf( Nptr curr )
 {
   int    slot;
@@ -285,7 +289,9 @@ Nptr Tree::descend_to_leaf( Nptr curr )
   return findNode;
 }
 
-/*~~~~~~~~~~~~~~~~~~~   find slot for search key   ~~~~~~~~~~~~~~~~~~~~*/
+//
+// find slot for search key
+//
 int Tree::get_slot( Nptr curr )
 {
   int slot, entries;
@@ -300,8 +306,9 @@ int Tree::get_slot( Nptr curr )
   return slot;
 }
 
-
-/*~~~~~~~~~~~~~~~~~~~   recursive binary search   ~~~~~~~~~~~~~~~~~~~~~*/
+//
+// recursive binary search
+//
 int Tree::find_key( Nptr curr, int lo, int hi )
 {
   int mid, findslot;
@@ -341,7 +348,9 @@ int Tree::find_key( Nptr curr, int lo, int hi )
 }
 
 
-/*~~~~~~~~~~~   comparison of key with a target key slot   ~~~~~~~~~~~~*/
+//
+// comparison of key with a target key slot
+//
 int Tree::best_match( Nptr curr, int slot )
 {
   int diff, comp, findslot;
@@ -379,19 +388,9 @@ int Tree::best_match( Nptr curr, int slot )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
-|    Insert new data into tree                    |
-\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-Nptr descend_split(Tree *B, Nptr curr);
-void insert_entry(Tree *B, Nptr node, int slot, Nptr sibling, Nptr downPtr);
-void place_entry(Tree *B, Nptr node, int slot, Nptr downPtr);
-Nptr split(Tree *B, Nptr node);
-void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode);
-
-/*~~~~~~~~~~~~~~~~~~~~~   top level insert call   ~~~~~~~~~~~~~~~~~~~~~*/
+//
+// top level insert call
+//
 void Tree::insert( keyT key )
 {
   Nptr newNode;
@@ -409,7 +408,9 @@ void Tree::insert( keyT key )
 }
 
 
-/*~~~~~~~~~~~~~~~~   recurse down and split back up   ~~~~~~~~~~~~~~~~~*/
+//
+// recurse down and split back up
+//
 Nptr Tree::descend_split( Nptr curr )
 {
   Nptr    newMe, newNode;
@@ -441,7 +442,9 @@ Nptr Tree::descend_split( Nptr curr )
   return newNode;
 }
 
-/*~~~~~~~~~~~~~~   determine location of inserted key   ~~~~~~~~~~~~~~~*/
+//
+// determine location of inserted key
+//
 void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
 {
   int split, i, j, k, x, y;
@@ -499,7 +502,9 @@ void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
   }
 }
 
-/*~~~~~~~~~~~   place key into appropriate node & slot   ~~~~~~~~~~~~~~*/
+//
+// place key into appropriate node & slot
+//
 void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 {
   int x;
@@ -514,7 +519,9 @@ void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 }
 
 
-/*~~~~~~~~~~~~~~~~   split full node and set flags   ~~~~~~~~~~~~~~~~~~*/
+//
+// split full node and set flags
+//
 Nptr Tree::split( Nptr newNode )
 {
   Nptr sibling;
@@ -535,7 +542,9 @@ Nptr Tree::split( Nptr newNode )
 }
 
 
-/*~~~~~~~~~~~~~~~~~~~~~   build new root node   ~~~~~~~~~~~~~~~~~~~~~~~*/
+//
+// build new root node
+//
 void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
 {
   set_root( get_free_node() );
@@ -704,22 +713,22 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
             /* CASE 3: choose the better of a merge or a shift */
     else if (!notleft && fewleft && !notright && !fewright) {
       test = !(rAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? merge(B, left, curr, lAnc) : shift(B, curr, right, rAnc);
+      newNode = test ? merge(B, left, curr, lAnc) : B->shift( curr, right, rAnc);
     }
             /* CASE 4: also choose between a merge or a shift */
     else if (!notleft && !fewleft && !notright && fewright) {
       test = !(lAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? merge(B, curr, right, rAnc) : shift(B, left, curr, lAnc);
+      newNode = test ? merge(B, curr, right, rAnc) : B->shift( left, curr, lAnc);
     }
             /* CASE 5: choose the more effective of two shifts */
     else if (lAnc == rAnc) {         /* => both anchors are the parent */
       test = (left->num_entries() <= right->num_entries());
-      newNode = test ? shift(B, curr, right, rAnc) : shift(B, left, curr, lAnc);
+      newNode = test ? B->shift( curr, right, rAnc) : B->shift( left, curr, lAnc);
     }
             /* CASE 6: choose the shift with more local effect */
     else {                /* if omitting cases 3,4,5 use below */
       test = (lAnc == parent);        /* test = (!notleft && !fewleft); */
-      newNode = test ? shift(B, left, curr, lAnc) : shift(B, curr, right, rAnc);
+      newNode = test ? B->shift( left, curr, lAnc) : B->shift( curr, right, rAnc);
     }
   }
 
@@ -783,7 +792,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
 
 
 /*~~~~~   shift entries in a node pair & adjust anchor key value   ~~~~*/
-Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
+Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
 {
   int    i, x, y, z;
 
@@ -797,8 +806,8 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (left->num_entries() < right->num_entries()) {    /* shift entries to left */
     y = (right->num_entries() - left->num_entries()) >> 1;
     x = left->num_entries() + y;
-    B->set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
-    z = B->get_slot( anchor);            /* find slot in anchor node */
+    set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
+    z = get_slot( anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
       right->dec_entries();            /* adjust for shifting anchor */
       left->inc_entries();
@@ -806,7 +815,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       right->set_first_node( right->get_node( y + 1 - i ));
     }
     right->clr_flag( isFULL );
-    anchor->set_key( z, B->get_fun_key( ) );        /* set new anchor value */
+    anchor->set_key( z, get_fun_key( ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
       right->dec_entries();            /* adjust entry count */
       left->inc_entries();
@@ -823,8 +832,8 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     for (z = right->num_entries(); z > 0; z--)    /* adjust increased node */
       right->push_entry( z, y);
 
-    B->set_fun_key( left->get_key( x ) );            /* set new anchor key value */
-    z = B->get_slot( anchor) + 1;
+    set_fun_key( left->get_key( x ) );            /* set new anchor key value */
+    z = get_slot( anchor) + 1;
     if (i) {
       left->dec_entries();
       right->inc_entries();
@@ -832,29 +841,29 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       right->set_first_node( left->get_node( x ));
     }
     left->clr_flag( isFULL );
-    anchor->set_key( z, B->get_fun_key( ) );
+    anchor->set_key( z, get_fun_key( ) );
     for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
       left->dec_entries();
       right->inc_entries();
       left->xfer_entry( x, right, y);        /* transfer entries over */
     }
   }
-  if (left->num_entries() == B->get_min_fanout( left ))        /* adjust node flags */
+  if (left->num_entries() == get_min_fanout( left ))        /* adjust node flags */
     left->set_flag( FEWEST );
   else
     left->clr_flag( FEWEST );            /* never happens in 2-3+trees */
-  if (right->num_entries() == B->get_min_fanout( right ))
+  if (right->num_entries() == get_min_fanout( right ))
     right->set_flag( FEWEST );
   else
     right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
-  B->set_merge_path( B->NONODE() );
+  set_merge_path( NONODE() );
 
 #ifdef DEBUG
   showNode(B, left);
   showNode(B, right);
 #endif
 
-  return B->NONODE();
+  return NONODE();
 }
 
 
