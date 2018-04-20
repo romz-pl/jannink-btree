@@ -26,9 +26,9 @@ keyT Tree::get_fun_key( ) const
 }
 
 // #define getfundata B->theData
-dataT get_fun_data( Tree* B )
+dataT Tree::get_fun_data( ) const
 {
-    return B->theData;
+    return theData;
 }
 
 // #define setfunkey(v) (B->theKey = (v))

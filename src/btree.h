@@ -14,7 +14,7 @@ class Tree
 public:
     /* access key and data values for B+tree methods */
     keyT get_fun_key( ) const;
-
+    dataT get_fun_data( ) const;
 
 
 public:
