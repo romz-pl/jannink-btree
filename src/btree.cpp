@@ -69,11 +69,10 @@ void Tree::set_node_array( Node* v )
     tree = v;
 }
 
-/* locations from which tree access begins */
 // #define getroot B->root
-Nptr get_root( Tree* B )
+Nptr Tree::get_root( ) const
 {
-    return B->root;
+    return root;
 }
 
 // #define setroot(v) (B->root = (v))
@@ -234,9 +233,9 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 
   set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
   set_root( B, get_leaf( B ) );            /* the root is initially the leaf */
-  get_root( B )->set_flag( isLEAF );
-  get_root( B )->set_flag( isROOT );
-  get_root( B )->set_flag( FEWEST );
+  B->get_root( )->set_flag( isLEAF );
+  B->get_root( )->set_flag( isROOT );
+  B->get_root( )->set_flag( FEWEST );
   init_tree_height( B );
 
   B->set_fun_key( 0 );
@@ -284,7 +283,7 @@ Nptr btree_search(Tree *B, keyT key)
 #endif
 
   B->set_fun_key( key );            /* set search key */
-  findNode = descend_to_leaf(B, get_root( B ));    /* start search from root node */
+  findNode = descend_to_leaf(B, B->get_root( ));    /* start search from root node */
 
 #ifdef DEBUG
   fprintf(stderr, "SEARCH:  found on page %d.\n", getnodenumber(findNode));
@@ -427,9 +426,9 @@ void btree_insert(Tree *B, keyT key)
   B->set_fun_key( key );            /* set insertion key */
   B->set_fun_data( "data" );            /* a node containing data */
   set_split_path( B, NONODE );
-  newNode = descend_split(B, get_root( B ));    /* insertion point search from root */
+  newNode = descend_split(B, B->get_root( ));    /* insertion point search from root */
   if (newNode != get_split_path( B ) )        /* indicates the root node has split */
-    make_new_root(B, get_root( B ), newNode);
+    make_new_root(B, B->get_root( ), newNode);
 }
 
 
@@ -564,13 +563,13 @@ void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
 {
   set_root( B, get_free_node(B));
 
-  get_root( B )->set_first_node( oldRoot);    /* old root becomes new root's child */
-  get_root( B )->set_entry( 1, B->get_fun_key( ), newNode);    /* old root's sibling also */
-  get_root( B )->inc_entries();
+  B->get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
+  B->get_root( )->set_entry( 1, B->get_fun_key( ), newNode);    /* old root's sibling also */
+  B->get_root( )->inc_entries();
 
   oldRoot->clr_flag( isROOT );
-  get_root( B )->set_flag( isROOT );
-  get_root( B )->set_flag( FEWEST );
+  B->get_root( )->set_flag( isROOT );
+  B->get_root( )->set_flag( FEWEST );
   inc_tree_height( B );
 }
 
@@ -614,9 +613,9 @@ void btree_delete(Tree *B, keyT key)
 
   B->set_fun_key( key );            /* set deletion key */
   set_merge_path( B, NONODE );
-  newNode = descend_balance(B, get_root( B ), NONODE, NONODE, NONODE, NONODE, NONODE);
+  newNode = descend_balance(B, B->get_root( ), NONODE, NONODE, NONODE, NONODE, NONODE);
   if (is_node( B, newNode ))
-    collapse_root(B, get_root( B ), newNode);    /* remove root when superfluous */
+    collapse_root(B, B->get_root( ), newNode);    /* remove root when superfluous */
 }
 
 

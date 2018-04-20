@@ -27,6 +27,9 @@ public:
     Node* get_node_array( ) const;
     void set_node_array( Node* v );
 
+    // locations from which tree access begins
+    Nptr get_root( ) const;
+
 
 public:
 
