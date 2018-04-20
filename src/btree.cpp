@@ -155,11 +155,10 @@ void Tree::set_first_free_node( Nptr v )
     pool = v;
 }
 
-/* handle split/merge points during insert/delete */
 // #define getsplitpath B->branch.split
-Nptr get_split_path( Tree* B )
+Nptr Tree::get_split_path( ) const
 {
-    return B->branch.split;
+    return branch.split;
 }
 
 // #define setsplitpath(v) (B->branch.split = (v))
@@ -424,7 +423,7 @@ void btree_insert(Tree *B, keyT key)
   B->set_fun_data( "data" );            /* a node containing data */
   set_split_path( B, NONODE );
   newNode = descend_split(B, B->get_root( ));    /* insertion point search from root */
-  if (newNode != get_split_path( B ) )        /* indicates the root node has split */
+  if (newNode != B->get_split_path() )        /* indicates the root node has split */
     make_new_root(B, B->get_root( ), newNode);
 }
 
@@ -437,7 +436,7 @@ Nptr descend_split(Tree *B, Nptr curr)
 
   if (!curr->is_full())
     set_split_path( B, NONODE );
-  else if (get_split_path( B ) == NONODE)
+  else if ( B->get_split_path() == NONODE)
     set_split_path( B, curr );            /* indicates where nodes must split */
 
   slot = get_slot(B, curr);        /* is null only if the root is empty */
@@ -453,7 +452,7 @@ Nptr descend_split(Tree *B, Nptr curr)
   newNode = NONODE;            /* assume no node splitting necessary */
 
   if (newMe != NONODE) {        /* insert only where necessary */
-    if (get_split_path( B ) != NONODE)
+    if ( B->get_split_path() != NONODE)
       newNode = split(B, curr);        /* a sibling node is prepared */
     insert_entry(B, curr, slot, newNode, newMe);
   }
@@ -548,7 +547,7 @@ Nptr split(Tree *B, Nptr newNode)
     sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
     newNode->set_next_node( sibling);
   }
-  if (get_split_path( B ) == newNode)
+  if ( B->get_split_path() == newNode)
     set_split_path( B, NONODE );            /* no more splitting needed */
 
   return sibling;

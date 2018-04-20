@@ -51,6 +51,9 @@ public:
     Nptr get_first_free_node( ) const;
     void set_first_free_node( Nptr v );
 
+    // handle split/merge points during insert/delete
+    Nptr get_split_path( ) const;
+
 
 public:
 
