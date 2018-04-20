@@ -44,11 +44,11 @@ void Tree::set_fun_data( const char* v )
     theData = strdup( v );
 }
 
-            /* define number of B+tree nodes for free node pool */
+
 // #define getpoolsize B->poolsize
-int get_pool_size( Tree* B )
+int Tree::get_pool_size( ) const
 {
-    return B->poolsize;
+    return poolsize;
 }
 
 // #define setpoolsize(v) (B->poolsize = (v))

@@ -12,12 +12,15 @@
 class Tree
 {
 public:
-    /* access key and data values for B+tree methods */
+    // access key and data values for B+tree methods
     keyT get_fun_key( ) const;
     void set_fun_key( keyT v );
 
     dataT get_fun_data( ) const;
     void set_fun_data( const char* v );
+
+     // define number of B+tree nodes for free node pool
+    int get_pool_size( ) const;
 
 
 public:
