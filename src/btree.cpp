@@ -302,7 +302,7 @@ int get_slot(Tree *B, Nptr curr)
   int slot, entries;
 
   entries = curr->num_entries();        /* need this if root is ever empty */
-  slot = !entries ? 0 : find_key(B, curr, 1, entries);
+  slot = !entries ? 0 : B->find_key( curr, 1, entries);
 
 #ifdef DEBUG
   fprintf(stderr, "GETSLOT:  slot %d.\n", slot);
@@ -313,7 +313,7 @@ int get_slot(Tree *B, Nptr curr)
 
 
 /*~~~~~~~~~~~~~~~~~~~   recursive binary search   ~~~~~~~~~~~~~~~~~~~~~*/
-int find_key(Tree *B, Nptr curr, int lo, int hi)
+int Tree::find_key( Nptr curr, int lo, int hi )
 {
   int mid, findslot;
 
@@ -323,7 +323,7 @@ int find_key(Tree *B, Nptr curr, int lo, int hi)
 #endif
 
   if (hi == lo) {
-    findslot = B->best_match( curr, lo);        /* recursion base case */
+    findslot = best_match( curr, lo);        /* recursion base case */
 
 #ifdef DEBUG
     if (findslot == ERROR)
@@ -333,12 +333,12 @@ int find_key(Tree *B, Nptr curr, int lo, int hi)
   }
   else {
     mid = (lo + hi) >> 1;
-    switch (findslot = B->best_match( curr, mid)) {
+    switch (findslot = best_match( curr, mid)) {
     case LOWER:                /* check lower half of range */
-      findslot = find_key(B, curr, lo, mid - 1);        /* never in 2-3+trees */
+      findslot = find_key( curr, lo, mid - 1);        /* never in 2-3+trees */
     break;
     case UPPER:                /* check upper half of range */
-      findslot = find_key(B, curr, mid + 1, hi);
+      findslot = find_key( curr, mid + 1, hi);
     break;
 
 #ifdef DEBUG

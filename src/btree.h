@@ -84,6 +84,7 @@ public:
     void init_free_node_pool( int quantity );
 
     int best_match( Nptr curr, int slot );
+    int find_key( Nptr curr, int lo, int hi );
 
 public:
 
