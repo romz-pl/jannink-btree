@@ -140,6 +140,9 @@ public:
 class Node
 {
 public:
+    keyT get_key( int q ) const;
+
+public:
     union
     {
         Entry   e[ ARRAY ];    /* allows access to entry array */
@@ -150,7 +153,6 @@ public:
     } X;
 } ;
 
-keyT get_key( const Node* j, int q );
 Nptr get_node( const Node* j, int q );
 void set_key( Node* j, int q, keyT v );
 void set_node( Node* j, int q, Nptr v );

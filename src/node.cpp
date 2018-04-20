@@ -2,9 +2,9 @@
 
 /* access keys and pointers in a node */
 // #define getkey(j, q) nAdr(j).e[(q)].key
-keyT get_key( const Node* j, int q )
+keyT Node::get_key( int q ) const
 {
-    return j->X.e[ q ].key;
+    return this->X.e[ q ].key;
 }
 
 // #define getnode(j, q) nAdr(j).e[(q)].downNode

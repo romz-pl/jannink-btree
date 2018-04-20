@@ -303,7 +303,7 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
 
   for (slot = get_slot(B, curr); is_internal(curr); slot = get_slot(B, curr))
     curr = get_node(curr, slot);
-  if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), get_key(curr, slot) ) )
+  if ((slot > 0) && !compare_keys( B )( get_fun_key( B ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
   else
     findNode = NONODE;            /* key value not in tree */
@@ -372,10 +372,10 @@ int best_match(Tree *B, Nptr curr, int slot)
 {
   int diff, comp, findslot;
 
-  diff = compare_keys( B )(get_fun_key( B ), get_key(curr, slot));
+  diff = compare_keys( B )(get_fun_key( B ), curr->get_key( slot ));
   if (diff < 0) {        /* also check previous slot */
     if ((slot == 1) ||
-        ((comp = compare_keys( B )(get_fun_key( B ), get_key(curr, slot - 1))) >= 0))
+        ((comp = compare_keys( B )(get_fun_key( B ), curr->get_key( slot - 1 ))) >= 0))
       findslot = slot - 1;
 
 #ifdef DEBUG
@@ -388,7 +388,7 @@ int best_match(Tree *B, Nptr curr, int slot)
   }
   else {            /* or check following slot */
     if ((slot == num_entries(curr)) ||
-        ((comp = compare_keys( B )(get_fun_key( B ), get_key(curr, slot + 1))) < 0))
+        ((comp = compare_keys( B )(get_fun_key( B ), curr->get_key( slot + 1 ))) < 0))
       findslot = slot;
     else if (comp == 0)
       findslot = slot + 1;
@@ -449,7 +449,7 @@ Nptr descend_split(Tree *B, Nptr curr)
   slot = get_slot(B, curr);        /* is null only if the root is empty */
   if (is_internal(curr))            /* continue recursion to leaves */
     newMe = descend_split(B, get_node(curr, slot));
-  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), get_key(curr, slot))) {
+  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), curr->get_key( slot ))) {
     newMe = NONODE;            /* this code discards duplicates */
     set_split_path( B, NONODE );
   }
@@ -500,7 +500,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     }
 
     if (j) {                /* insert new entry into correct spot */
-      x = get_key(newNode, split + k);
+      x = newNode->get_key( split + k );
       if (k)
     place_entry(B, sibling, slot - split + 1 - i, downPtr);
       else
@@ -671,7 +671,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
     }
     newMe = descend_balance(B, newNode, myLeft, myRight, lAnchor, rAnchor, curr);
   }
-  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), get_key(curr, slot)))
+  else if ((slot > 0) && !compare_keys( B )(get_fun_key( B ), curr->get_key( slot )))
     newMe = newNode;        /* a key to be deleted is found */
   else {
     newMe = NONODE;        /* no deletion possible, key not found */
@@ -785,9 +785,9 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
 
   if (is_internal(left)) {
     inc_entries(left);            /* copy key separating the nodes */
-    set_fun_key( B, get_key(right, 1) );    /* defined but maybe just deleted */
+    set_fun_key( B, right->get_key( 1 ) );    /* defined but maybe just deleted */
     z = get_slot(B, anchor);        /* needs the just calculated key */
-    set_fun_key( B, get_key(anchor, z) );    /* set slot to delete in anchor */
+    set_fun_key( B, anchor->get_key( z ) );    /* set slot to delete in anchor */
     set_entry(left, num_entries(left), get_fun_key( B ), getfirstnode(right));
   }
   else
@@ -823,12 +823,12 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (num_entries(left) < num_entries(right)) {    /* shift entries to left */
     y = (num_entries(right) - num_entries(left)) >> 1;
     x = num_entries(left) + y;
-    set_fun_key( B, get_key(right, y + 1 - i) );    /* set new anchor key value */
+    set_fun_key( B, right->get_key( y + 1 - i ) );    /* set new anchor key value */
     z = get_slot(B, anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
       dec_entries(right);            /* adjust for shifting anchor */
       inc_entries(left);
-      set_entry(left, num_entries(left), get_key(anchor, z), getfirstnode(right));
+      set_entry(left, num_entries(left), anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, get_node(right, y + 1 - i));
     }
     clr_flag(right, isFULL);
@@ -849,12 +849,12 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     for (z = num_entries(right); z > 0; z--)    /* adjust increased node */
       push_entry(right, z, y);
 
-    set_fun_key( B, get_key(left, x) );            /* set new anchor key value */
+    set_fun_key( B, left->get_key( x ) );            /* set new anchor key value */
     z = get_slot(B, anchor) + 1;
     if (i) {
       dec_entries(left);
       inc_entries(right);
-      set_entry(right, y, get_key(anchor, z), getfirstnode(right));
+      set_entry(right, y, anchor->get_key( z ), getfirstnode(right));
       set_first_node(right, get_node(left, x));
     }
     clr_flag(left, isFULL);
@@ -995,8 +995,8 @@ void list_btree_values(Tree *B, Nptr n, int num)
   int slot, prev = -1;
 
   for (slot = 1; (n != NONODE) && num && num_entries(n); num--) {
-    if (get_key(n, slot) <= prev) fprintf(stderr, "BOMB");
-    prev = get_key(n, slot);
+    if ( n->get_key( slot ) <= prev) fprintf(stderr, "BOMB");
+    prev = n->get_key( slot );
     fprintf(stderr, "%8d%c", prev, (num & 7 ? ' ' : '\n'));
     if (++slot > num_entries(n))
       n = get_next_node(n), slot = 1;
