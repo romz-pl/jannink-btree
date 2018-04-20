@@ -27,10 +27,10 @@ const int MASK = 0xFFF0;
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    constants    ~~~~~~~~~~~~~~~~~~~~~~~*/
-/* ARRAY is a place holder value for:  fanout */
-const int ARRAY = 1;
+
 
 /* special node slot values used in key search */
+const int ERROR = -1;
 const int UPPER = -2;
 const int LOWER = -3;
 
@@ -185,6 +185,8 @@ public:
     void set_entry( int q, keyT v, Nptr z );
 
 public:
+    /* ARRAY is a place holder value for:  fanout */
+    static constexpr int ARRAY = 1;
     union
     {
         Entry   e[ ARRAY ];    /* allows access to entry array */
