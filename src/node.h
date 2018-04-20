@@ -144,6 +144,7 @@ public:
     Nptr get_node( int q ) const;
 
     void set_key( int q, keyT v );
+    void set_node( int q, Nptr v );
 
 public:
     union
@@ -158,7 +159,7 @@ public:
 
 
 
-void set_node( Node* j, int q, Nptr v );
+
 void set_flag( Node* j, short v );
 void clr_flag( Node* j, short v );
 short get_flags( const Node* j );

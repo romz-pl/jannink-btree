@@ -20,12 +20,12 @@ void Node::set_key( int q, keyT v )
 }
 
 // #define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))
-void set_node( Node* j, int q, Nptr v )
+void Node::set_node( int q, Nptr v )
 {
-    j->X.e[ q ].downNode =  v;
+    this->X.e[ q ].downNode =  v;
 }
 
-            /* access node flag values */
+/* access node flag values */
 // #define setflag(j, v) (nAdr(j).i.info.flags |= (v))
 void set_flag( Node* j, short v )
 {
