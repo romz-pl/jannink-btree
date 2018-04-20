@@ -29,6 +29,7 @@ public:
 
     // locations from which tree access begins
     Nptr get_root( ) const;
+    void set_root( Nptr v );
 
 
 public:

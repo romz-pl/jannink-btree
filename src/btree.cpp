@@ -76,9 +76,9 @@ Nptr Tree::get_root( ) const
 }
 
 // #define setroot(v) (B->root = (v))
-void set_root( Tree* B, Nptr v )
+void Tree::set_root( Nptr v )
 {
-    B->root = v;
+    root = v;
 }
 
 // #define getleaf B->leaf
@@ -232,7 +232,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   init_free_node_pool( B, poolsz );
 
   set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
-  set_root( B, get_leaf( B ) );            /* the root is initially the leaf */
+  B->set_root( get_leaf( B ) );            /* the root is initially the leaf */
   B->get_root( )->set_flag( isLEAF );
   B->get_root( )->set_flag( isROOT );
   B->get_root( )->set_flag( FEWEST );
@@ -561,7 +561,7 @@ Nptr split(Tree *B, Nptr newNode)
 /*~~~~~~~~~~~~~~~~~~~~~   build new root node   ~~~~~~~~~~~~~~~~~~~~~~~*/
 void make_new_root(Tree *B, Nptr oldRoot, Nptr newNode)
 {
-  set_root( B, get_free_node(B));
+  B->set_root( get_free_node(B));
 
   B->get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
   B->get_root( )->set_entry( 1, B->get_fun_key( ), newNode);    /* old root's sibling also */
@@ -629,7 +629,7 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
   showNode(B, newRoot);
 #endif
 
-  set_root( B, newRoot);
+  B->set_root( newRoot);
   newRoot->set_flag( isROOT );
   put_free_node(B, oldRoot);
   dec_tree_height( B );            /* the height of the tree decreases */
