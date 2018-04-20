@@ -12,7 +12,7 @@
 class Tree
 {
 public:
-    Tree();
+    Tree( int poolsz, int fan, KeyCmp keyCmp );
     ~Tree();
 
 
@@ -108,9 +108,7 @@ public:
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~    B+tree methods        ~~~~~~~~~~~~~~~*/
-Tree* btree_init( int poolsz, int fan, KeyCmp keyCmp );
 /* Tree    *remakeBtree(Tree * B, int fillfactor); */
-void btree_free(Tree *B);
 
 #ifdef DEBUG
 void    showNode(Tree *B, Nptr node);

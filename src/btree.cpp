@@ -3,6 +3,40 @@
 #include <cstring>
 #include "btree.h"
 
+/*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
+Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
+{
+    set_fanout( fan );
+    set_min_fanout( (fan + 1) >> 1 );
+    init_free_node_pool( poolsz );
+
+    set_leaf( get_free_node() );        /* set up the first leaf node */
+    set_root( get_leaf( ) );            /* the root is initially the leaf */
+    get_root( )->set_flag( isLEAF );
+    get_root( )->set_flag( isROOT );
+    get_root( )->set_flag( FEWEST );
+    init_tree_height( );
+
+    set_fun_key( 0 );
+    set_fun_data( "0" );
+    set_compare_keys( keyCmp );
+
+#ifdef DEBUG
+    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
+    showBtree();
+    showNode( get_root() );
+#endif
+}
+
+Tree::~Tree()
+{
+#ifdef DEBUG
+    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
+#endif
+
+  free( (void *)get_node_array( ) );
+}
+
 
 /* corresponds to a NULL node pointer value */
 Nptr Tree::NONODE() const
@@ -226,46 +260,9 @@ int compare_keys(keyT key1, keyT key2)
 
 
 
-/*~~~~~~~~~~~~~~~~~~~   Set up B+tree structure   ~~~~~~~~~~~~~~~~~~~~~*/
-Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
-{
-  Tree *B;
 
-  B = (Tree *)( malloc( sizeof( Tree ) ) );
-  B->set_fanout( fan );
-  B->set_min_fanout( (fan + 1) >> 1 );
-  B->init_free_node_pool( poolsz );
 
-  B->set_leaf( B->get_free_node() );        /* set up the first leaf node */
-  B->set_root( B->get_leaf( ) );            /* the root is initially the leaf */
-  B->get_root( )->set_flag( isLEAF );
-  B->get_root( )->set_flag( isROOT );
-  B->get_root( )->set_flag( FEWEST );
-  B->init_tree_height( );
 
-  B->set_fun_key( 0 );
-  B->set_fun_data( "0" );
-  B->set_compare_keys( keyCmp );
-
-#ifdef DEBUG
-  fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
-  showBtree(B);
-  showNode(B, getroot);
-#endif
-
-  return B;
-}
-
-/*~~~~~~~~~~~~~~~~~~~   Clean up B+tree structure   ~~~~~~~~~~~~~~~~~~~*/
-void btree_free(Tree *B)
-{
-#ifdef DEBUG
-  fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
-#endif
-
-  free((void *) B->get_node_array( ) );
-  free((void *) B);
-}
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
