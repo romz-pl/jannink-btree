@@ -132,9 +132,9 @@ void Tree::inc_tree_height( )
 }
 
 // #define dectreeheight B->height--
-void dec_tree_height( Tree* B )
+void Tree::dec_tree_height( )
 {
-    B->height--;
+    height--;
 }
 
 // #define gettreeheight B->height
@@ -631,7 +631,7 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
   B->set_root( newRoot);
   newRoot->set_flag( isROOT );
   put_free_node(B, oldRoot);
-  dec_tree_height( B );            /* the height of the tree decreases */
+  B->dec_tree_height( );            /* the height of the tree decreases */
 }
 
 

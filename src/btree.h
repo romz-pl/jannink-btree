@@ -44,6 +44,7 @@ public:
     // manage B+tree height
     void init_tree_height( );
     void inc_tree_height( );
+    void dec_tree_height( );
 
 
 public:
