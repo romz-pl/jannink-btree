@@ -74,6 +74,9 @@ public:
     Nptr NONODE() const;
     Nptr node_array_head( ) const;
 
+    void list_all_btree_values( ) const;
+    void list_btree_values( Nptr n, int num ) const;
+
 public:
 
     /* `private' variables */
@@ -108,8 +111,6 @@ void    showNode(Tree *B, Nptr node);
 void    showBtree(Tree *B);
 #endif
 
-void list_btree_values(Tree *B, Nptr start, int count);
-void list_all_btree_values(Tree *B);
 
 int compare_keys(keyT key1, keyT key2);
 

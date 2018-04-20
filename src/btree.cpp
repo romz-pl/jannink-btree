@@ -998,22 +998,31 @@ void showBtree(Tree *B)
 #endif
 
 /*~~~~~~~~~~~~~~~~~~~~~~   B+tree data printer   ~~~~~~~~~~~~~~~~~~~~~~*/
-void list_btree_values(Tree *B, Nptr n, int num)
+void Tree::list_btree_values( Nptr n, int num ) const
 {
-  int slot, prev = -1;
+    int slot, prev = -1;
 
-  for (slot = 1; (n != B->NONODE()) && num && n->num_entries(); num--) {
-    if ( n->get_key( slot ) <= prev) fprintf(stderr, "BOMB");
-    prev = n->get_key( slot );
-    fprintf(stderr, "%8d%c", prev, (num & 7 ? ' ' : '\n'));
-    if (++slot > n->num_entries())
-      n = n->get_next_node(), slot = 1;
-  }
-  fprintf(stderr, "\n\n");
+    for( slot = 1; ( n != NONODE() ) && num && n->num_entries(); num-- )
+    {
+        if( n->get_key( slot ) <= prev)
+        {
+            fprintf(stderr, "BOMB");
+        }
+        prev = n->get_key( slot );
+
+
+        fprintf( stderr, "%8d%c", prev, ( num & 7 ? ' ' : '\n' ) );
+        if( ++slot > n->num_entries() )
+        {
+            n = n->get_next_node();
+            slot = 1;
+        }
+    }
+    fprintf( stderr, "\n\n" );
 }
 
 /*~~~~~~~~~~~~~~~~~~~   entire B+tree data printer   ~~~~~~~~~~~~~~~~~~*/
-void list_all_btree_values( Tree *B )
+void Tree::list_all_btree_values( ) const
 {
-  list_btree_values( B, B->get_leaf( ), ERROR );
+  list_btree_values( get_leaf( ), ERROR );
 }
