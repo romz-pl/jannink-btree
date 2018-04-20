@@ -88,9 +88,9 @@ Nptr Tree::get_leaf( ) const
 }
 
 // #define setleaf(v) (B->leaf = (v))
-void set_leaf( Tree* B, Nptr v )
+void Tree::set_leaf( Nptr v )
 {
-    B->leaf = v;
+    leaf = v;
 }
 
 /* define max/min number of pointers per node */
@@ -231,7 +231,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   set_min_fanout( B, (fan + 1) >> 1 );
   init_free_node_pool( B, poolsz );
 
-  set_leaf( B, get_free_node( B ) );        /* set up the first leaf node */
+  B->set_leaf( get_free_node( B ) );        /* set up the first leaf node */
   B->set_root( B->get_leaf( ) );            /* the root is initially the leaf */
   B->get_root( )->set_flag( isLEAF );
   B->get_root( )->set_flag( isROOT );
