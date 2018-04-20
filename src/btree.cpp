@@ -168,9 +168,9 @@ void Tree::set_split_path( Nptr v )
 }
 
 // #define getmergepath B->branch.merge
-Nptr get_merge_path( Tree* B )
+Nptr Tree::get_merge_path( ) const
 {
-    return B->branch.merge;
+    return branch.merge;
 }
 
 // #define setmergepath(v) (B->branch.merge = (v))
@@ -640,7 +640,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 
   if (!curr->is_few())
     set_merge_path( B, NONODE );
-  else if (get_merge_path( B ) == NONODE)
+  else if ( B->get_merge_path() == NONODE)
     set_merge_path( B, curr );        /* mark which nodes may need rebalancing */
 
   slot = get_slot(B, curr);
@@ -702,7 +702,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   showNode(B, curr);
 #endif
 
-  if (get_merge_path( B ) == NONODE)
+  if ( B->get_merge_path() == NONODE)
     newNode = NONODE;
   else {        /* tree rebalancing rules for node merges and shifts */
     notleft = isnt_node( B, left );
@@ -722,12 +722,12 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
     }
             /* CASE 3: choose the better of a merge or a shift */
     else if (!notleft && fewleft && !notright && !fewright) {
-      test = !(rAnc == parent) && (curr == get_merge_path( B ) );
+      test = !(rAnc == parent) && (curr == B->get_merge_path() );
       newNode = test ? merge(B, left, curr, lAnc) : shift(B, curr, right, rAnc);
     }
             /* CASE 4: also choose between a merge or a shift */
     else if (!notleft && !fewleft && !notright && fewright) {
-      test = !(lAnc == parent) && (curr == get_merge_path( B ) );
+      test = !(lAnc == parent) && (curr == B->get_merge_path() );
       newNode = test ? merge(B, curr, right, rAnc) : shift(B, left, curr, lAnc);
     }
             /* CASE 5: choose the more effective of two shifts */
@@ -794,7 +794,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (left->num_entries() == B->get_fanout())
     left->set_flag( isFULL );        /* never happens in even size nodes */
 
-  if (get_merge_path( B ) == left || get_merge_path( B ) == right)
+  if ( B->get_merge_path() == left || B->get_merge_path() == right)
     set_merge_path( B, NONODE );        /* indicate rebalancing is complete */
 
   return right;
