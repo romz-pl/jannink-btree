@@ -124,11 +124,10 @@ Nptr Node::get_last_node( ) const
     return this->X.e[ this->X.i.info.pairs ].downNode;
 }
 
-/* manage pointers to next nodes in leaf nodes */
 // #define setnextnode(j, v) (nAdr(j).l.nextNode = (v))
-void set_next_node( Node* j, Nptr v )
+void Node::set_next_node( Nptr v )
 {
-    j->X.l.nextNode = v;
+    this->X.l.nextNode = v;
 }
 
 // #define getnextnode(j) nAdr(j).l.nextNode

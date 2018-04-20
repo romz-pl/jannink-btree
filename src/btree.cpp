@@ -551,8 +551,8 @@ Nptr split(Tree *B, Nptr newNode)
 
   if ( newNode->is_leaf()) {
     sibling->set_flag( isLEAF );
-    set_next_node(sibling, get_next_node(newNode));    /* adjust leaf pointers */
-    set_next_node(newNode, sibling);
+    sibling->set_next_node( get_next_node(newNode));    /* adjust leaf pointers */
+    newNode->set_next_node( sibling);
   }
   if (get_split_path( B ) == newNode)
     set_split_path( B, NONODE );            /* no more splitting needed */
@@ -791,7 +791,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     set_entry(left, left->num_entries(), get_fun_key( B ), right->get_first_node());
   }
   else
-    set_next_node(left, get_next_node(right));
+    left->set_next_node( get_next_node(right));
   for (x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++) {
     left->inc_entries();
     xfer_entry(right, y, left, x);    /* transfer entries to left node */
@@ -900,9 +900,9 @@ void init_free_node_pool(Tree *B, int quantity)
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
     n->clear_entries();
-    set_next_node(n, n + 1);        /* insert node into free node list */
+    n->set_next_node( n + 1);        /* insert node into free node list */
   }
-  set_next_node(--n, NONODE);        /* indicates end of free node list */
+  (--n)->set_next_node( NONODE);        /* indicates end of free node list */
 }
 
 
@@ -913,7 +913,7 @@ Nptr get_free_node(Tree *B)
 
   if (newNode != NONODE) {
     set_first_free_node( B, get_next_node( newNode ) );    /* adjust free node list */
-    set_next_node(newNode, NONODE);        /* remove node from list */
+    newNode->set_next_node( NONODE);        /* remove node from list */
   }
   else {
     fprintf(stderr, "Out of tree nodes.");    /* can't recover from this */
@@ -928,7 +928,7 @@ void put_free_node(Tree *B, Nptr self)
 {
   self->clear_flags();
   self->clear_entries();
-  set_next_node( self, get_first_free_node( B ) );        /* add node to list */
+  self->set_next_node(  get_first_free_node( B ) );        /* add node to list */
   set_first_free_node( B, self );            /* set it to be list head */
 }
 
