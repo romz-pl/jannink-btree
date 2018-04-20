@@ -4,18 +4,15 @@
 
 TEST( btree, init_free )
 {
-    Tree *B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
-    EXPECT_TRUE( B );
+    Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
 
-    btree_insert( B, 17 );
-    Nptr na = btree_search( B, 17 );
-    EXPECT_TRUE( na != NONODE );
+    B.insert( 17 );
+    Nptr na = B.search( 17 );
+    EXPECT_TRUE( na != B.NONODE() );
 
-    btree_delete( B, 17 );
-    Nptr nb = btree_search( B, 17 );
-    EXPECT_TRUE( nb == NONODE );
-
-    btree_free( B );
+    B.erase( 17 );
+    Nptr nb = B.search( 17 );
+    EXPECT_TRUE( nb == B.NONODE() );
 }
 
 TEST( btree, insert_search_delete )
@@ -24,8 +21,7 @@ TEST( btree, insert_search_delete )
     const unsigned seed = 12345;
     std::set< int > sset;
     std::srand( seed );
-    Tree *B;
-    B = btree_init( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
+    Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
 
     for( int i = 0; i < item_no; i++ )
     {
@@ -33,29 +29,27 @@ TEST( btree, insert_search_delete )
         auto ret = sset.insert( key );
         if( ret.second )
         {
-            btree_insert( B, key );
+            B.insert( key );
         }
     }
 
     for( auto v : sset )
     {
-        Nptr na = btree_search( B, v );
-        EXPECT_TRUE( na != NONODE );
+        Nptr na = B.search( v );
+        EXPECT_TRUE( na != B.NONODE() );
     }
 
 /*    for( auto v : sset )
     {
-        btree_delete( B, v );
+        B.btree_delete( v );
     }
 
     for( auto v : sset )
     {
-        Nptr na = btree_search( B, v );
-        EXPECT_TRUE( na == NONODE );
+        Nptr na = B.btree_search( v );
+        EXPECT_TRUE( na == B.NONODE() );
     }
     */
-
-    btree_free( B );
 }
 
 
