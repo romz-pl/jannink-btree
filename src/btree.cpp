@@ -899,7 +899,7 @@ void init_free_node_pool(Tree *B, int quantity)
   set_first_free_node( B, node_array_head( B ) );    /* start a list of free nodes */
   for (n = get_first_free_node( B ), i = 0; i < quantity; n++, i++) {
     n->clear_flags();
-    clear_entries(n);
+    n->clear_entries();
     set_next_node(n, n + 1);        /* insert node into free node list */
   }
   set_next_node(--n, NONODE);        /* indicates end of free node list */
@@ -927,7 +927,7 @@ Nptr get_free_node(Tree *B)
 void put_free_node(Tree *B, Nptr self)
 {
   self->clear_flags();
-  clear_entries(self);
+  self->clear_entries();
   set_next_node( self, get_first_free_node( B ) );        /* add node to list */
   set_first_free_node( B, self );            /* set it to be list head */
 }

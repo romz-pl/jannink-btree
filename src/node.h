@@ -159,6 +159,7 @@ public:
     bool is_few( ) const;
 
     short num_entries( ) const;
+    void clear_entries( );
 
 public:
     union
@@ -173,7 +174,7 @@ public:
 
 
 
-void clear_entries( Node* j );
+
 void inc_entries( Node * j );
 void dec_entries( Node* j );
 void set_first_node( Node* j, Nptr v );

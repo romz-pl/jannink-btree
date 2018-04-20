@@ -88,9 +88,9 @@ short Node::num_entries( ) const
 }
 
 // #define clearentries(j) (nAdr(j).i.info.pairs = 0)
-void clear_entries( Node* j )
+void Node::clear_entries( )
 {
-    j->X.i.info.pairs = 0;
+    this->X.i.info.pairs = 0;
 }
 
 // #define incentries(j) (nAdr(j).i.info.pairs++)
