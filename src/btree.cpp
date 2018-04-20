@@ -93,11 +93,11 @@ void Tree::set_leaf( Nptr v )
     leaf = v;
 }
 
-/* define max/min number of pointers per node */
+
 // #define getfanout B->fanout
-int get_fanout( Tree* B )
+int Tree::get_fanout( ) const
 {
-    return B->fanout;
+    return fanout;
 }
 
 // #define setfanout(v) (B->fanout = (v) - 1)
@@ -475,16 +475,16 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
   }
   else {                /* split entries between the two */
     i = newNode->is_internal();        /* adjustment values */
-    split = i ? get_fanout( B ) - get_min_fanout( B, newNode ): get_min_fanout( B, newNode );
+    split = i ? B->get_fanout( ) - get_min_fanout( B, newNode ): get_min_fanout( B, newNode );
     j = (slot != split);
     k = (slot >= split);
 
-    for (x = split + k + j * i, y = 1; x <= get_fanout( B ); x++, y++) {
+    for (x = split + k + j * i, y = 1; x <= B->get_fanout(); x++, y++) {
       newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
       newNode->dec_entries();
       sibling->inc_entries();
     }
-    if (sibling->num_entries() == get_fanout( B ))
+    if (sibling->num_entries() == B->get_fanout())
       sibling->set_flag( isFULL );        /* only ever happens in 2-3+trees */
 
     if (i) {                /* set first pointer of internal node */
@@ -532,7 +532,7 @@ void place_entry(Tree *B, Nptr newNode, int slot, Nptr downPtr)
   newNode->set_entry( slot, B->get_fun_key( ), downPtr);    /* place it in correct slot */
 
   newNode->inc_entries();                /* adjust entry counter */
-  if (newNode->num_entries() == get_fanout( B ))
+  if (newNode->num_entries() == B->get_fanout())
     newNode->set_flag( isFULL );
 }
 
@@ -795,7 +795,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   }
   if (left->num_entries() > get_min_fanout( B, left ))
     left->clr_flag( FEWEST );
-  if (left->num_entries() == get_fanout( B ))
+  if (left->num_entries() == B->get_fanout())
     left->set_flag( isFULL );        /* never happens in even size nodes */
 
   if (get_merge_path( B ) == left || get_merge_path( B ) == right)

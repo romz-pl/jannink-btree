@@ -34,6 +34,9 @@ public:
     Nptr get_leaf( ) const;
     void set_leaf( Nptr v );
 
+    // define max/min number of pointers per node
+    int get_fanout( ) const;
+
 
 public:
 
