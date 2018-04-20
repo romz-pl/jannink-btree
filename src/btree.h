@@ -99,6 +99,7 @@ public:
     Nptr shift( Nptr left, Nptr right, Nptr anchor );
     Nptr merge( Nptr left, Nptr right, Nptr anchor );
     void remove_entry( Nptr curr, int slot );
+    Nptr descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent );
 
 public:
 

@@ -599,7 +599,7 @@ void btree_delete(Tree *B, keyT key)
 
   B->set_fun_key( key );            /* set deletion key */
   B->set_merge_path( B->NONODE() );
-  newNode = descend_balance(B, B->get_root( ), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE());
+  newNode = B->descend_balance( B->get_root( ), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE(), B->NONODE());
   if ( B->is_node( newNode ))
     collapse_root(B, B->get_root( ), newNode);    /* remove root when superfluous */
 }
@@ -623,21 +623,21 @@ void collapse_root(Tree *B, Nptr oldRoot, Nptr newRoot)
 
 
 /*~~~~~~~~~~~~~~~   recurse down and balance back up   ~~~~~~~~~~~~~~~~*/
-Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent)
+Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent )
 {
   Nptr    newMe, myLeft, myRight, lAnchor, rAnchor, newNode;
   int    slot, notleft, notright, fewleft, fewright, test;
 
   if (!curr->is_few())
-    B->set_merge_path( B->NONODE() );
-  else if ( B->get_merge_path() == B->NONODE())
-    B->set_merge_path( curr );        /* mark which nodes may need rebalancing */
+    set_merge_path( NONODE() );
+  else if ( get_merge_path() == NONODE())
+    set_merge_path( curr );        /* mark which nodes may need rebalancing */
 
-  slot = B->get_slot( curr);
+  slot = get_slot( curr);
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = B->isnt_node( left ) ? B->NONODE() : left->get_last_node();
+      myLeft = isnt_node( left ) ? NONODE() : left->get_last_node();
       lAnchor = lAnc;
     }
     else {
@@ -645,20 +645,20 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
       lAnchor = curr;
     }
     if (slot == curr->num_entries()) {
-      myRight = B->isnt_node( right ) ? B->NONODE() : right->get_first_node();
+      myRight = isnt_node( right ) ? NONODE() : right->get_first_node();
       rAnchor = rAnc;
     }
     else {
       myRight = curr->get_node( slot + 1 );
       rAnchor = curr;
     }
-    newMe = descend_balance(B, newNode, myLeft, myRight, lAnchor, rAnchor, curr);
+    newMe = descend_balance( newNode, myLeft, myRight, lAnchor, rAnchor, curr);
   }
-  else if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot )))
+  else if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot )))
     newMe = newNode;        /* a key to be deleted is found */
   else {
-    newMe = B->NONODE();        /* no deletion possible, key not found */
-    B->set_merge_path( B->NONODE() );
+    newMe = NONODE();        /* no deletion possible, key not found */
+    set_merge_path( NONODE() );
   }
 
 /*~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~*\
@@ -684,51 +684,51 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 
 /*             begin deletion, working upwards from leaves */
 
-  if (newMe != B->NONODE())    /* this node removal doesn't consider duplicates */
-    B->remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
+  if (newMe != NONODE())    /* this node removal doesn't consider duplicates */
+    remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
 
 #ifdef DEBUG
   fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, getnodenumber(newMe));
   showNode(B, curr);
 #endif
 
-  if ( B->get_merge_path() == B->NONODE())
-    newNode = B->NONODE();
+  if ( get_merge_path() == NONODE())
+    newNode = NONODE();
   else {        /* tree rebalancing rules for node merges and shifts */
-    notleft = B->isnt_node( left );
-    notright = B->isnt_node( right );
+    notleft = isnt_node( left );
+    notright = isnt_node( right );
     fewleft = left->is_few();        /* only used when defined */
     fewright = right->is_few();
 
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
       test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? B->NONODE() : curr->get_first_node();
+      newNode = test ? NONODE() : curr->get_first_node();
     }
             /* CASE 2:  the merging of two nodes is a must */
     else if ((notleft || fewleft) && (notright || fewright)) {
       test = !(lAnc == parent);
-      newNode = test ? B->merge( curr, right, rAnc) : B->merge( left, curr, lAnc);
+      newNode = test ? merge( curr, right, rAnc) : merge( left, curr, lAnc);
     }
             /* CASE 3: choose the better of a merge or a shift */
     else if (!notleft && fewleft && !notright && !fewright) {
-      test = !(rAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? B->merge( left, curr, lAnc) : B->shift( curr, right, rAnc);
+      test = !(rAnc == parent) && (curr == get_merge_path() );
+      newNode = test ? merge( left, curr, lAnc) : shift( curr, right, rAnc);
     }
             /* CASE 4: also choose between a merge or a shift */
     else if (!notleft && !fewleft && !notright && fewright) {
-      test = !(lAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? B->merge( curr, right, rAnc) : B->shift( left, curr, lAnc);
+      test = !(lAnc == parent) && (curr == get_merge_path() );
+      newNode = test ? merge( curr, right, rAnc) : shift( left, curr, lAnc);
     }
             /* CASE 5: choose the more effective of two shifts */
     else if (lAnc == rAnc) {         /* => both anchors are the parent */
       test = (left->num_entries() <= right->num_entries());
-      newNode = test ? B->shift( curr, right, rAnc) : B->shift( left, curr, lAnc);
+      newNode = test ? shift( curr, right, rAnc) : shift( left, curr, lAnc);
     }
             /* CASE 6: choose the shift with more local effect */
     else {                /* if omitting cases 3,4,5 use below */
       test = (lAnc == parent);        /* test = (!notleft && !fewleft); */
-      newNode = test ? B->shift( left, curr, lAnc) : B->shift( curr, right, rAnc);
+      newNode = test ? shift( left, curr, lAnc) : shift( curr, right, rAnc);
     }
   }
 
