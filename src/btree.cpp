@@ -685,7 +685,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 /*             begin deletion, working upwards from leaves */
 
   if (newMe != B->NONODE())    /* this node removal doesn't consider duplicates */
-    remove_entry(B, curr, slot + (newMe != newNode));    /* removes one of two */
+    B->remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
 
 #ifdef DEBUG
   fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, getnodenumber(newMe));
@@ -737,11 +737,11 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 
 
 /*~~~~~~~~~~~~~~~   remove key and pointer from node   ~~~~~~~~~~~~~~~~*/
-void remove_entry(Tree *B, Nptr curr, int slot)
+void Tree::remove_entry( Nptr curr, int slot )
 {
   int x;
 
-  B->put_free_node( curr->get_node( slot ));    /* return deleted node to free list */
+  put_free_node( curr->get_node( slot ));    /* return deleted node to free list */
   for (x = slot; x < curr->num_entries(); x++)
     curr->pull_entry( x, 1);        /* adjust node with removed key */
   curr->dec_entries();
@@ -750,7 +750,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
     if (curr->num_entries() == 1)
       curr->set_flag( FEWEST );
   }
-  else if (curr->num_entries() == B->get_min_fanout( curr ))
+  else if (curr->num_entries() == get_min_fanout( curr ))
     curr->set_flag( FEWEST );
 }
 
