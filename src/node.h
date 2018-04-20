@@ -153,6 +153,7 @@ public:
 
     // test individual flag values
     bool is_internal( ) const;
+    bool is_leaf( ) const;
 
 public:
     union
@@ -166,7 +167,7 @@ public:
 } ;
 
 
-bool is_leaf( Node* j );
+
 bool is_root( Node* j );
 bool is_full( Node* j );
 bool is_few( Node* j );

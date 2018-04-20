@@ -549,7 +549,7 @@ Nptr split(Tree *B, Nptr newNode)
 
   sibling->set_flag( FEWEST );            /* set up node flags */
 
-  if (is_leaf(newNode)) {
+  if ( newNode->is_leaf()) {
     sibling->set_flag( isLEAF );
     set_next_node(sibling, get_next_node(newNode));    /* adjust leaf pointers */
     set_next_node(newNode, sibling);
@@ -719,7 +719,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
 
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
-      test = is_leaf(curr);        /* check if B+tree has become empty */
+      test = curr->is_leaf();        /* check if B+tree has become empty */
       newNode = test ? NONODE : getfirstnode(curr);
     }
             /* CASE 2:  the merging of two nodes is a must */

@@ -57,9 +57,9 @@ bool Node::is_internal( ) const
 }
 
 // #define isleaf(j) ((nAdr(j).i.info.flags & isLEAF) == isLEAF)
-bool is_leaf( Node* j )
+bool Node::is_leaf( ) const
 {
-    return ( ( j->X.i.info.flags & isLEAF ) == isLEAF );
+    return ( ( this->X.i.info.flags & isLEAF ) == isLEAF );
 }
 
 // #define isroot(j) ((nAdr(j).i.info.flags & isROOT) == isROOT)
