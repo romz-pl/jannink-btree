@@ -434,7 +434,7 @@ Nptr descend_split(Tree *B, Nptr curr)
 
   if (newMe != B->NONODE()) {        /* insert only where necessary */
     if ( B->get_split_path() != B->NONODE())
-      newNode = split(B, curr);        /* a sibling node is prepared */
+      newNode = B->split( curr);        /* a sibling node is prepared */
     B->insert_entry( curr, slot, newNode, newMe);
   }
 
@@ -515,11 +515,11 @@ void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 
 
 /*~~~~~~~~~~~~~~~~   split full node and set flags   ~~~~~~~~~~~~~~~~~~*/
-Nptr split(Tree *B, Nptr newNode)
+Nptr Tree::split( Nptr newNode )
 {
   Nptr sibling;
 
-  sibling = B->get_free_node();
+  sibling = get_free_node();
 
   sibling->set_flag( FEWEST );            /* set up node flags */
 
@@ -528,8 +528,8 @@ Nptr split(Tree *B, Nptr newNode)
     sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
     newNode->set_next_node( sibling);
   }
-  if ( B->get_split_path() == newNode)
-    B->set_split_path( B->NONODE() );            /* no more splitting needed */
+  if ( get_split_path() == newNode)
+    set_split_path( NONODE() );            /* no more splitting needed */
 
   return sibling;
 }
