@@ -82,9 +82,9 @@ bool Node::is_few( ) const
 
 /* manage number of keys in a node */
 // #define numentries(j) nAdr(j).i.info.pairs
-short num_entries( Node* j )
+short Node::num_entries( ) const
 {
-    return j->X.i.info.pairs;
+    return this->X.i.info.pairs;
 }
 
 // #define clearentries(j) (nAdr(j).i.info.pairs = 0)

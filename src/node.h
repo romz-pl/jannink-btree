@@ -158,6 +158,8 @@ public:
     bool is_full( ) const;
     bool is_few( ) const;
 
+    short num_entries( ) const;
+
 public:
     union
     {
@@ -170,7 +172,7 @@ public:
 } ;
 
 
-short num_entries( Node* j );
+
 void clear_entries( Node* j );
 void inc_entries( Node * j );
 void dec_entries( Node* j );
