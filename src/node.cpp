@@ -158,8 +158,8 @@ void Node::xfer_entry( int q, Node* v, int z ) const
 
 
 // #define setentry(j, q, v, z) (nAdr(j).e[(q)].key = (v), nAdr(j).e[(q)].downNode = (z))
-void set_entry( Node* j, int q, keyT v, Nptr z )
+void Node::set_entry( int q, keyT v, Nptr z )
 {
-    j->X.e[ q ].key = v;
-    j->X.e[ q ].downNode = z;
+    this->X.e[ q ].key = v;
+    this->X.e[ q ].downNode = z;
 }

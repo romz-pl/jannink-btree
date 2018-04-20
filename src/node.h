@@ -176,6 +176,7 @@ public:
     void push_entry( int q, int v );
     void pull_entry( int q, int v );
     void xfer_entry( int q, Node* v, int z ) const;
+    void set_entry( int q, keyT v, Nptr z );
 
 public:
     union
@@ -188,14 +189,6 @@ public:
     } X;
 } ;
 
-
-
-
-
-
-
-
-void set_entry( Node* j, int q, keyT v, Nptr z );
 
 
 #endif
