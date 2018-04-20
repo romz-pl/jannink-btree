@@ -97,6 +97,7 @@ public:
     void insert( keyT key );
 
     Nptr shift( Nptr left, Nptr right, Nptr anchor );
+    Nptr merge( Nptr left, Nptr right, Nptr anchor );
 
 public:
 

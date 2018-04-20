@@ -708,17 +708,17 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
             /* CASE 2:  the merging of two nodes is a must */
     else if ((notleft || fewleft) && (notright || fewright)) {
       test = !(lAnc == parent);
-      newNode = test ? merge(B, curr, right, rAnc) : merge(B, left, curr, lAnc);
+      newNode = test ? B->merge( curr, right, rAnc) : B->merge( left, curr, lAnc);
     }
             /* CASE 3: choose the better of a merge or a shift */
     else if (!notleft && fewleft && !notright && !fewright) {
       test = !(rAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? merge(B, left, curr, lAnc) : B->shift( curr, right, rAnc);
+      newNode = test ? B->merge( left, curr, lAnc) : B->shift( curr, right, rAnc);
     }
             /* CASE 4: also choose between a merge or a shift */
     else if (!notleft && !fewleft && !notright && fewright) {
       test = !(lAnc == parent) && (curr == B->get_merge_path() );
-      newNode = test ? merge(B, curr, right, rAnc) : B->shift( left, curr, lAnc);
+      newNode = test ? B->merge( curr, right, rAnc) : B->shift( left, curr, lAnc);
     }
             /* CASE 5: choose the more effective of two shifts */
     else if (lAnc == rAnc) {         /* => both anchors are the parent */
@@ -756,7 +756,7 @@ void remove_entry(Tree *B, Nptr curr, int slot)
 
 
 /*~~~~~~   merge a node pair & set emptied node up for removal   ~~~~~~*/
-Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
+Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
 {
   int    x, y, z;
 
@@ -768,10 +768,10 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
 
   if (left->is_internal()) {
     left->inc_entries();            /* copy key separating the nodes */
-    B->set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
-    z = B->get_slot( anchor);        /* needs the just calculated key */
-    B->set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
-    left->set_entry( left->num_entries(), B->get_fun_key( ), right->get_first_node());
+    set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
+    z = get_slot( anchor);        /* needs the just calculated key */
+    set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
+    left->set_entry( left->num_entries(), get_fun_key( ), right->get_first_node());
   }
   else
     left->set_next_node( right->get_next_node());
@@ -779,13 +779,13 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
     left->inc_entries();
     right->xfer_entry( y, left, x);    /* transfer entries to left node */
   }
-  if (left->num_entries() > B->get_min_fanout( left ))
+  if (left->num_entries() > get_min_fanout( left ))
     left->clr_flag( FEWEST );
-  if (left->num_entries() == B->get_fanout())
+  if (left->num_entries() == get_fanout())
     left->set_flag( isFULL );        /* never happens in even size nodes */
 
-  if ( B->get_merge_path() == left || B->get_merge_path() == right)
-    B->set_merge_path( B->NONODE() );        /* indicate rebalancing is complete */
+  if ( get_merge_path() == left || get_merge_path() == right)
+    set_merge_path( NONODE() );        /* indicate rebalancing is complete */
 
   return right;
 }
