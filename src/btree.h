@@ -93,6 +93,7 @@ public:
     void insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr );
     Nptr split( Nptr newNode );
     void make_new_root( Nptr oldRoot, Nptr newNode );
+    Nptr descend_split( Nptr curr );
 
 public:
 

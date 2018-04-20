@@ -403,39 +403,39 @@ void btree_insert(Tree *B, keyT key)
   B->set_fun_key( key );            /* set insertion key */
   B->set_fun_data( "data" );            /* a node containing data */
   B->set_split_path( B->NONODE() );
-  newNode = descend_split(B, B->get_root( ));    /* insertion point search from root */
+  newNode = B->descend_split( B->get_root( ));    /* insertion point search from root */
   if (newNode != B->get_split_path() )        /* indicates the root node has split */
     B->make_new_root( B->get_root( ), newNode);
 }
 
 
 /*~~~~~~~~~~~~~~~~   recurse down and split back up   ~~~~~~~~~~~~~~~~~*/
-Nptr descend_split(Tree *B, Nptr curr)
+Nptr Tree::descend_split( Nptr curr )
 {
   Nptr    newMe, newNode;
   int    slot;
 
   if (!curr->is_full())
-    B->set_split_path( B->NONODE() );
-  else if ( B->get_split_path() == B->NONODE())
-    B->set_split_path( curr );            /* indicates where nodes must split */
+    set_split_path( NONODE() );
+  else if ( get_split_path() == NONODE())
+    set_split_path( curr );            /* indicates where nodes must split */
 
-  slot = B->get_slot( curr);        /* is null only if the root is empty */
+  slot = get_slot( curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
-    newMe = descend_split(B, curr->get_node( slot ));
-  else if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ))) {
-    newMe = B->NONODE();            /* this code discards duplicates */
-    B->set_split_path( B->NONODE() );
+    newMe = descend_split( curr->get_node( slot ));
+  else if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot ))) {
+    newMe = NONODE();            /* this code discards duplicates */
+    set_split_path( NONODE() );
   }
   else
-    newMe = B->get_data_node( B->get_fun_key( ) );    /* an insertion takes place */
+    newMe = get_data_node( get_fun_key( ) );    /* an insertion takes place */
 
-  newNode = B->NONODE();            /* assume no node splitting necessary */
+  newNode = NONODE();            /* assume no node splitting necessary */
 
-  if (newMe != B->NONODE()) {        /* insert only where necessary */
-    if ( B->get_split_path() != B->NONODE())
-      newNode = B->split( curr);        /* a sibling node is prepared */
-    B->insert_entry( curr, slot, newNode, newMe);
+  if (newMe != NONODE()) {        /* insert only where necessary */
+    if ( get_split_path() != NONODE())
+      newNode = split( curr);        /* a sibling node is prepared */
+    insert_entry( curr, slot, newNode, newMe);
   }
 
   return newNode;
