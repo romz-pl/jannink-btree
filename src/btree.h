@@ -36,6 +36,7 @@ public:
 
     // define max/min number of pointers per node
     int get_fanout( ) const;
+    void set_fanout( int v );
 
 
 public:

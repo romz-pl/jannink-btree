@@ -101,9 +101,9 @@ int Tree::get_fanout( ) const
 }
 
 // #define setfanout(v) (B->fanout = (v) - 1)
-void set_fanout( Tree* B, int v )
+void Tree::set_fanout( int v )
 {
-    B->fanout = v - 1;
+    fanout = v - 1;
 }
 
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
@@ -227,7 +227,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   Tree *B;
 
   B = (Tree *)( malloc( sizeof( Tree ) ) );
-  set_fanout( B, fan );
+  B->set_fanout( fan );
   set_min_fanout( B, (fan + 1) >> 1 );
   init_free_node_pool( B, poolsz );
 
