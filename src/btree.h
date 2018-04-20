@@ -58,6 +58,9 @@ public:
     Nptr get_merge_path( ) const;
     void set_merge_path( Nptr v );
 
+    // exploit function to compare two B+tree keys
+    KeyCmp compare_keys( ) const;
+
 
 public:
 

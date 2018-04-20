@@ -179,11 +179,10 @@ void Tree::set_merge_path( Nptr v )
     branch.merge = v;
 }
 
-/* exploit function to compare two B+tree keys */
 // #define comparekeys (*B->keycmp)
-KeyCmp compare_keys( Tree* B )
+KeyCmp Tree::compare_keys( ) const
 {
-    return *B->keycmp;
+    return *keycmp;
 }
 
 // #define setcomparekeys(v) (B->keycmp = (v))
@@ -296,7 +295,7 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
 
   for (slot = get_slot(B, curr); curr->is_internal(); slot = get_slot(B, curr))
     curr = curr->get_node( slot );
-  if ((slot > 0) && !compare_keys( B )( B->get_fun_key( ), curr->get_key( slot ) ) )
+  if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
   else
     findNode = NONODE;            /* key value not in tree */
@@ -365,10 +364,10 @@ int best_match(Tree *B, Nptr curr, int slot)
 {
   int diff, comp, findslot;
 
-  diff = compare_keys( B )( B->get_fun_key( ), curr->get_key( slot ));
+  diff = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ));
   if (diff < 0) {        /* also check previous slot */
     if ((slot == 1) ||
-        ((comp = compare_keys( B )( B->get_fun_key( ), curr->get_key( slot - 1 ))) >= 0))
+        ((comp = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot - 1 ))) >= 0))
       findslot = slot - 1;
 
 #ifdef DEBUG
@@ -381,7 +380,7 @@ int best_match(Tree *B, Nptr curr, int slot)
   }
   else {            /* or check following slot */
     if ((slot == curr->num_entries()) ||
-        ((comp = compare_keys( B )( B->get_fun_key( ), curr->get_key( slot + 1 ))) < 0))
+        ((comp = B->compare_keys()( B->get_fun_key( ), curr->get_key( slot + 1 ))) < 0))
       findslot = slot;
     else if (comp == 0)
       findslot = slot + 1;
@@ -442,7 +441,7 @@ Nptr descend_split(Tree *B, Nptr curr)
   slot = get_slot(B, curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split(B, curr->get_node( slot ));
-  else if ((slot > 0) && !compare_keys( B )( B->get_fun_key( ), curr->get_key( slot ))) {
+  else if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ))) {
     newMe = NONODE;            /* this code discards duplicates */
     B->set_split_path( NONODE );
   }
@@ -664,7 +663,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
     }
     newMe = descend_balance(B, newNode, myLeft, myRight, lAnchor, rAnchor, curr);
   }
-  else if ((slot > 0) && !compare_keys( B )( B->get_fun_key( ), curr->get_key( slot )))
+  else if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot )))
     newMe = newNode;        /* a key to be deleted is found */
   else {
     newMe = NONODE;        /* no deletion possible, key not found */
