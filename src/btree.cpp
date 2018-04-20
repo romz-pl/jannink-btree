@@ -138,9 +138,9 @@ void Tree::dec_tree_height( )
 }
 
 // #define gettreeheight B->height
-int get_tree_height( Tree* B )
+int Tree::get_tree_height( ) const
 {
-    return B->height;
+    return height;
 }
 
 

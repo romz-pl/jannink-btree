@@ -45,6 +45,7 @@ public:
     void init_tree_height( );
     void inc_tree_height( );
     void dec_tree_height( );
+    int get_tree_height( ) const;
 
 
 public:
