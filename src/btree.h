@@ -39,6 +39,7 @@ public:
     void set_fanout( int v );
 
     int get_min_fanout( const Node* j ) const;
+    void set_min_fanout( int v );
 
 
 public:

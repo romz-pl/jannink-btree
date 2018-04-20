@@ -114,9 +114,9 @@ int Tree::get_min_fanout( const Node* j ) const
 
 
 // #define setminfanout(v) (B->minfanout = (v) - 1)
-void set_min_fanout( Tree* B, int v )
+void Tree::set_min_fanout( int v )
 {
-    B->minfanout = v - 1;
+    minfanout = v - 1;
 }
 
 /* manage B+tree height */
@@ -228,7 +228,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
 
   B = (Tree *)( malloc( sizeof( Tree ) ) );
   B->set_fanout( fan );
-  set_min_fanout( B, (fan + 1) >> 1 );
+  B->set_min_fanout( (fan + 1) >> 1 );
   init_free_node_pool( B, poolsz );
 
   B->set_leaf( get_free_node( B ) );        /* set up the first leaf node */
