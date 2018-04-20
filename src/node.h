@@ -166,6 +166,7 @@ public:
     // manage first/last node pointers in internal nodes
     void set_first_node( Nptr v );
     Nptr get_first_node( ) const;
+    Nptr get_last_node( ) const;
 
 public:
     union
@@ -185,7 +186,7 @@ public:
 
 
 
-Nptr get_last_node( Node* j );
+
 void set_next_node( Node* j, Nptr v );
 Nptr get_next_node( Node* j );
 void push_entry( Node* j, int q, int v );

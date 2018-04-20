@@ -654,7 +654,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = isnt_node( B, left ) ? NONODE : get_last_node(left);
+      myLeft = isnt_node( B, left ) ? NONODE : left->get_last_node();
       lAnchor = lAnc;
     }
     else {
