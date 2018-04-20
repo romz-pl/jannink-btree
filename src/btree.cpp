@@ -32,9 +32,9 @@ dataT Tree::get_fun_data( ) const
 }
 
 // #define setfunkey(v) (B->theKey = (v))
-void set_fun_key( Tree* B, keyT v )
+void Tree::set_fun_key( keyT v )
 {
-    B->theKey = v;
+    theKey = v;
 }
 
 // #define setfundata(v) (B->theData = strdup(v))
@@ -240,7 +240,7 @@ Tree *btree_init(int poolsz, int fan, KeyCmp keyCmp)
   get_root( B )->set_flag( FEWEST );
   init_tree_height( B );
 
-  set_fun_key( B, 0 );
+  B->set_fun_key( 0 );
   set_fun_data( B, "0" );
   set_compare_keys( B, keyCmp );
 
@@ -284,7 +284,7 @@ Nptr btree_search(Tree *B, keyT key)
   fprintf(stderr, "SEARCH:  key %d.\n", key);
 #endif
 
-  set_fun_key( B, key );            /* set search key */
+  B->set_fun_key( key );            /* set search key */
   findNode = descend_to_leaf(B, get_root( B ));    /* start search from root node */
 
 #ifdef DEBUG
@@ -425,7 +425,7 @@ void btree_insert(Tree *B, keyT key)
   fprintf(stderr, "INSERT:  key %d.\n", key);
 #endif
 
-  set_fun_key( B, key );            /* set insertion key */
+  B->set_fun_key( key );            /* set insertion key */
   set_fun_data( B, "data" );            /* a node containing data */
   set_split_path( B, NONODE );
   newNode = descend_split(B, get_root( B ));    /* insertion point search from root */
@@ -504,7 +504,7 @@ void insert_entry(Tree *B, Nptr newNode, int slot, Nptr sibling, Nptr downPtr)
     place_entry(B, sibling, slot - split + 1 - i, downPtr);
       else
     place_entry(B, newNode, slot + 1, downPtr);
-      set_fun_key( B, x );            /* set key separating nodes */
+      B->set_fun_key( x );            /* set key separating nodes */
     }
     else if (!i)
       place_entry(B, sibling, 1, downPtr);
@@ -613,7 +613,7 @@ void btree_delete(Tree *B, keyT key)
   fprintf(stderr, "DELETE:  key %d.\n", key);
 #endif
 
-  set_fun_key( B, key );            /* set deletion key */
+  B->set_fun_key( key );            /* set deletion key */
   set_merge_path( B, NONODE );
   newNode = descend_balance(B, get_root( B ), NONODE, NONODE, NONODE, NONODE, NONODE);
   if (is_node( B, newNode ))
@@ -784,9 +784,9 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
 
   if (left->is_internal()) {
     left->inc_entries();            /* copy key separating the nodes */
-    set_fun_key( B, right->get_key( 1 ) );    /* defined but maybe just deleted */
+    B->set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
     z = get_slot(B, anchor);        /* needs the just calculated key */
-    set_fun_key( B, anchor->get_key( z ) );    /* set slot to delete in anchor */
+    B->set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
     left->set_entry( left->num_entries(), B->get_fun_key( ), right->get_first_node());
   }
   else
@@ -822,7 +822,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (left->num_entries() < right->num_entries()) {    /* shift entries to left */
     y = (right->num_entries() - left->num_entries()) >> 1;
     x = left->num_entries() + y;
-    set_fun_key( B, right->get_key( y + 1 - i ) );    /* set new anchor key value */
+    B->set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
     z = get_slot(B, anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
       right->dec_entries();            /* adjust for shifting anchor */
@@ -848,7 +848,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     for (z = right->num_entries(); z > 0; z--)    /* adjust increased node */
       right->push_entry( z, y);
 
-    set_fun_key( B, left->get_key( x ) );            /* set new anchor key value */
+    B->set_fun_key( left->get_key( x ) );            /* set new anchor key value */
     z = get_slot(B, anchor) + 1;
     if (i) {
       left->dec_entries();
