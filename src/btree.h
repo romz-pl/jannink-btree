@@ -69,6 +69,8 @@ public:
 
     void put_free_node( Nptr self );
 
+    Nptr get_data_node( keyT key ) const;
+
 public:
 
     /* `private' variables */

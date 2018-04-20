@@ -402,7 +402,7 @@ int best_match(Tree *B, Nptr curr, int slot)
 \*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 /*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
-Nptr get_data_node(Tree *B, keyT key);
+
 Nptr descend_split(Tree *B, Nptr curr);
 void insert_entry(Tree *B, Nptr node, int slot, Nptr sibling, Nptr downPtr);
 void place_entry(Tree *B, Nptr node, int slot, Nptr downPtr);
@@ -446,7 +446,7 @@ Nptr descend_split(Tree *B, Nptr curr)
     B->set_split_path( NONODE );
   }
   else
-    newMe = get_data_node(B, B ->get_fun_key( ));    /* an insertion takes place */
+    newMe = B->get_data_node( B->get_fun_key( ) );    /* an insertion takes place */
 
   newNode = NONODE;            /* assume no node splitting necessary */
 
@@ -899,7 +899,7 @@ void init_free_node_pool(Tree *B, int quantity)
 
 
 /*~~~~~~~~~~~~~   take a free B+tree node from the pool   ~~~~~~~~~~~~~*/
-Nptr get_free_node(Tree *B)
+Nptr get_free_node( Tree *B )
 {
   Nptr newNode = B->get_first_free_node( );
 
@@ -924,17 +924,21 @@ void Tree::put_free_node( Nptr self )
   set_first_free_node( self );            /* set it to be list head */
 }
 
-
-/*~~~~~~   fill a free data node with a key and associated data   ~~~~~*/
-Nptr get_data_node(Tree *B, keyT key)        /* can add data parameter */
+//
+// fill a free data node with a key and associated data
+// can add data parameter
+//
+Nptr Tree::get_data_node( keyT key ) const
 {
-  Nptr    newNode = get_free_node(B);
-  keyT    *value;
+    Nptr newNode = get_free_node( const_cast<Tree*>( this ) );
+    keyT* value;
 
-  value = (keyT *) &newNode->X.d;
-  *value = key;                    /* can add code to fill node */
+    value = (keyT *) &newNode->X.d;
 
-  return newNode;
+    // can add code to fill node
+    *value = key;
+
+    return newNode;
 }
 
 
