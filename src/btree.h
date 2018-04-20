@@ -85,6 +85,7 @@ public:
 
     int best_match( Nptr curr, int slot );
     int find_key( Nptr curr, int lo, int hi );
+    int get_slot( Nptr curr );
 
 public:
 

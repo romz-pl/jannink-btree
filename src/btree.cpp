@@ -257,8 +257,7 @@ void Tree::set_compare_keys( KeyCmp v )
 
 /*~~~~~~~~~~~~~~~~~~~~~~   private functions   ~~~~~~~~~~~~~~~~~~~~~~~~*/
 Nptr descend_to_leaf(Tree *B, Nptr curr);
-int get_slot(Tree *B, Nptr curr);
-int find_key(Tree *B, Nptr curr, int lo, int hi);
+
 
 
 /*~~~~~~~~~~~~~~~~~~~~~   top level search call   ~~~~~~~~~~~~~~~~~~~~~*/
@@ -286,7 +285,7 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
   int    slot;
   Nptr    findNode;
 
-  for (slot = get_slot(B, curr); curr->is_internal(); slot = get_slot(B, curr))
+  for (slot = B->get_slot( curr); curr->is_internal(); slot = B->get_slot( curr))
     curr = curr->get_node( slot );
   if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ) ) )
     findNode = curr;            /* correct key value found */
@@ -297,12 +296,12 @@ Nptr descend_to_leaf(Tree *B, Nptr curr)
 }
 
 /*~~~~~~~~~~~~~~~~~~~   find slot for search key   ~~~~~~~~~~~~~~~~~~~~*/
-int get_slot(Tree *B, Nptr curr)
+int Tree::get_slot( Nptr curr )
 {
   int slot, entries;
 
   entries = curr->num_entries();        /* need this if root is ever empty */
-  slot = !entries ? 0 : B->find_key( curr, 1, entries);
+  slot = !entries ? 0 : find_key( curr, 1, entries);
 
 #ifdef DEBUG
   fprintf(stderr, "GETSLOT:  slot %d.\n", slot);
@@ -431,7 +430,7 @@ Nptr descend_split(Tree *B, Nptr curr)
   else if ( B->get_split_path() == B->NONODE())
     B->set_split_path( curr );            /* indicates where nodes must split */
 
-  slot = get_slot(B, curr);        /* is null only if the root is empty */
+  slot = B->get_slot( curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split(B, curr->get_node( slot ));
   else if ((slot > 0) && !B->compare_keys()( B->get_fun_key( ), curr->get_key( slot ))) {
@@ -635,7 +634,7 @@ Nptr descend_balance(Tree *B, Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr 
   else if ( B->get_merge_path() == B->NONODE())
     B->set_merge_path( curr );        /* mark which nodes may need rebalancing */
 
-  slot = get_slot(B, curr);
+  slot = B->get_slot( curr);
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
@@ -771,7 +770,7 @@ Nptr merge(Tree *B, Nptr left, Nptr right, Nptr anchor)
   if (left->is_internal()) {
     left->inc_entries();            /* copy key separating the nodes */
     B->set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
-    z = get_slot(B, anchor);        /* needs the just calculated key */
+    z = B->get_slot( anchor);        /* needs the just calculated key */
     B->set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
     left->set_entry( left->num_entries(), B->get_fun_key( ), right->get_first_node());
   }
@@ -809,7 +808,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
     y = (right->num_entries() - left->num_entries()) >> 1;
     x = left->num_entries() + y;
     B->set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
-    z = get_slot(B, anchor);            /* find slot in anchor node */
+    z = B->get_slot( anchor);            /* find slot in anchor node */
     if (i) {                    /* move out old anchor value */
       right->dec_entries();            /* adjust for shifting anchor */
       left->inc_entries();
@@ -835,7 +834,7 @@ Nptr shift(Tree *B, Nptr left, Nptr right, Nptr anchor)
       right->push_entry( z, y);
 
     B->set_fun_key( left->get_key( x ) );            /* set new anchor key value */
-    z = get_slot(B, anchor) + 1;
+    z = B->get_slot( anchor) + 1;
     if (i) {
       left->dec_entries();
       right->inc_entries();
