@@ -12,6 +12,12 @@
 class Tree
 {
 public:
+    /* access key and data values for B+tree methods */
+    keyT get_fun_key( ) const;
+
+
+
+public:
 
     /* `private' variables */
     int     poolsize;    /* # of nodes allocated for tree */
