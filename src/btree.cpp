@@ -20,7 +20,7 @@ Tree::Tree( int pool_size )
     , root( nullptr )
     , leaf( nullptr )
     , fanout( 0 )
-    , minfanout( 0 )
+    , min_fanout( 0 )
     , height( 0 )
     , pool( 0 )
     , theKey( 0 )
@@ -185,15 +185,15 @@ void Tree::set_fanout( int v )
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
 int Tree::get_min_fanout( const Node* j ) const
 {
-    // return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
-    return j->is_leaf() ? fanout - minfanout : minfanout;
+    // return ( j->inner.info.flags & Node::isLEAF ) ? fanout - minfanout : minfanout;
+    return j->is_leaf() ? fanout - min_fanout : min_fanout;
 }
 
 
 // #define setminfanout(v) (B->minfanout = (v) - 1)
 void Tree::set_min_fanout( int v )
 {
-    minfanout = v - 1;
+    min_fanout = v - 1;
 }
 
 // #define inittreeheight (B->height = 0)
@@ -470,13 +470,13 @@ void Tree::insert( Key key )
     set_split_path( NO_NODE() );
 
     // insertion point search from root
-    Node* newNode = descend_split( get_root() );
+    Node* new_node = descend_split( get_root() );
 
 
     // indicates the root node has split
-    if( newNode != get_split_path() )
+    if( new_node != get_split_path() )
     {
-        make_new_root( get_root(), newNode );
+        make_new_root( get_root(), new_node );
     }
 }
 
@@ -492,14 +492,14 @@ Node* Tree::descend_split( Node* curr )
     {
         set_split_path( NO_NODE() );
     }
-    else if ( get_split_path() == NO_NODE() )
+    else if( get_split_path() == NO_NODE() )
     {
         // indicates where nodes must split
         set_split_path( curr );
     }
 
     // is null only if the root is empty
-    int slot = get_slot( curr);
+    const int slot = get_slot( curr );
 
     // continue recursion to leaves
     if( curr->is_internal() )
@@ -527,7 +527,7 @@ Node* Tree::descend_split( Node* curr )
         if( get_split_path() != NO_NODE() )
         {
             // a sibling node is prepared
-            new_node = split( curr);
+            new_node = split( curr );
         }
         insert_entry( curr, slot, new_node, new_me );
     }
@@ -544,7 +544,7 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
     {
         // no split occurred
         place_entry( new_node, slot + 1, down_ptr );
-        new_node->clr_flag( Node::Node::FEWEST );
+        new_node->clr_flag( Node::FEWEST );
         return;
     }
 
@@ -564,6 +564,7 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
         new_node->dec_entries();
         sibling->inc_entries();
     }
+
     if( sibling->num_entries() == get_fanout() )
     {
         // only ever happens in 2-3+trees
@@ -1070,9 +1071,7 @@ void Tree::put_free_node( Node* self )
 Node* Tree::get_data_node( Key key )
 {
     Node* newNode = get_free_node( );
-    Key* value;
-
-    value = (Key *) &newNode->data;
+    Key* value = ( Key * ) &newNode->data;
 
     // can add code to fill node
     *value = key;

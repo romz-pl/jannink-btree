@@ -116,7 +116,7 @@ public:
     Node*   root;        /* pointer to root node */
     Node*   leaf;        /* pointer to first leaf node in B+tree */
     int     fanout;        /* # of pointers to other nodes */
-    int     minfanout;    /* usually minfanout == ceil(fanout/2) */
+    int     min_fanout;    /* usually minfanout == ceil(fanout/2) */
     int     height;        /* nodes traversed from root to leaves */
     Node*     pool;        /* list of empty nodes */
     Key       theKey;        /*  the key value used in tree operations */
