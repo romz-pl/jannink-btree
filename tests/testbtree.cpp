@@ -95,12 +95,9 @@ TEST( btree, insert_search_delete )
     for( int i = 0; i < item_no; i++ )
     {
         const Key key = Key( std::rand() );
-        if( sset.find( key ) == sset.end() )
-        {
-            // std::cout << key.get_value() << " " << std::flush;
-            sset.insert( key );
-            ASSERT_NO_THROW( B.insert( key ) );
-        }
+        // std::cout << key.get_value() << " " << std::flush;
+        sset.insert( key );
+        ASSERT_NO_THROW( B.insert( key ) );
     }
 
     for( auto v : sset )
@@ -144,11 +141,8 @@ TEST( btree, insert_random )
 
         if( x > threshold )
         {
-            auto ret = sset.insert( key );
-            if( ret.second )
-            {
-                B.insert( key );
-            }
+            sset.insert( key );
+            B.insert( key );
         }
         else
         {
