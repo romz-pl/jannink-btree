@@ -873,8 +873,13 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
         const int notright = isnt_node( right );
 
         // only used when defined
-        const int fewleft = left->is_few();
-        const int fewright = right->is_few();
+        //assert( left != NO_NODE() );
+        //assert( right != NO_NODE() );
+        //const int fewleft = left->is_few();
+        //const int fewright = right->is_few();
+
+#define fewleft (left->is_few())
+#define fewright (right->is_few())
 
 
         if( notleft && notright )
@@ -907,7 +912,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
         {
             /* => both anchors are the parent */
             const int test = (left->num_entries() <= right->num_entries());
-            new_node = test ? shift( curr, right, r_anc) : shift( left, curr, l_anc);
+            new_node = test ? shift( curr, right, r_anc) : shift( left, curr, l_anc );
         }
         else
         {
