@@ -38,7 +38,7 @@ public:
     // can be a hashed value
     Key key;
 
-    Node* downNode;
+    Node* down_node;
 };
 
 

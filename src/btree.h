@@ -76,7 +76,7 @@ public:
 
     Node* get_data_node( Key key );
 
-    Node* NONODE() const;
+    Node* NO_NODE() const;
     Node* node_array_head( ) const;
 
     void list_all_btree_values( ) const;

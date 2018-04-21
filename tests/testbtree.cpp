@@ -11,11 +11,11 @@ TEST( btree, init_free )
 
     EXPECT_NO_THROW( B.insert( k ) );
     Node* na = B.search( k );
-    EXPECT_TRUE( na != B.NONODE() );
+    EXPECT_TRUE( na );
 
     B.erase( k );
     Node* nb = B.search( k );
-    EXPECT_TRUE( nb == B.NONODE() );
+    EXPECT_TRUE( !nb );
 }
 
 TEST( btree, insert_search_delete )
@@ -41,7 +41,7 @@ TEST( btree, insert_search_delete )
     for( auto v : sset )
     {
         Node* na = B.search( v );
-        ASSERT_TRUE( na != B.NONODE() );
+        ASSERT_TRUE( na );
     }
 
 /*    for( auto v : sset )
@@ -52,7 +52,7 @@ TEST( btree, insert_search_delete )
     for( auto v : sset )
     {
         Nptr na = B.btree_search( v );
-        ASSERT_TRUE( na == B.NONODE() );
+        ASSERT_TRUE( na );
     }
     */
 }

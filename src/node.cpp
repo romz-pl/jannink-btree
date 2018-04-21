@@ -10,7 +10,7 @@ Key Node::get_key( int q ) const
 // #define getnode(j, q) nAdr(j).e[(q)].downNode
 Node* Node::get_node( int q ) const
 {
-    return entry[ q ].downNode;
+    return entry[ q ].down_node;
 }
 
 // #define setkey(j, q, v) (nAdr(j).e[(q)].key = (v))
@@ -22,7 +22,7 @@ void Node::set_key( int q, Key v )
 // #define setnode(j, q, v) (nAdr(j).e[(q)].downNode = (v))
 void Node::set_node( int q, Node* v )
 {
-    entry[ q ].downNode =  v;
+    entry[ q ].down_node =  v;
 }
 
 /* access node flag values */
@@ -126,7 +126,7 @@ Node* Node::get_first_node( ) const
 // #define getlastnode(j) nAdr(j).e[nAdr(j).i.info.pairs].downNode
 Node* Node::get_last_node( ) const
 {
-    return entry[ inner.info.pairs ].downNode;
+    return entry[ inner.info.pairs ].down_node;
 }
 
 // #define setnextnode(j, v) (nAdr(j).l.nextNode = (v))
@@ -166,5 +166,5 @@ void Node::xfer_entry( int q, Node* v, int z ) const
 void Node::set_entry( int q, Key v, Node* z )
 {
     entry[ q ].key = v;
-    entry[ q ].downNode = z;
+    entry[ q ].down_node = z;
 }

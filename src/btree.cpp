@@ -68,7 +68,7 @@ Tree::~Tree()
 //
 // corresponds to a NULL node pointer value
 //
-Node* Tree::NONODE() const
+Node* Tree::NO_NODE() const
 {
     return node_array_head( ) - 1;
 }
@@ -85,13 +85,13 @@ Node* Tree::node_array_head( ) const
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != NONODE() && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
+    return ( j != NO_NODE() && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
 bool Tree::isnt_node( Node* j ) const
 {
-    return ( j == NONODE() );
+    return ( j == NO_NODE() );
 }
 
 
@@ -293,21 +293,25 @@ Node* Tree::search( Key key )
 //
 Node* Tree::descend_to_leaf( Node* curr )
 {
-    int slot = get_slot( curr );
-    Node* findNode = NONODE();
+    int slot = 0;
 
-    for( ; curr->is_internal(); slot = get_slot( curr ) )
+    while( curr->is_internal() )
     {
+        slot = get_slot( curr );
         curr = curr->get_node( slot );
     }
 
+    assert( curr->is_leaf() );
+    slot = get_slot( curr );
+
     if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
     {
-        findNode = curr;            /* correct key value found */
+        // correct key value found
+        return curr;
     }
 
 
-    return findNode;
+    return nullptr;
 }
 
 //
@@ -444,7 +448,7 @@ void Tree::insert( Key key )
 
   set_fun_key( key );            /* set insertion key */
   set_fun_data( "data" );            /* a node containing data */
-  set_split_path( NONODE() );
+  set_split_path( NO_NODE() );
   newNode = descend_split( get_root( ));    /* insertion point search from root */
   if (newNode != get_split_path() )        /* indicates the root node has split */
     make_new_root( get_root( ), newNode);
@@ -460,24 +464,24 @@ Node* Tree::descend_split( Node* curr )
   int    slot;
 
   if (!curr->is_full())
-    set_split_path( NONODE() );
-  else if ( get_split_path() == NONODE())
+    set_split_path( NO_NODE() );
+  else if ( get_split_path() == NO_NODE())
     set_split_path( curr );            /* indicates where nodes must split */
 
   slot = get_slot( curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split( curr->get_node( slot ));
   else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot ))) {
-    newMe = NONODE();            /* this code discards duplicates */
-    set_split_path( NONODE() );
+    newMe = NO_NODE();            /* this code discards duplicates */
+    set_split_path( NO_NODE() );
   }
   else
     newMe = get_data_node( get_fun_key( ) );    /* an insertion takes place */
 
-  newNode = NONODE();            /* assume no node splitting necessary */
+  newNode = NO_NODE();            /* assume no node splitting necessary */
 
-  if (newMe != NONODE()) {        /* insert only where necessary */
-    if ( get_split_path() != NONODE())
+  if (newMe != NO_NODE()) {        /* insert only where necessary */
+    if ( get_split_path() != NO_NODE())
       newNode = split( curr);        /* a sibling node is prepared */
     insert_entry( curr, slot, newNode, newMe);
   }
@@ -492,7 +496,7 @@ void Tree::insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr )
 {
     int split, i, j, k, x, y;
 
-    if (sibling == NONODE()) {        /* no split occurred */
+    if (sibling == NO_NODE()) {        /* no split occurred */
         place_entry( newNode, slot + 1, downPtr);
         newNode->clr_flag( Node::Node::FEWEST );
     }
@@ -579,7 +583,7 @@ Node* Tree::split( Node* newNode )
     newNode->set_next_node( sibling);
   }
   if ( get_split_path() == newNode)
-    set_split_path( NONODE() );            /* no more splitting needed */
+    set_split_path( NO_NODE() );            /* no more splitting needed */
 
   return sibling;
 }
@@ -629,8 +633,8 @@ void Tree::erase( Key key )
 #endif
 
   set_fun_key( key );            /* set deletion key */
-  set_merge_path( NONODE() );
-  newNode = descend_balance( get_root( ), NONODE(), NONODE(), NONODE(), NONODE(), NONODE());
+  set_merge_path( NO_NODE() );
+  newNode = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE());
   if ( is_node( newNode ))
     collapse_root( get_root( ), newNode);    /* remove root when superfluous */
 }
@@ -664,15 +668,15 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
   int    slot, notleft, notright, fewleft, fewright, test;
 
   if (!curr->is_few())
-    set_merge_path( NONODE() );
-  else if ( get_merge_path() == NONODE())
+    set_merge_path( NO_NODE() );
+  else if ( get_merge_path() == NO_NODE())
     set_merge_path( curr );        /* mark which nodes may need rebalancing */
 
   slot = get_slot( curr);
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = isnt_node( left ) ? NONODE() : left->get_last_node();
+      myLeft = isnt_node( left ) ? NO_NODE() : left->get_last_node();
       lAnchor = lAnc;
     }
     else {
@@ -680,7 +684,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
       lAnchor = curr;
     }
     if (slot == curr->num_entries()) {
-      myRight = isnt_node( right ) ? NONODE() : right->get_first_node();
+      myRight = isnt_node( right ) ? NO_NODE() : right->get_first_node();
       rAnchor = rAnc;
     }
     else {
@@ -692,8 +696,8 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
   else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot )))
     newMe = newNode;        /* a key to be deleted is found */
   else {
-    newMe = NONODE();        /* no deletion possible, key not found */
-    set_merge_path( NONODE() );
+    newMe = NO_NODE();        /* no deletion possible, key not found */
+    set_merge_path( NO_NODE() );
   }
 
 //~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
@@ -721,7 +725,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
 // begin deletion, working upwards from leaves
 //
 
-  if (newMe != NONODE())    /* this node removal doesn't consider duplicates */
+  if (newMe != NO_NODE())    /* this node removal doesn't consider duplicates */
     remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
 
 #ifdef DEBUG
@@ -729,8 +733,8 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
   show_node( curr);
 #endif
 
-  if ( get_merge_path() == NONODE())
-    newNode = NONODE();
+  if ( get_merge_path() == NO_NODE())
+    newNode = NO_NODE();
   else {        /* tree rebalancing rules for node merges and shifts */
     notleft = isnt_node( left );
     notright = isnt_node( right );
@@ -740,7 +744,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
       test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? NONODE() : curr->get_first_node();
+      newNode = test ? NO_NODE() : curr->get_first_node();
     }
             /* CASE 2:  the merging of two nodes is a must */
     else if ((notleft || fewleft) && (notright || fewright)) {
@@ -826,7 +830,7 @@ Node* Tree::merge( Node* left, Node* right, Node* anchor )
     left->set_flag( Node::isFULL );        /* never happens in even size nodes */
 
   if ( get_merge_path() == left || get_merge_path() == right)
-    set_merge_path( NONODE() );        /* indicate rebalancing is complete */
+    set_merge_path( NO_NODE() );        /* indicate rebalancing is complete */
 
   return right;
 }
@@ -899,14 +903,14 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
     right->set_flag( Node::FEWEST );
   else
     right->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
-  set_merge_path( NONODE() );
+  set_merge_path( NO_NODE() );
 
 #ifdef DEBUG
   show_node( left);
   show_node( right);
 #endif
 
-  return NONODE();
+  return NO_NODE();
 }
 
 
@@ -928,7 +932,7 @@ void Tree::init_free_node_pool( int quantity )
         n++;
     }
     --n;
-    n->set_next_node( NONODE() );        /* indicates end of free node list */
+    n->set_next_node( NO_NODE() );        /* indicates end of free node list */
 }
 
 
@@ -939,7 +943,7 @@ Node* Tree::get_free_node( )
 {
     Node* newNode = get_first_free_node( );
 
-    if( newNode == NONODE() )
+    if( newNode == NO_NODE() )
     {
           // can't recover from this
           throw std::runtime_error( "Out of tree nodes." );
@@ -949,7 +953,7 @@ Node* Tree::get_free_node( )
     set_first_free_node( newNode->get_next_node( ) );
 
     // remove node from list
-    newNode->set_next_node( NONODE() );
+    newNode->set_next_node( NO_NODE() );
 
     return newNode;
 }
@@ -1025,7 +1029,7 @@ void Tree::show_btree( ) const
   fprintf(stderr, "-  --  --  --  --  --  -\n");
 
    Node* n = get_root();
-   while( n != NONODE() )
+   while( n != NO_NODE() )
    {
        show_node( n );
        n = n->get_next_node();
@@ -1041,7 +1045,7 @@ void Tree::list_btree_values( Node* n ) const
     int slot, prev = -1;
     int num = 0;
 
-    for( slot = 1; ( n != NONODE() ) && n->num_entries(); num++ )
+    for( slot = 1; ( n != NO_NODE() ) && n->num_entries(); num++ )
     {
         if( n->get_key( slot ).get_value() <= prev)
         {
