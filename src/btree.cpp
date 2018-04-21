@@ -959,36 +959,58 @@ void Tree::remove_entry( Node* curr, int slot )
 //
 Node* Tree::merge( Node* left, Node* right, Node* anchor )
 {
-  int    x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
-  show_node( left);
-  show_node( right);
+    fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+    show_node( left);
+    show_node( right);
 #endif
 
-  if (left->is_internal()) {
-    left->inc_entries();            /* copy key separating the nodes */
-    set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
-    z = get_slot( anchor);        /* needs the just calculated key */
-    set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
-    left->set_entry( left->num_entries(), get_fun_key( ), right->get_first_node());
-  }
-  else
-    left->set_next_node( right->get_next_node());
-  for (x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++) {
-    left->inc_entries();
-    right->xfer_entry( y, left, x);    /* transfer entries to left node */
-  }
-  if (left->num_entries() > get_min_fanout( left ))
-    left->clr_flag( Node::FEWEST );
-  if (left->num_entries() == get_fanout())
-    left->set_flag( Node::isFULL );        /* never happens in even size nodes */
+    if( left->is_internal() )
+    {
+        left->inc_entries();
 
-  if ( get_merge_path() == left || get_merge_path() == right)
-    set_merge_path( NO_NODE() );        /* indicate rebalancing is complete */
+        // copy key separating the nodes
+        set_fun_key( right->get_key( 1 ) );
 
-  return right;
+        // defined but maybe just deleted
+        const int z = get_slot( anchor );
+
+        // needs the just calculated key
+        // set slot to delete in anchor
+        set_fun_key( anchor->get_key( z ) );
+        left->set_entry( left->num_entries(), get_fun_key( ), right->get_first_node() );
+    }
+    else
+    {
+        left->set_next_node( right->get_next_node() );
+    }
+
+    for( int x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++ )
+    {
+        left->inc_entries();
+        // transfer entries to left node
+        right->xfer_entry( y, left, x );
+    }
+
+    if( left->num_entries() > get_min_fanout( left ) )
+    {
+        left->clr_flag( Node::FEWEST );
+    }
+
+    if( left->num_entries() == get_fanout() )
+    {
+        // never happens in even size nodes
+        left->set_flag( Node::isFULL );
+    }
+
+    if( get_merge_path() == left || get_merge_path() == right )
+    {
+        // indicate rebalancing is complete
+        set_merge_path( NO_NODE() );
+    }
+
+    return right;
 }
 
 
