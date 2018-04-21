@@ -1019,76 +1019,121 @@ Node* Tree::merge( Node* left, Node* right, Node* anchor )
 //
 Node* Tree::shift( Node* left, Node* right, Node* anchor )
 {
-  int    i, x, y, z;
+
 
 #ifdef DEBUG
-  fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
-  show_node( left);
-  show_node( right);
+    fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+    show_node( left);
+    show_node( right);
 #endif
 
-  i = left->is_internal();
-  if (left->num_entries() < right->num_entries()) {    /* shift entries to left */
-    y = (right->num_entries() - left->num_entries()) >> 1;
-    x = left->num_entries() + y;
-    set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
-    z = get_slot( anchor);            /* find slot in anchor node */
-    if (i) {                    /* move out old anchor value */
-      right->dec_entries();            /* adjust for shifting anchor */
-      left->inc_entries();
-      left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node());
-      right->set_first_node( right->get_node( y + 1 - i ));
+    const int i = left->is_internal();
+    if( left->num_entries() < right->num_entries() )
+    {
+        // shift entries to left
+        int y = ( right->num_entries() - left->num_entries() ) >> 1;
+        int x = left->num_entries() + y;
+
+        // set new anchor key value
+        set_fun_key( right->get_key( y + 1 - i ) );
+
+        // find slot in anchor node
+        int z = get_slot( anchor );
+        if (i)
+        {
+            // move out old anchor value
+            // adjust for shifting anchor
+            right->dec_entries();
+            left->inc_entries();
+            left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node() );
+            right->set_first_node( right->get_node( y + 1 - i ) );
+        }
+
+        right->clr_flag( Node::isFULL );
+
+        // set new anchor value
+        anchor->set_key( z, get_fun_key() );
+
+        for( z = y, y -= i; y > 0; y--, x-- )
+        {
+            // adjust entry count
+            right->dec_entries();
+            left->inc_entries();
+
+            // transfer entries over
+            right->xfer_entry( y, left, x );
+        }
+
+        for ( x = 1; x <= right->num_entries(); x++ )
+        {
+            // adjust reduced node
+            right->pull_entry( x, z);
+        }
     }
-    right->clr_flag( Node::isFULL );
-    anchor->set_key( z, get_fun_key( ) );        /* set new anchor value */
-    for (z = y, y -= i; y > 0; y--, x--) {
-      right->dec_entries();            /* adjust entry count */
-      left->inc_entries();
-      right->xfer_entry( y, left, x);        /* transfer entries over */
+    else
+    {
+        // shift entries to right
+        int y = ( left->num_entries() - right->num_entries() ) >> 1;
+        int x = left->num_entries() - y + 1;
+
+        for( int z = right->num_entries(); z > 0; z-- )
+        {
+            // adjust increased node
+            right->push_entry( z, y );
+        }
+
+        // set new anchor key value
+        set_fun_key( left->get_key( x ) );
+        int z = get_slot( anchor ) + 1;
+        if( i )
+        {
+            left->dec_entries();
+            right->inc_entries();
+            right->set_entry( y, anchor->get_key( z ), right->get_first_node() );
+            right->set_first_node( left->get_node( x ) );
+        }
+
+        left->clr_flag( Node::isFULL );
+        anchor->set_key( z, get_fun_key() );
+        for( x = left->num_entries() + i, y -= i; y > 0; y--, x-- )
+        {
+            left->dec_entries();
+            right->inc_entries();
+
+            // transfer entries over
+            left->xfer_entry( x, right, y );
+        }
     }
 
-    for (x = 1; x <= right->num_entries(); x++)    /* adjust reduced node */
-      right->pull_entry( x, z);
-  }
-  else {                    /* shift entries to right */
-    y = (left->num_entries() - right->num_entries()) >> 1;
-    x = left->num_entries() - y + 1;
-
-    for (z = right->num_entries(); z > 0; z--)    /* adjust increased node */
-      right->push_entry( z, y);
-
-    set_fun_key( left->get_key( x ) );            /* set new anchor key value */
-    z = get_slot( anchor) + 1;
-    if (i) {
-      left->dec_entries();
-      right->inc_entries();
-      right->set_entry( y, anchor->get_key( z ), right->get_first_node());
-      right->set_first_node( left->get_node( x ));
+    if( left->num_entries() == get_min_fanout( left ) )
+    {
+        // adjust node flags
+        left->set_flag( Node::FEWEST );
     }
-    left->clr_flag( Node::isFULL );
-    anchor->set_key( z, get_fun_key( ) );
-    for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
-      left->dec_entries();
-      right->inc_entries();
-      left->xfer_entry( x, right, y);        /* transfer entries over */
+    else
+    {
+        // never happens in 2-3+trees
+        left->clr_flag( Node::FEWEST );
     }
-  }
-  if (left->num_entries() == get_min_fanout( left ))        /* adjust node flags */
-    left->set_flag( Node::FEWEST );
-  else
-    left->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
-  if (right->num_entries() == get_min_fanout( right ))
-    right->set_flag( Node::FEWEST );
-  else
-    right->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
-  set_merge_path( NO_NODE() );
+
+    if( right->num_entries() == get_min_fanout( right ) )
+    {
+        right->set_flag( Node::FEWEST );
+    }
+    else
+    {
+        // never happens in 2-3+trees
+        right->clr_flag( Node::FEWEST );
+    }
+
+    set_merge_path( NO_NODE() );
 
 #ifdef DEBUG
-  show_node( left);
-  show_node( right);
+    show_node( left);
+    show_node( right);
 #endif
 
-  return NO_NODE();
+    return NO_NODE();
 }
 
 
