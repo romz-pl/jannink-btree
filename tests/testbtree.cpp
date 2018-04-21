@@ -59,17 +59,18 @@ TEST( btree, insert_search_delete )
         ASSERT_TRUE( na );
     }
 
-/*    for( auto v : sset )
+    /*
+    for( auto v : sset )
     {
-        B.btree_delete( v );
+        B.erase( v );
     }
 
     for( auto v : sset )
     {
-        Nptr na = B.btree_search( v );
+        Node* na = B.search( v );
         ASSERT_TRUE( na );
     }
-    */
+*/
 }
 
 

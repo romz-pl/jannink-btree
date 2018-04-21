@@ -92,7 +92,7 @@ public:
     Node* search( Key key );
 
     void place_entry( Node* newNode, int slot, Node* downPtr );
-    void insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr );
+    void insert_entry( Node* newNode, const int slot, Node* sibling, Node* downPtr );
     Node* split( Node* newNode );
     void make_new_root( Node* oldRoot, Node* newNode );
     Node* descend_split( Node* curr );
@@ -116,7 +116,7 @@ public:
     Node*   root;        /* pointer to root node */
     Node*   leaf;        /* pointer to first leaf node in B+tree */
     int     fanout;        /* # of pointers to other nodes */
-    int     minfanout;    /* usually minfanout == ceil(fanout/2) */
+    int     min_fanout;    /* usually minfanout == ceil(fanout/2) */
     int     height;        /* nodes traversed from root to leaves */
     Node*     pool;        /* list of empty nodes */
     Key       theKey;        /*  the key value used in tree operations */
