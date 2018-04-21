@@ -631,15 +631,22 @@ void Tree::insert_entry( Node* newNode, const int slot, Node* sibling, Node* dow
 //
 void Tree::place_entry( Node* newNode, int slot, Node* downPtr )
 {
-  int x;
+    for( int x = newNode->num_entries(); x >= slot; x-- )
+    {
+        /* make room for new entry */
+        newNode->push_entry( x, 1 );
+    }
 
-  for (x = newNode->num_entries(); x >= slot; x--)    /* make room for new entry */
-    newNode->push_entry( x, 1);
-  newNode->set_entry( slot, get_fun_key( ), downPtr);    /* place it in correct slot */
+    // place it in correct slot
+    newNode->set_entry( slot, get_fun_key(), downPtr );
 
-  newNode->inc_entries();                /* adjust entry counter */
-  if (newNode->num_entries() == get_fanout())
-    newNode->set_flag( Node::isFULL );
+    // adjust entry counter
+    newNode->inc_entries();
+
+    if( newNode->num_entries() == get_fanout() )
+    {
+        newNode->set_flag( Node::isFULL );
+    }
 }
 
 
