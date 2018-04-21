@@ -84,11 +84,11 @@ TEST( btree, reverse_erase )
 
 TEST( btree, insert_search_delete )
 {
-    const int item_no = 400;
+    const int item_no = 9000;
     const unsigned seed = 12345;
     std::set< Key > sset;
     std::srand( seed );
-    const int pool_size = 1820;
+    const int pool_size = 50000;
 
     Tree B( pool_size );
 
