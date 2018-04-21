@@ -16,7 +16,7 @@ private:
     static constexpr int LOWER = -3;
 
 public:
-    Tree( int m_pool_size );
+    Tree( int pool_size );
     ~Tree();
 
 
@@ -37,9 +37,6 @@ public:
 
     Node* get_leaf( ) const;
     void set_leaf( Node* v );
-
-    int get_min_fanout( const Node* j ) const;
-    void set_min_fanout( int v );
 
     // manage B+tree height
     void init_tree_height( );
@@ -118,7 +115,7 @@ private:
     const int m_fanout = Data::NODE_SIZE / sizeof( Entry ) - 1; // Why (-1) ???
 
     // usually min_fanout == ceil(fanout / 2)
-    int m_min_fanout;
+    const int m_min_fanout = ( ( m_fanout + 1 ) >> 1 ) - 1;
 
     // nodes traversed from root to leaves
     int m_height;

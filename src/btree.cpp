@@ -19,8 +19,6 @@ Tree::Tree( int pool_size )
     , m_tree( nullptr )
     , m_root( nullptr )
     , m_leaf( nullptr )
-    // , m_fanout( 0 )
-    , m_min_fanout( 0 )
     , m_height( 0 )
     , m_pool( 0 )
     , m_the_key( 0 )
@@ -30,7 +28,6 @@ Tree::Tree( int pool_size )
 
     branch.split = nullptr;
 
-    set_min_fanout( ( m_fanout + 1 ) >> 1 );
     init_free_node_pool( );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
@@ -152,21 +149,6 @@ Node* Tree::get_leaf( ) const
 void Tree::set_leaf( Node* v )
 {
     m_leaf = v;
-}
-
-// #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
-int Tree::get_min_fanout( const Node* /*j*/ ) const
-{
-    // return ( j->inner.info.flags & Node::isLEAF ) ? fanout - minfanout : minfanout;
-    // return j->is_leaf() ? fanout - min_fanout : min_fanout;
-    return m_min_fanout;
-}
-
-
-// #define setminfanout(v) (B->minfanout = (v) - 1)
-void Tree::set_min_fanout( int v )
-{
-    m_min_fanout = v - 1;
 }
 
 // #define inittreeheight (B->height = 0)
@@ -571,13 +553,13 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
     // adjust node flags
     new_node->clr_flag( Node::isFULL );
 
-    if( new_node->num_entries() == get_min_fanout( new_node ) )
+    if( new_node->num_entries() == m_min_fanout )
     {
         // never happens in even size nodes
         new_node->set_flag( Node::FEWEST );
     }
 
-    if( sibling->num_entries() > get_min_fanout( sibling ) )
+    if( sibling->num_entries() > m_min_fanout )
     {
         sibling->clr_flag( Node::FEWEST );
     }
@@ -913,7 +895,7 @@ void Tree::remove_entry( Node* curr, int slot )
             curr->set_flag( Node::FEWEST );
         }
     }
-    else if( curr->num_entries() == get_min_fanout( curr ) )
+    else if( curr->num_entries() == m_min_fanout )
     {
         curr->set_flag( Node::FEWEST );
     }
@@ -959,7 +941,7 @@ Node* Tree::merge( Node* left, Node* right, Node* anchor )
         right->xfer_entry( y, left, x );
     }
 
-    if( left->num_entries() > get_min_fanout( left ) )
+    if( left->num_entries() > m_min_fanout )
     {
         left->clr_flag( Node::FEWEST );
     }
@@ -1070,7 +1052,7 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
         }
     }
 
-    if( left->num_entries() == get_min_fanout( left ) )
+    if( left->num_entries() == m_min_fanout )
     {
         // adjust node flags
         left->set_flag( Node::FEWEST );
@@ -1081,7 +1063,7 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
         left->clr_flag( Node::FEWEST );
     }
 
-    if( right->num_entries() == get_min_fanout( right ) )
+    if( right->num_entries() == m_min_fanout )
     {
         right->set_flag( Node::FEWEST );
     }
