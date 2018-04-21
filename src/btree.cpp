@@ -120,19 +120,6 @@ void Tree::set_fun_data( const char* v )
     m_the_data = strdup( v );
 }
 
-/*
-// #define getpoolsize B->poolsize
-int Tree::get_pool_size( ) const
-{
-    return m_pool_size;
-}
-
-// #define setpoolsize(v) (B->poolsize = (v))
-void Tree::set_pool_size( int v )
-{
-    m_pool_size = v;
-}
-*/
 
 // #define getnodearray B->tree
 Node* Tree::get_node_array( ) const
@@ -257,16 +244,6 @@ void Tree::set_merge_path( Node* v )
 {
     branch.merge = v;
 }
-
-//
-// representation independent node numbering
-//
-// #define getnodenumber(v) ((v) - nodearrayhead)
-int Tree::get_node_number( Node* v ) const
-{
-    return ( v - node_array_head() );
-}
-
 
 
 //

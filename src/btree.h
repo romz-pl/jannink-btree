@@ -65,8 +65,6 @@ public:
     bool is_node( Node* j ) const;
     bool isnt_node( Node* j ) const;
 
-    int get_node_number( Node* v ) const;
-
 
     void put_free_node( Node* self );
 
