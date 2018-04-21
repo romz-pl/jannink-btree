@@ -553,7 +553,8 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
     // split entries between the two
     const int i = new_node->is_internal();
     // adjustment values
-    const int split = ( i ? get_fanout( ) - get_min_fanout( new_node ) : get_min_fanout( new_node ) );
+    // const int split = ( i ? get_fanout( ) - get_min_fanout( new_node ) : get_min_fanout( new_node ) );
+    const int split = get_fanout() / 2;
     const int j = ( slot != split );
     const int k = ( slot >= split );
 
