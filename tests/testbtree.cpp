@@ -6,7 +6,7 @@ TEST( btree, constuction )
 {
     const int pool_size = 100;
 
-    EXPECT_NO_THROW( Tree{ pool_size } );
+    ASSERT_NO_THROW( Tree{ pool_size } );
 }
 
 TEST( btree, search_empty )
@@ -14,7 +14,7 @@ TEST( btree, search_empty )
     const int pool_size = 100;
     Tree tree( pool_size );
     Node* nb = tree.search( Key( 1 ) );
-    EXPECT_TRUE( !nb );
+    ASSERT_TRUE( !nb );
 }
 
 TEST( btree, one_item )
@@ -24,18 +24,67 @@ TEST( btree, one_item )
 
     Tree tree( pool_size );
 
-    EXPECT_NO_THROW( tree.insert( k ) );
+    ASSERT_NO_THROW( tree.insert( k ) );
     Node* na = tree.search( k );
-    EXPECT_TRUE( na );
+    ASSERT_TRUE( na );
 
     tree.erase( k );
     Node* nb = tree.search( k );
-    EXPECT_TRUE( !nb );
+    ASSERT_TRUE( !nb );
+}
+
+TEST( btree, more_items )
+{
+    const int pool_size = 1000;
+    const int item_no = 200;
+    Tree B( pool_size );
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        ASSERT_NO_THROW( B.insert( Key( i ) ) );
+    }
+
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        Node* na = B.search( Key( i ) );
+        ASSERT_TRUE( na );
+    }
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        B.erase( Key( i ) );
+    }
+
+}
+
+TEST( btree, reverse_erase )
+{
+    const int pool_size = 1000;
+    const int item_no = 200;
+    Tree B( pool_size );
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        ASSERT_NO_THROW( B.insert( Key( i ) ) );
+    }
+
+    for( int i = 0; i < item_no; i++ )
+    {
+        Node* na = B.search( Key( i ) );
+        ASSERT_TRUE( na );
+    }
+
+    for( int i = item_no - 1; i >= 0 ; i-- )
+    {
+        B.erase( Key( i ) );
+    }
+
 }
 
 TEST( btree, insert_search_delete )
 {
-    const int item_no = 2000;
+    const int item_no = 200;
     const unsigned seed = 12345;
     std::set< Key > sset;
     std::srand( seed );
@@ -46,9 +95,10 @@ TEST( btree, insert_search_delete )
     for( int i = 0; i < item_no; i++ )
     {
         const Key key = Key( std::rand() );
-        auto ret = sset.insert( key );
-        if( ret.second )
+        if( sset.find( key ) == sset.end() )
         {
+            // std::cout << key.get_value() << " " << std::flush;
+            sset.insert( key );
             ASSERT_NO_THROW( B.insert( key ) );
         }
     }
@@ -59,7 +109,7 @@ TEST( btree, insert_search_delete )
         ASSERT_TRUE( na );
     }
 
-    /*
+/*
     for( auto v : sset )
     {
         B.erase( v );

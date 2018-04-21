@@ -779,7 +779,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
         set_merge_path( curr );
     }
 
-    const int slot = get_slot( curr);
+    const int slot = get_slot( curr );
     Node *new_node = curr->get_node( slot );
     if( curr->is_internal() )
     {
@@ -813,7 +813,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
         }
         new_me = descend_balance( new_node, my_left, my_right, left_anchor, right_anchor, curr );
     }
-    else if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
+    else if( ( slot > 0 ) && !Key::compare( get_fun_key(), curr->get_key( slot ) ) )
     {
         // a key to be deleted is found
         new_me = new_node;
@@ -1038,7 +1038,7 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
 
         // find slot in anchor node
         int z = get_slot( anchor );
-        if (i)
+        if( i )
         {
             // move out old anchor value
             // adjust for shifting anchor
