@@ -400,12 +400,17 @@ int Tree::best_match( Node* curr, const int slot )
     const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ) );
     if( diff < 0 )
     {
+        if( slot == 1 )
+        {
+            return ( slot - 1 );
+        }
+
         //
-        // also check previous slot
+        // also check the previous slot
         //
         const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ) );
 
-        if( ( slot == 1 ) || ( comp >= 0 ) )
+        if( comp >= 0 )
         {
             find_slot = slot - 1;
         }
@@ -417,12 +422,17 @@ int Tree::best_match( Node* curr, const int slot )
     }
     else
     {
+        if( slot == curr->num_entries() )
+        {
+            return slot;
+        }
+
         //
         // or check following slot
         //
-        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ));
+        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ) );
 
-        if( ( slot == curr->num_entries() ) || ( comp < 0 ) )
+        if( comp < 0 )
         {
             find_slot = slot;
         }
