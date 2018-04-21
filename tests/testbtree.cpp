@@ -84,11 +84,11 @@ TEST( btree, reverse_erase )
 
 TEST( btree, insert_search_delete )
 {
-    const int item_no = 200;
+    const int item_no = 400;
     const unsigned seed = 12345;
     std::set< Key > sset;
     std::srand( seed );
-    const int pool_size = 10000;
+    const int pool_size = 1820;
 
     Tree B( pool_size );
 
@@ -109,7 +109,7 @@ TEST( btree, insert_search_delete )
         ASSERT_TRUE( na );
     }
 
-/*
+
     for( auto v : sset )
     {
         B.erase( v );
@@ -118,9 +118,8 @@ TEST( btree, insert_search_delete )
     for( auto v : sset )
     {
         Node* na = B.search( v );
-        ASSERT_TRUE( na );
+        ASSERT_TRUE( !na );
     }
-*/
 }
 
 
