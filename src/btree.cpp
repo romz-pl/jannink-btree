@@ -486,7 +486,7 @@ void Tree::insert( Key key )
 //
 Node* Tree::descend_split( Node* curr )
 {
-    Node* newMe = NO_NODE();
+    Node* new_me = NO_NODE();
 
     if( !curr->is_full() )
     {
@@ -504,64 +504,64 @@ Node* Tree::descend_split( Node* curr )
     // continue recursion to leaves
     if( curr->is_internal() )
     {
-        newMe = descend_split( curr->get_node( slot ) );
+        new_me = descend_split( curr->get_node( slot ) );
     }
     else if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
     {
         // this code discards duplicates
-        newMe = NO_NODE();
+        new_me = NO_NODE();
         set_split_path( NO_NODE() );
     }
     else
     {
         // an insertion takes place
-        newMe = get_data_node( get_fun_key( ) );
+        new_me = get_data_node( get_fun_key( ) );
     }
 
     // assume no node splitting necessary
-    Node* newNode = NO_NODE();
+    Node* new_node = NO_NODE();
 
-    if( newMe != NO_NODE() )
+    if( new_me != NO_NODE() )
     {
         // insert only where necessary
         if( get_split_path() != NO_NODE() )
         {
             // a sibling node is prepared
-            newNode = split( curr);
+            new_node = split( curr);
         }
-        insert_entry( curr, slot, newNode, newMe );
+        insert_entry( curr, slot, new_node, new_me );
     }
 
-    return newNode;
+    return new_node;
 }
 
 //
 // determine location of inserted key
 //
-void Tree::insert_entry( Node* newNode, const int slot, Node* sibling, Node* downPtr )
+void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* down_ptr )
 {
     if( sibling == NO_NODE() )
     {
         // no split occurred
-        place_entry( newNode, slot + 1, downPtr );
-        newNode->clr_flag( Node::Node::FEWEST );
+        place_entry( new_node, slot + 1, down_ptr );
+        new_node->clr_flag( Node::Node::FEWEST );
         return;
     }
 
     assert( sibling != NO_NODE() );
 
     // split entries between the two
-    const int i = newNode->is_internal();
+    const int i = new_node->is_internal();
     // adjustment values
-    const int split = ( i ? get_fanout( ) - get_min_fanout( newNode ) : get_min_fanout( newNode ) );
+    const int split = ( i ? get_fanout( ) - get_min_fanout( new_node ) : get_min_fanout( new_node ) );
     const int j = ( slot != split );
     const int k = ( slot >= split );
 
     for( int x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++ )
     {
         // copy entries to sibling
-        newNode->xfer_entry( x, sibling, y );
-        newNode->dec_entries();
+        new_node->xfer_entry( x, sibling, y );
+        new_node->dec_entries();
         sibling->inc_entries();
     }
     if( sibling->num_entries() == get_fanout() )
@@ -575,42 +575,42 @@ void Tree::insert_entry( Node* newNode, const int slot, Node* sibling, Node* dow
         // set first pointer of internal node
         if( j )
         {
-            sibling->set_first_node( newNode->get_node( split + k ) );
-            newNode->dec_entries();
+            sibling->set_first_node( new_node->get_node( split + k ) );
+            new_node->dec_entries();
         }
         else
         {
-            sibling->set_first_node( downPtr );
+            sibling->set_first_node( down_ptr );
         }
     }
 
     if( j )
     {
         // insert new entry into correct spot
-        const Key xx = newNode->get_key( split + k );
+        const Key xx = new_node->get_key( split + k );
         if( k )
         {
-            place_entry( sibling, slot - split + 1 - i, downPtr );
+            place_entry( sibling, slot - split + 1 - i, down_ptr );
         }
         else
         {
-            place_entry( newNode, slot + 1, downPtr );
+            place_entry( new_node, slot + 1, down_ptr );
         }
         // set key separating nodes
         set_fun_key( xx );
     }
     else if( !i )
     {
-        place_entry( sibling, 1, downPtr );
+        place_entry( sibling, 1, down_ptr );
     }
 
     // adjust node flags
-    newNode->clr_flag( Node::isFULL );
+    new_node->clr_flag( Node::isFULL );
 
-    if( newNode->num_entries() == get_min_fanout( newNode ) )
+    if( new_node->num_entries() == get_min_fanout( new_node ) )
     {
         // never happens in even size nodes
-        newNode->set_flag( Node::FEWEST );
+        new_node->set_flag( Node::FEWEST );
     }
 
     if( sibling->num_entries() > get_min_fanout( sibling ) )
@@ -629,23 +629,23 @@ void Tree::insert_entry( Node* newNode, const int slot, Node* sibling, Node* dow
 //
 // place key into appropriate node & slot
 //
-void Tree::place_entry( Node* newNode, int slot, Node* downPtr )
+void Tree::place_entry( Node* new_node, int slot, Node* down_ptr )
 {
-    for( int x = newNode->num_entries(); x >= slot; x-- )
+    for( int x = new_node->num_entries(); x >= slot; x-- )
     {
         // make room for new entry
-        newNode->push_entry( x, 1 );
+        new_node->push_entry( x, 1 );
     }
 
     // place it in correct slot
-    newNode->set_entry( slot, get_fun_key(), downPtr );
+    new_node->set_entry( slot, get_fun_key(), down_ptr );
 
     // adjust entry counter
-    newNode->inc_entries();
+    new_node->inc_entries();
 
-    if( newNode->num_entries() == get_fanout() )
+    if( new_node->num_entries() == get_fanout() )
     {
-        newNode->set_flag( Node::isFULL );
+        new_node->set_flag( Node::isFULL );
     }
 }
 
