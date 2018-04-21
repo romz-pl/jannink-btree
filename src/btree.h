@@ -16,7 +16,7 @@ private:
     static constexpr int LOWER = -3;
 
 public:
-    Tree( int pool_size );
+    Tree( int m_pool_size );
     ~Tree();
 
 
@@ -110,27 +110,43 @@ public:
 #endif
 
 
-public:
+private:
 
-    /* `private' variables */
-    int     pool_size;    /* # of nodes allocated for tree */
-    Node*   tree;        /* pointer to array of nodes (NOT Nptr !) */
-    Node*   root;        /* pointer to root node */
-    Node*   leaf;        /* pointer to first leaf node in B+tree */
-    int     fanout;        /* # of pointers to other nodes */
-    int     min_fanout;    /* usually minfanout == ceil(fanout/2) */
-    int     height;        /* nodes traversed from root to leaves */
-    Node*     pool;        /* list of empty nodes */
-    Key       theKey;        /*  the key value used in tree operations */
-    data_type   theData;    /*  data used for insertions/deletions */
+    // # of nodes allocated for tree
+    int m_pool_size;
+
+    // pointer to array of nodes (NOT Nptr !)
+    Node* m_tree;
+
+    // pointer to root node
+    Node* m_root;
+
+    // pointer to first leaf node in B+tree
+    Node* m_leaf;
+
+    // # of pointers to other nodes
+    int m_fanout;
+
+    // usually min_fanout == ceil(fanout / 2)
+    int m_min_fanout;
+
+    // nodes traversed from root to leaves
+    int m_height;
+
+    // list of empty nodes
+    Node* m_pool;
+
+    //  the key value used in tree operations
+    Key m_the_key;
+
+    //  data used for insertions/deletions
+    data_type m_the_data;
 
     union /* nodes to change in insert and delete */
     {
-        Node*    split;
-        Node*    merge;
+        Node* split;
+        Node* merge;
     } branch;
-
-    // KeyCmp    keycmp;        /* pointer to function comparing two keys */
 };
 
 

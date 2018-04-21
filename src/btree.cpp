@@ -15,16 +15,16 @@
 //
 //
 Tree::Tree( int pool_size )
-    : pool_size( 0 )
-    , tree( nullptr )
-    , root( nullptr )
-    , leaf( nullptr )
-    , fanout( 0 )
-    , min_fanout( 0 )
-    , height( 0 )
-    , pool( 0 )
-    , theKey( 0 )
-    , theData( nullptr )
+    : m_pool_size( 0 )
+    , m_tree( nullptr )
+    , m_root( nullptr )
+    , m_leaf( nullptr )
+    , m_fanout( 0 )
+    , m_min_fanout( 0 )
+    , m_height( 0 )
+    , m_pool( 0 )
+    , m_the_key( 0 )
+    , m_the_data( nullptr )
     // , branch.split( nullptr )
 {
 
@@ -76,7 +76,7 @@ Node* Tree::NO_NODE() const
 // #define nodearrayhead B->tree
 Node* Tree::node_array_head( ) const
 {
-    return tree;
+    return m_tree;
 }
 
 //
@@ -98,88 +98,88 @@ bool Tree::isnt_node( Node* j ) const
 // #define getfunkey B->theKey
 Key Tree::get_fun_key( ) const
 {
-    return theKey;
+    return m_the_key;
 }
 
 // #define getfundata B->theData
 data_type Tree::get_fun_data( ) const
 {
-    return theData;
+    return m_the_data;
 }
 
 // #define setfunkey(v) (B->theKey = (v))
 void Tree::set_fun_key( Key v )
 {
-    theKey = v;
+    m_the_key = v;
 }
 
 // #define setfundata(v) (B->theData = strdup(v))
 // void setfundata( Tree* B, dataT v )
 void Tree::set_fun_data( const char* v )
 {
-    theData = strdup( v );
+    m_the_data = strdup( v );
 }
 
 
 // #define getpoolsize B->poolsize
 int Tree::get_pool_size( ) const
 {
-    return pool_size;
+    return m_pool_size;
 }
 
 // #define setpoolsize(v) (B->poolsize = (v))
 void Tree::set_pool_size( int v )
 {
-    pool_size = v;
+    m_pool_size = v;
 }
 
 // #define getnodearray B->tree
 Node* Tree::get_node_array( ) const
 {
-    return tree;
+    return m_tree;
 }
 
 // #define setnodearray(v) (B->tree = (Node *)(v))
 void Tree::set_node_array( Node* v )
 {
-    tree = v;
+    m_tree = v;
 }
 
 // #define getroot B->root
 Node* Tree::get_root( ) const
 {
-    return root;
+    return m_root;
 }
 
 // #define setroot(v) (B->root = (v))
 void Tree::set_root( Node* v )
 {
-    root = v;
+    m_root = v;
 }
 
 // #define getleaf B->leaf
 Node* Tree::get_leaf( ) const
 {
-    return leaf;
+    return m_leaf;
 }
 
 // #define setleaf(v) (B->leaf = (v))
 void Tree::set_leaf( Node* v )
 {
-    leaf = v;
+    m_leaf = v;
 }
 
 
 // #define getfanout B->fanout
 int Tree::get_fanout( ) const
 {
-    return fanout;
+    return m_fanout;
 }
 
 // #define setfanout(v) (B->fanout = (v) - 1)
 void Tree::set_fanout( int v )
 {
-    fanout = v - 1;
+    m_fanout = v - 1;
 }
 
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
@@ -187,50 +187,50 @@ int Tree::get_min_fanout( const Node* /*j*/ ) const
 {
     // return ( j->inner.info.flags & Node::isLEAF ) ? fanout - minfanout : minfanout;
     // return j->is_leaf() ? fanout - min_fanout : min_fanout;
-    return min_fanout;
+    return m_min_fanout;
 }
 
 
 // #define setminfanout(v) (B->minfanout = (v) - 1)
 void Tree::set_min_fanout( int v )
 {
-    min_fanout = v - 1;
+    m_min_fanout = v - 1;
 }
 
 // #define inittreeheight (B->height = 0)
 void Tree::init_tree_height( )
 {
-    height = 0;
+    m_height = 0;
 }
 
 // #define inctreeheight B->height++
 void Tree::inc_tree_height( )
 {
-    height++;
+    m_height++;
 }
 
 // #define dectreeheight B->height--
 void Tree::dec_tree_height( )
 {
-    height--;
+    m_height--;
 }
 
 // #define gettreeheight B->height
 int Tree::get_tree_height( ) const
 {
-    return height;
+    return m_height;
 }
 
 // #define getfirstfreenode B->pool
 Node* Tree::get_first_free_node( ) const
 {
-    return pool;
+    return m_pool;
 }
 
 // #define setfirstfreenode(v) (B->pool = (v))
 void Tree::set_first_free_node( Node* v )
 {
-    pool = v;
+    m_pool = v;
 }
 
 // #define getsplitpath B->branch.split
