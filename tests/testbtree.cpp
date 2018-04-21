@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "btree.h"
-
+#include <random>
 
 TEST( btree, constuction )
 {
@@ -121,6 +121,52 @@ TEST( btree, insert_search_delete )
         ASSERT_TRUE( !na );
     }
 }
+
+TEST( btree, insert_random )
+{
+    std::set< Key > sset;
+    const int pool_size = 182100;
+    Tree B( pool_size );
+
+    const double threshold = 0.6;
+    const int iter_no = 1000;
+
+    std::random_device rd; // only used once to initialise (seed) engine
+    std::mt19937 rng( rd() ); // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_real_distribution<> dist_real( 0, 1 );
+
+    std::uniform_int_distribution< int > dist_int( 0, iter_no/2 );
+
+    for( int i = 0; i < iter_no; i++ )
+    {
+        const Key key( dist_int( rng ) );
+        const double x = dist_real( rng );
+
+        if( x > threshold )
+        {
+            auto ret = sset.insert( key );
+            if( ret.second )
+            {
+                B.insert( key );
+            }
+        }
+        else
+        {
+            sset.erase( key );
+            B.erase( key );
+        }
+
+        // std::cout<< sset.size() << "\n" << std::flush;
+
+        for( auto v : sset )
+        {
+            Node* na = B.search( v );
+            assert( na  );
+        }
+
+    }
+}
+
 
 
 //int main(void)
