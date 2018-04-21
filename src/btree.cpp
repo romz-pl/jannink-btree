@@ -486,33 +486,53 @@ void Tree::insert( Key key )
 //
 Node* Tree::descend_split( Node* curr )
 {
-  Node*    newMe, *newNode;
-  int    slot;
+    Node* newMe = NO_NODE();
 
-  if (!curr->is_full())
-    set_split_path( NO_NODE() );
-  else if ( get_split_path() == NO_NODE())
-    set_split_path( curr );            /* indicates where nodes must split */
+    if( !curr->is_full() )
+    {
+        set_split_path( NO_NODE() );
+    }
+    else if ( get_split_path() == NO_NODE() )
+    {
+        // indicates where nodes must split
+        set_split_path( curr );
+    }
 
-  slot = get_slot( curr);        /* is null only if the root is empty */
-  if (curr->is_internal())            /* continue recursion to leaves */
-    newMe = descend_split( curr->get_node( slot ));
-  else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot ))) {
-    newMe = NO_NODE();            /* this code discards duplicates */
-    set_split_path( NO_NODE() );
-  }
-  else
-    newMe = get_data_node( get_fun_key( ) );    /* an insertion takes place */
+    // is null only if the root is empty
+    int slot = get_slot( curr);
 
-  newNode = NO_NODE();            /* assume no node splitting necessary */
+    // continue recursion to leaves
+    if( curr->is_internal() )
+    {
+        newMe = descend_split( curr->get_node( slot ) );
+    }
+    else if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
+    {
+        // this code discards duplicates
+        newMe = NO_NODE();
+        set_split_path( NO_NODE() );
+    }
+    else
+    {
+        // an insertion takes place
+        newMe = get_data_node( get_fun_key( ) );
+    }
 
-  if (newMe != NO_NODE()) {        /* insert only where necessary */
-    if ( get_split_path() != NO_NODE())
-      newNode = split( curr);        /* a sibling node is prepared */
-    insert_entry( curr, slot, newNode, newMe);
-  }
+    // assume no node splitting necessary
+    Node* newNode = NO_NODE();
 
-  return newNode;
+    if( newMe != NO_NODE() )
+    {
+        // insert only where necessary
+        if( get_split_path() != NO_NODE() )
+        {
+            // a sibling node is prepared
+            newNode = split( curr);
+        }
+        insert_entry( curr, slot, newNode, newMe );
+    }
+
+    return newNode;
 }
 
 //
