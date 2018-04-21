@@ -722,154 +722,203 @@ void Tree::make_new_root( Node* old_root, Node* new_node )
 //
 void Tree::erase( Key key )
 {
-  Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
+    fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
 #endif
 
-  set_fun_key( key );            /* set deletion key */
-  set_merge_path( NO_NODE() );
-  newNode = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE());
-  if ( is_node( newNode ))
-    collapse_root( get_root( ), newNode);    /* remove root when superfluous */
+    // set deletion key
+    set_fun_key( key );
+    set_merge_path( NO_NODE() );
+
+    Node* new_node = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE() );
+
+    if( is_node( new_node ) )
+    {
+        // remove root when superfluous
+        collapse_root( get_root( ), new_node );
+    }
 }
 
 
 //
 // remove old root node
 //
-void Tree::collapse_root( Node* oldRoot, Node* newRoot )
+void Tree::collapse_root( Node* old_root, Node* new_root )
 {
 
 #ifdef DEBUG
-  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", get_node_number(oldRoot), get_node_number(newRoot));
-  show_node( oldRoot);
-  show_node( newRoot);
+    fprintf(stderr, "Tree::collapse_root:  old %d, new %d.\n", get_node_number( old_root ), get_node_number( new_root ) );
+    show_node( old_root );
+    show_node( new_root );
 #endif
 
-  set_root( newRoot);
-  newRoot->set_flag( Node::isROOT );
-  put_free_node( oldRoot );
-  dec_tree_height( );            /* the height of the tree decreases */
+    set_root( new_root );
+    new_root->set_flag( Node::isROOT );
+    put_free_node( old_root );
+
+    // the height of the tree decreases
+    dec_tree_height( );
 }
 
 
 //
 // recurse down and balance back up
 //
-Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, Node* rAnc, Node* parent )
+Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, Node* r_anc, Node* parent )
 {
-  Node*    newMe, *myLeft, *myRight, *lAnchor, *rAnchor, *newNode;
-  int    slot, notleft, notright, fewleft, fewright, test;
+    Node* new_me = NO_NODE();
 
-  if (!curr->is_few())
-    set_merge_path( NO_NODE() );
-  else if ( get_merge_path() == NO_NODE())
-    set_merge_path( curr );        /* mark which nodes may need rebalancing */
-
-  slot = get_slot( curr);
-  newNode = curr->get_node( slot );
-  if (curr->is_internal()) {    /* set up next recursion call's parameters */
-    if (slot == 0) {
-      myLeft = isnt_node( left ) ? NO_NODE() : left->get_last_node();
-      lAnchor = lAnc;
+    if( !curr->is_few() )
+    {
+        set_merge_path( NO_NODE() );
     }
-    else {
-      myLeft = curr->get_node( slot - 1 );
-      lAnchor = curr;
+    else if ( get_merge_path() == NO_NODE() )
+    {
+        // mark which nodes may need rebalancing
+        set_merge_path( curr );
     }
-    if (slot == curr->num_entries()) {
-      myRight = isnt_node( right ) ? NO_NODE() : right->get_first_node();
-      rAnchor = rAnc;
+
+    const int slot = get_slot( curr );
+    Node *new_node = curr->get_node( slot );
+    if( curr->is_internal() )
+    {
+        Node* my_left = NO_NODE();
+        Node* my_right = NO_NODE();
+
+        Node* left_anchor = NO_NODE();
+        Node* right_anchor = NO_NODE();
+
+        // set up next recursion call's parameters
+        if( slot == 0 )
+        {
+            my_left = isnt_node( left ) ? NO_NODE() : left->get_last_node();
+            left_anchor = l_anc;
+        }
+        else
+        {
+            my_left = curr->get_node( slot - 1 );
+            left_anchor = curr;
+        }
+
+        if( slot == curr->num_entries() )
+        {
+            my_right = isnt_node( right ) ? NO_NODE() : right->get_first_node();
+            right_anchor = r_anc;
+        }
+        else
+        {
+            my_right = curr->get_node( slot + 1 );
+            right_anchor = curr;
+        }
+        new_me = descend_balance( new_node, my_left, my_right, left_anchor, right_anchor, curr );
     }
-    else {
-      myRight = curr->get_node( slot + 1 );
-      rAnchor = curr;
+    else if( ( slot > 0 ) && !Key::compare( get_fun_key(), curr->get_key( slot ) ) )
+    {
+        // a key to be deleted is found
+        new_me = new_node;
     }
-    newMe = descend_balance( newNode, myLeft, myRight, lAnchor, rAnchor, curr);
-  }
-  else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot )))
-    newMe = newNode;        /* a key to be deleted is found */
-  else {
-    newMe = NO_NODE();        /* no deletion possible, key not found */
-    set_merge_path( NO_NODE() );
-  }
+    else
+    {
+        // no deletion possible, key not found
+        new_me = NO_NODE();
+        set_merge_path( NO_NODE() );
+    }
 
-//~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
-//
-//    The simplest B+tree rebalancing consists of the following rules.
-//
-//    If a node underflows:
-//    CASE 1 check if it is the root, and collapse it if it is,
-//    CASE 2 otherwise, check if both of its neighbors are minimum
-//        sized and merge the underflowing node with one of them,
-//    CASE 3 otherwise shift surplus entries to the underflowing node.
-//
-//    The choice of which neighbor to use is optional.  However, the
-//    rebalancing rules that follow also ensure whenever possible
-//    that the merges and shifts which do occur use a neighbor whose
-//    anchor is the parent of the underflowing node.
-//
-//    Cases 3, 4, 5 below are more an optimization than a requirement,
-//    and can be omitted, with a change of the action value in case 6,
-//    which actually corresponds to the third case described above.
-//
-//
+    //~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
+    //
+    //    The simplest B+tree rebalancing consists of the following rules.
+    //
+    //    If a node underflows:
+    //    CASE 1 check if it is the root, and collapse it if it is,
+    //    CASE 2 otherwise, check if both of its neighbors are minimum
+    //        sized and merge the underflowing node with one of them,
+    //    CASE 3 otherwise shift surplus entries to the underflowing node.
+    //
+    //    The choice of which neighbor to use is optional.  However, the
+    //    rebalancing rules that follow also ensure whenever possible
+    //    that the merges and shifts which do occur use a neighbor whose
+    //    anchor is the parent of the underflowing node.
+    //
+    //    Cases 3, 4, 5 below are more an optimization than a requirement,
+    //    and can be omitted, with a change of the action value in case 6,
+    //    which actually corresponds to the third case described above.
+    //
+    //
 
-//
-// begin deletion, working upwards from leaves
-//
+    //
+    // begin deletion, working upwards from leaves
+    //
 
-  if (newMe != NO_NODE())    /* this node removal doesn't consider duplicates */
-    remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
+    if( new_me != NO_NODE() )
+    {
+        /* this node removal doesn't consider duplicates */
+        /* removes one of two */
+        remove_entry( curr, slot + ( new_me != new_node ) );
+    }
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number(newMe));
-  show_node( curr);
+    fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number( new_me ) );
+    show_node( curr);
 #endif
 
-  if ( get_merge_path() == NO_NODE())
-    newNode = NO_NODE();
-  else {        /* tree rebalancing rules for node merges and shifts */
-    notleft = isnt_node( left );
-    notright = isnt_node( right );
-    fewleft = left->is_few();        /* only used when defined */
-    fewright = right->is_few();
+    if( get_merge_path() == NO_NODE() )
+    {
+        new_node = NO_NODE();
+    }
+    else
+    {
+        // tree rebalancing rules for node merges and shifts
+        const int notleft = isnt_node( left );
+        const int notright = isnt_node( right );
 
-            /* CASE 1:  prepare root node (curr) for removal */
-    if (notleft && notright) {
-      test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? NO_NODE() : curr->get_first_node();
-    }
-            /* CASE 2:  the merging of two nodes is a must */
-    else if ((notleft || fewleft) && (notright || fewright)) {
-      test = !(lAnc == parent);
-      newNode = test ? merge( curr, right, rAnc) : merge( left, curr, lAnc);
-    }
-            /* CASE 3: choose the better of a merge or a shift */
-    else if (!notleft && fewleft && !notright && !fewright) {
-      test = !(rAnc == parent) && (curr == get_merge_path() );
-      newNode = test ? merge( left, curr, lAnc) : shift( curr, right, rAnc);
-    }
-            /* CASE 4: also choose between a merge or a shift */
-    else if (!notleft && !fewleft && !notright && fewright) {
-      test = !(lAnc == parent) && (curr == get_merge_path() );
-      newNode = test ? merge( curr, right, rAnc) : shift( left, curr, lAnc);
-    }
-            /* CASE 5: choose the more effective of two shifts */
-    else if (lAnc == rAnc) {         /* => both anchors are the parent */
-      test = (left->num_entries() <= right->num_entries());
-      newNode = test ? shift( curr, right, rAnc) : shift( left, curr, lAnc);
-    }
-            /* CASE 6: choose the shift with more local effect */
-    else {                /* if omitting cases 3,4,5 use below */
-      test = (lAnc == parent);        /* test = (!notleft && !fewleft); */
-      newNode = test ? shift( left, curr, lAnc) : shift( curr, right, rAnc);
-    }
-  }
+        // only used when defined
+        const int fewleft = left->is_few();
+        const int fewright = right->is_few();
 
-  return newNode;
+
+        if( notleft && notright )
+        {
+            // CASE 1:  prepare root node (curr) for removal
+            // check if B+tree has become empty
+            const int test = curr->is_leaf();
+            new_node = test ? NO_NODE() : curr->get_first_node();
+        }
+        else if( ( notleft || fewleft ) && ( notright || fewright ) )
+        {
+            // CASE 2:  the merging of two nodes is a must
+            const int test = !( l_anc == parent );
+            new_node = test ? merge( curr, right, r_anc ) : merge( left, curr, l_anc );
+        }
+        else if( !notleft && fewleft && !notright && !fewright )
+        {
+            // CASE 3: choose the better of a merge or a shift
+            const int test = !( r_anc == parent ) && ( curr == get_merge_path() );
+            new_node = test ? merge( left, curr, l_anc ) : shift( curr, right, r_anc );
+        }
+        else if( !notleft && !fewleft && !notright && fewright )
+        {
+            // CASE 4: also choose between a merge or a shift
+            const int test = !( l_anc == parent ) && ( curr == get_merge_path() );
+            new_node = test ? merge( curr, right, r_anc ) : shift( left, curr, l_anc );
+        }
+        /* CASE 5: choose the more effective of two shifts */
+        else if( l_anc == r_anc )
+        {
+            /* => both anchors are the parent */
+            const int test = (left->num_entries() <= right->num_entries());
+            new_node = test ? shift( curr, right, r_anc) : shift( left, curr, l_anc);
+        }
+        else
+        {
+            // CASE 6: choose the shift with more local effect
+            // if omitting cases 3,4,5 use below
+            const int test = ( l_anc == parent );        /* test = (!notleft && !fewleft); */
+            new_node = test ? shift( left, curr, l_anc ) : shift( curr, right, r_anc );
+        }
+    }
+
+    return new_node;
 }
 
 
@@ -878,19 +927,30 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, No
 //
 void Tree::remove_entry( Node* curr, int slot )
 {
-  int x;
+    // return deleted node to free list
+    put_free_node( curr->get_node( slot ) );
 
-  put_free_node( curr->get_node( slot ));    /* return deleted node to free list */
-  for (x = slot; x < curr->num_entries(); x++)
-    curr->pull_entry( x, 1);        /* adjust node with removed key */
-  curr->dec_entries();
-  curr->clr_flag( Node::isFULL );        /* keep flag information up to date */
-  if (curr->is_root()) {
-    if (curr->num_entries() == 1)
-      curr->set_flag( Node::FEWEST );
-  }
-  else if (curr->num_entries() == get_min_fanout( curr ))
-    curr->set_flag( Node::FEWEST );
+    for( int x = slot; x < curr->num_entries(); x++ )
+    {
+        // adjust node with removed key
+        curr->pull_entry( x, 1);
+    }
+
+    curr->dec_entries();
+
+    // keep flag information up to date
+    curr->clr_flag( Node::isFULL );
+    if( curr->is_root() )
+    {
+        if( curr->num_entries() == 1 )
+        {
+            curr->set_flag( Node::FEWEST );
+        }
+    }
+    else if( curr->num_entries() == get_min_fanout( curr ) )
+    {
+        curr->set_flag( Node::FEWEST );
+    }
 }
 
 
@@ -899,36 +959,58 @@ void Tree::remove_entry( Node* curr, int slot )
 //
 Node* Tree::merge( Node* left, Node* right, Node* anchor )
 {
-  int    x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
-  show_node( left);
-  show_node( right);
+    fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+    show_node( left);
+    show_node( right);
 #endif
 
-  if (left->is_internal()) {
-    left->inc_entries();            /* copy key separating the nodes */
-    set_fun_key( right->get_key( 1 ) );    /* defined but maybe just deleted */
-    z = get_slot( anchor);        /* needs the just calculated key */
-    set_fun_key( anchor->get_key( z ) );    /* set slot to delete in anchor */
-    left->set_entry( left->num_entries(), get_fun_key( ), right->get_first_node());
-  }
-  else
-    left->set_next_node( right->get_next_node());
-  for (x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++) {
-    left->inc_entries();
-    right->xfer_entry( y, left, x);    /* transfer entries to left node */
-  }
-  if (left->num_entries() > get_min_fanout( left ))
-    left->clr_flag( Node::FEWEST );
-  if (left->num_entries() == get_fanout())
-    left->set_flag( Node::isFULL );        /* never happens in even size nodes */
+    if( left->is_internal() )
+    {
+        left->inc_entries();
 
-  if ( get_merge_path() == left || get_merge_path() == right)
-    set_merge_path( NO_NODE() );        /* indicate rebalancing is complete */
+        // copy key separating the nodes
+        set_fun_key( right->get_key( 1 ) );
 
-  return right;
+        // defined but maybe just deleted
+        const int z = get_slot( anchor );
+
+        // needs the just calculated key
+        // set slot to delete in anchor
+        set_fun_key( anchor->get_key( z ) );
+        left->set_entry( left->num_entries(), get_fun_key( ), right->get_first_node() );
+    }
+    else
+    {
+        left->set_next_node( right->get_next_node() );
+    }
+
+    for( int x = left->num_entries() + 1, y = 1; y <= right->num_entries(); x++, y++ )
+    {
+        left->inc_entries();
+        // transfer entries to left node
+        right->xfer_entry( y, left, x );
+    }
+
+    if( left->num_entries() > get_min_fanout( left ) )
+    {
+        left->clr_flag( Node::FEWEST );
+    }
+
+    if( left->num_entries() == get_fanout() )
+    {
+        // never happens in even size nodes
+        left->set_flag( Node::isFULL );
+    }
+
+    if( get_merge_path() == left || get_merge_path() == right )
+    {
+        // indicate rebalancing is complete
+        set_merge_path( NO_NODE() );
+    }
+
+    return right;
 }
 
 
@@ -937,76 +1019,120 @@ Node* Tree::merge( Node* left, Node* right, Node* anchor )
 //
 Node* Tree::shift( Node* left, Node* right, Node* anchor )
 {
-  int    i, x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
-  show_node( left);
-  show_node( right);
+    fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+    show_node( left);
+    show_node( right);
 #endif
 
-  i = left->is_internal();
-  if (left->num_entries() < right->num_entries()) {    /* shift entries to left */
-    y = (right->num_entries() - left->num_entries()) >> 1;
-    x = left->num_entries() + y;
-    set_fun_key( right->get_key( y + 1 - i ) );    /* set new anchor key value */
-    z = get_slot( anchor);            /* find slot in anchor node */
-    if (i) {                    /* move out old anchor value */
-      right->dec_entries();            /* adjust for shifting anchor */
-      left->inc_entries();
-      left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node());
-      right->set_first_node( right->get_node( y + 1 - i ));
+    const int i = left->is_internal();
+    if( left->num_entries() < right->num_entries() )
+    {
+        // shift entries to left
+        int y = ( right->num_entries() - left->num_entries() ) >> 1;
+        int x = left->num_entries() + y;
+
+        // set new anchor key value
+        set_fun_key( right->get_key( y + 1 - i ) );
+
+        // find slot in anchor node
+        int z = get_slot( anchor );
+        if( i )
+        {
+            // move out old anchor value
+            // adjust for shifting anchor
+            right->dec_entries();
+            left->inc_entries();
+            left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node() );
+            right->set_first_node( right->get_node( y + 1 - i ) );
+        }
+
+        right->clr_flag( Node::isFULL );
+
+        // set new anchor value
+        anchor->set_key( z, get_fun_key() );
+
+        for( z = y, y -= i; y > 0; y--, x-- )
+        {
+            // adjust entry count
+            right->dec_entries();
+            left->inc_entries();
+
+            // transfer entries over
+            right->xfer_entry( y, left, x );
+        }
+
+        for ( x = 1; x <= right->num_entries(); x++ )
+        {
+            // adjust reduced node
+            right->pull_entry( x, z);
+        }
     }
-    right->clr_flag( Node::isFULL );
-    anchor->set_key( z, get_fun_key( ) );        /* set new anchor value */
-    for (z = y, y -= i; y > 0; y--, x--) {
-      right->dec_entries();            /* adjust entry count */
-      left->inc_entries();
-      right->xfer_entry( y, left, x);        /* transfer entries over */
+    else
+    {
+        // shift entries to right
+        int y = ( left->num_entries() - right->num_entries() ) >> 1;
+        int x = left->num_entries() - y + 1;
+
+        for( int z = right->num_entries(); z > 0; z-- )
+        {
+            // adjust increased node
+            right->push_entry( z, y );
+        }
+
+        // set new anchor key value
+        set_fun_key( left->get_key( x ) );
+        int z = get_slot( anchor ) + 1;
+        if( i )
+        {
+            left->dec_entries();
+            right->inc_entries();
+            right->set_entry( y, anchor->get_key( z ), right->get_first_node() );
+            right->set_first_node( left->get_node( x ) );
+        }
+
+        left->clr_flag( Node::isFULL );
+        anchor->set_key( z, get_fun_key() );
+        for( x = left->num_entries() + i, y -= i; y > 0; y--, x-- )
+        {
+            left->dec_entries();
+            right->inc_entries();
+
+            // transfer entries over
+            left->xfer_entry( x, right, y );
+        }
     }
 
-    for (x = 1; x <= right->num_entries(); x++)    /* adjust reduced node */
-      right->pull_entry( x, z);
-  }
-  else {                    /* shift entries to right */
-    y = (left->num_entries() - right->num_entries()) >> 1;
-    x = left->num_entries() - y + 1;
-
-    for (z = right->num_entries(); z > 0; z--)    /* adjust increased node */
-      right->push_entry( z, y);
-
-    set_fun_key( left->get_key( x ) );            /* set new anchor key value */
-    z = get_slot( anchor) + 1;
-    if (i) {
-      left->dec_entries();
-      right->inc_entries();
-      right->set_entry( y, anchor->get_key( z ), right->get_first_node());
-      right->set_first_node( left->get_node( x ));
+    if( left->num_entries() == get_min_fanout( left ) )
+    {
+        // adjust node flags
+        left->set_flag( Node::FEWEST );
     }
-    left->clr_flag( Node::isFULL );
-    anchor->set_key( z, get_fun_key( ) );
-    for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
-      left->dec_entries();
-      right->inc_entries();
-      left->xfer_entry( x, right, y);        /* transfer entries over */
+    else
+    {
+        // never happens in 2-3+trees
+        left->clr_flag( Node::FEWEST );
     }
-  }
-  if (left->num_entries() == get_min_fanout( left ))        /* adjust node flags */
-    left->set_flag( Node::FEWEST );
-  else
-    left->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
-  if (right->num_entries() == get_min_fanout( right ))
-    right->set_flag( Node::FEWEST );
-  else
-    right->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
-  set_merge_path( NO_NODE() );
+
+    if( right->num_entries() == get_min_fanout( right ) )
+    {
+        right->set_flag( Node::FEWEST );
+    }
+    else
+    {
+        // never happens in 2-3+trees
+        right->clr_flag( Node::FEWEST );
+    }
+
+    set_merge_path( NO_NODE() );
 
 #ifdef DEBUG
-  show_node( left);
-  show_node( right);
+    show_node( left);
+    show_node( right);
 #endif
 
-  return NO_NODE();
+    return NO_NODE();
 }
 
 
@@ -1060,10 +1186,14 @@ Node* Tree::get_free_node( )
 //
 void Tree::put_free_node( Node* self )
 {
-  self->clear_flags();
-  self->clear_entries();
-  self->set_next_node(  get_first_free_node() );        /* add node to list */
-  set_first_free_node( self );            /* set it to be list head */
+    self->clear_flags();
+    self->clear_entries();
+
+    // add node to list
+    self->set_next_node(  get_first_free_node() );
+
+    // set it to be list head
+    set_first_free_node( self );
 }
 
 //
@@ -1087,21 +1217,21 @@ Node* Tree::get_data_node( Key key )
 //
 void Tree::show_node( Node* n ) const
 {
-  int x;
 
-  fprintf(stderr, "------------------------------------------------\n");
-  fprintf(stderr, "| node %6d                 ", get_node_number(n));
-  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & Node::MASK);
-  fprintf(stderr, "|- - - - - - - - - - - - - - - - - - - - - - - |\n");
-  fprintf(stderr, "| flags   %1d%1d%1d%1d ", n->is_few(), n->is_full(), n->is_root(), n->is_leaf());
-  fprintf(stderr, "| keys = %5d ", n->num_entries());
-  fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_first_node()));
-  for (x = 1; x <= n->num_entries(); x++) {
-    fprintf(stderr, "| entry %6d ", x);
-    fprintf(stderr, "| key = %6d ", n->get_key( x ).get_value() & 0xFFFF);
-    fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_node( x )));
-  }
-  fprintf(stderr, "------------------------------------------------\n\n");
+    fprintf(stderr, "------------------------------------------------\n");
+    fprintf(stderr, "| node %6d                 ", get_node_number(n));
+    fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & Node::MASK);
+    fprintf(stderr, "|- - - - - - - - - - - - - - - - - - - - - - - |\n");
+    fprintf(stderr, "| flags   %1d%1d%1d%1d ", n->is_few(), n->is_full(), n->is_root(), n->is_leaf());
+    fprintf(stderr, "| keys = %5d ", n->num_entries());
+    fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_first_node()));
+    for( int x = 1; x <= n->num_entries(); x++)
+    {
+        fprintf(stderr, "| entry %6d ", x);
+        fprintf(stderr, "| key = %6d ", n->get_key( x ).get_value() & 0xFFFF);
+        fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_node( x )));
+    }
+    fprintf(stderr, "------------------------------------------------\n\n");
 }
 
 //
@@ -1109,25 +1239,25 @@ void Tree::show_node( Node* n ) const
 //
 void Tree::show_btree( ) const
 {
-  fprintf(stderr, "-  --  --  --  --  --  -\n");
-  fprintf(stderr, "|  B+tree  %10p  |\n", (void *) this);
-  fprintf(stderr, "-  --  --  --  --  --  -\n");
-  fprintf(stderr, "|  root        %6d  |\n", get_node_number( get_root() ));
-  fprintf(stderr, "|  leaf        %6d  |\n", get_node_number( get_leaf() ));
-  fprintf(stderr, "|  fanout         %3d  |\n", get_fanout() + 1);
-  fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
-  fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
-  fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
-  fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key().get_value() );
-  fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
-  fprintf(stderr, "-  --  --  --  --  --  -\n");
+    fprintf(stderr, "-  --  --  --  --  --  -\n");
+    fprintf(stderr, "|  B+tree  %10p  |\n", (void *) this);
+    fprintf(stderr, "-  --  --  --  --  --  -\n");
+    fprintf(stderr, "|  root        %6d  |\n", get_node_number( get_root() ));
+    fprintf(stderr, "|  leaf        %6d  |\n", get_node_number( get_leaf() ));
+    fprintf(stderr, "|  fanout         %3d  |\n", get_fanout() + 1);
+    fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
+    fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
+    fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
+    fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key().get_value() );
+    fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
+    fprintf(stderr, "-  --  --  --  --  --  -\n");
 
-   Node* n = get_root();
-   while( n != NO_NODE() )
-   {
-       show_node( n );
-       n = n->get_next_node();
-   }
+    Node* n = get_root();
+    while( n != NO_NODE() )
+    {
+        show_node( n );
+        n = n->get_next_node();
+    }
 }
 
 
@@ -1163,5 +1293,5 @@ void Tree::list_btree_values( Node* n ) const
 //
 void Tree::list_all_btree_values( ) const
 {
-  list_btree_values( get_leaf( ) );
+    list_btree_values( get_leaf( ) );
 }
