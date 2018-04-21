@@ -722,17 +722,21 @@ void Tree::make_new_root( Node* old_root, Node* new_node )
 //
 void Tree::erase( Key key )
 {
-  Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
+    fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
 #endif
 
-  set_fun_key( key );            /* set deletion key */
-  set_merge_path( NO_NODE() );
-  newNode = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE());
-  if ( is_node( newNode ))
-    collapse_root( get_root( ), newNode);    /* remove root when superfluous */
+    // set deletion key
+    set_fun_key( key );
+    set_merge_path( NO_NODE() );
+    Node* new_node = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE() );
+
+    if( is_node( new_node ) )
+    {
+        // remove root when superfluous
+        collapse_root( get_root( ), new_node );
+    }
 }
 
 
