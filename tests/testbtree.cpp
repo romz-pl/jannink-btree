@@ -2,41 +2,61 @@
 #include "btree.h"
 
 
-TEST( btree, init_free )
+TEST( btree, constuction )
 {
-    Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
+    const int pool_size = 100;
 
-    B.insert( 17 );
-    Nptr na = B.search( 17 );
-    EXPECT_TRUE( na != B.NONODE() );
+    EXPECT_NO_THROW( Tree{ pool_size } );
+}
 
-    B.erase( 17 );
-    Nptr nb = B.search( 17 );
-    EXPECT_TRUE( nb == B.NONODE() );
+TEST( btree, search_empty )
+{
+    const int pool_size = 100;
+    Tree tree( pool_size );
+    Node* nb = tree.search( Key( 1 ) );
+    EXPECT_TRUE( !nb );
+}
+
+TEST( btree, one_item )
+{
+    const int pool_size = 100;
+    const Key k( 17 );
+
+    Tree tree( pool_size );
+
+    EXPECT_NO_THROW( tree.insert( k ) );
+    Node* na = tree.search( k );
+    EXPECT_TRUE( na );
+
+    tree.erase( k );
+    Node* nb = tree.search( k );
+    EXPECT_TRUE( !nb );
 }
 
 TEST( btree, insert_search_delete )
 {
     const int item_no = 2000;
     const unsigned seed = 12345;
-    std::set< int > sset;
+    std::set< Key > sset;
     std::srand( seed );
-    Tree B( ARRAY_SIZE, NODE_SIZE / sizeof( Entry ), compare_keys );
+    const int pool_size = 10000;
+
+    Tree B( pool_size );
 
     for( int i = 0; i < item_no; i++ )
     {
-        const int key = std::rand();
+        const Key key = Key( std::rand() );
         auto ret = sset.insert( key );
         if( ret.second )
         {
-            B.insert( key );
+            ASSERT_NO_THROW( B.insert( key ) );
         }
     }
 
     for( auto v : sset )
     {
-        Nptr na = B.search( v );
-        EXPECT_TRUE( na != B.NONODE() );
+        Node* na = B.search( v );
+        ASSERT_TRUE( na );
     }
 
 /*    for( auto v : sset )
@@ -47,7 +67,7 @@ TEST( btree, insert_search_delete )
     for( auto v : sset )
     {
         Nptr na = B.btree_search( v );
-        EXPECT_TRUE( na == B.NONODE() );
+        ASSERT_TRUE( na );
     }
     */
 }

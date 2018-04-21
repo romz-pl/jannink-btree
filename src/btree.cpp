@@ -1,32 +1,55 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
+#include <cassert>
 #include "btree.h"
+
+
+// causes printing of node information
+#define DEBUG 1
+#undef DEBUG
+
 
 //
 //
 //
-Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
+Tree::Tree( int pool_size )
+    : pool_size( 0 )
+    , tree( nullptr )
+    , root( nullptr )
+    , leaf( nullptr )
+    , fanout( 0 )
+    , minfanout( 0 )
+    , height( 0 )
+    , pool( 0 )
+    , theKey( 0 )
+    , theData( nullptr )
+    // , branch.split( nullptr )
 {
-    set_fanout( fan );
-    set_min_fanout( (fan + 1) >> 1 );
-    init_free_node_pool( poolsz );
+
+    branch.split = nullptr;
+
+    const int fanout = Data::NODE_SIZE / sizeof( Entry );
+
+    set_fanout( fanout );
+    set_min_fanout( ( fanout + 1 ) >> 1 );
+    init_free_node_pool( pool_size );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
     set_root( get_leaf( ) );            /* the root is initially the leaf */
-    get_root( )->set_flag( isLEAF );
-    get_root( )->set_flag( isROOT );
-    get_root( )->set_flag( FEWEST );
+    get_root( )->set_flag( Node::isLEAF );
+    get_root( )->set_flag( Node::isROOT );
+    get_root( )->set_flag( Node::Node::FEWEST );
     init_tree_height( );
 
-    set_fun_key( 0 );
     set_fun_data( "0" );
-    set_compare_keys( keyCmp );
+
 
 #ifdef DEBUG
-    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
-    showBtree();
-    showNode( get_root() );
+    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", get_fanout() );
+    show_btree();
+    show_node( get_root() );
 #endif
 }
 
@@ -36,22 +59,22 @@ Tree::Tree( int poolsz, int fan, KeyCmp keyCmp )
 Tree::~Tree()
 {
 #ifdef DEBUG
-    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) B);
+    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) this);
 #endif
 
-  free( (void *)get_node_array( ) );
+    free( (void *)get_node_array( ) );
 }
 
 //
-/// corresponds to a NULL node pointer value
+// corresponds to a NULL node pointer value
 //
-Nptr Tree::NONODE() const
+Node* Tree::NO_NODE() const
 {
     return node_array_head( ) - 1;
 }
 
 // #define nodearrayhead B->tree
-Nptr Tree::node_array_head( ) const
+Node* Tree::node_array_head( ) const
 {
     return tree;
 }
@@ -59,33 +82,33 @@ Nptr Tree::node_array_head( ) const
 //
 // check that a node is in fact a node
 //
-// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & MASK) == MAGIC))
+// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != NONODE() && ( ( j->X.i.info.flags & MASK ) == MAGIC ) );
+    return ( j != NO_NODE() && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
 bool Tree::isnt_node( Node* j ) const
 {
-    return ( j == NONODE() );
+    return ( j == NO_NODE() );
 }
 
 
 // #define getfunkey B->theKey
-keyT Tree::get_fun_key( ) const
+Key Tree::get_fun_key( ) const
 {
     return theKey;
 }
 
 // #define getfundata B->theData
-dataT Tree::get_fun_data( ) const
+data_type Tree::get_fun_data( ) const
 {
     return theData;
 }
 
 // #define setfunkey(v) (B->theKey = (v))
-void Tree::set_fun_key( keyT v )
+void Tree::set_fun_key( Key v )
 {
     theKey = v;
 }
@@ -123,25 +146,25 @@ void Tree::set_node_array( Node* v )
 }
 
 // #define getroot B->root
-Nptr Tree::get_root( ) const
+Node* Tree::get_root( ) const
 {
     return root;
 }
 
 // #define setroot(v) (B->root = (v))
-void Tree::set_root( Nptr v )
+void Tree::set_root( Node* v )
 {
     root = v;
 }
 
 // #define getleaf B->leaf
-Nptr Tree::get_leaf( ) const
+Node* Tree::get_leaf( ) const
 {
     return leaf;
 }
 
 // #define setleaf(v) (B->leaf = (v))
-void Tree::set_leaf( Nptr v )
+void Tree::set_leaf( Node* v )
 {
     leaf = v;
 }
@@ -162,7 +185,8 @@ void Tree::set_fanout( int v )
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
 int Tree::get_min_fanout( const Node* j ) const
 {
-    return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
+    // return ( j->X.i.info.flags & isLEAF ) ? fanout - minfanout : minfanout;
+    return j->is_leaf() ? fanout - minfanout : minfanout;
 }
 
 
@@ -197,61 +221,48 @@ int Tree::get_tree_height( ) const
 }
 
 // #define getfirstfreenode B->pool
-Nptr Tree::get_first_free_node( ) const
+Node* Tree::get_first_free_node( ) const
 {
     return pool;
 }
 
 // #define setfirstfreenode(v) (B->pool = (v))
-void Tree::set_first_free_node( Nptr v )
+void Tree::set_first_free_node( Node* v )
 {
     pool = v;
 }
 
 // #define getsplitpath B->branch.split
-Nptr Tree::get_split_path( ) const
+Node* Tree::get_split_path( ) const
 {
     return branch.split;
 }
 
 // #define setsplitpath(v) (B->branch.split = (v))
-void Tree::set_split_path( Nptr v )
+void Tree::set_split_path( Node* v )
 {
     branch.split = v;
 }
 
 // #define getmergepath B->branch.merge
-Nptr Tree::get_merge_path( ) const
+Node* Tree::get_merge_path( ) const
 {
     return branch.merge;
 }
 
 // #define setmergepath(v) (B->branch.merge = (v))
-void Tree::set_merge_path( Nptr v )
+void Tree::set_merge_path( Node* v )
 {
     branch.merge = v;
 }
-
-// #define comparekeys (*B->keycmp)
-KeyCmp Tree::compare_keys( ) const
-{
-    return *keycmp;
-}
-
-// #define setcomparekeys(v) (B->keycmp = (v))
-void Tree::set_compare_keys( KeyCmp v )
-{
-    keycmp = v;
-}
-
 
 //
 // representation independent node numbering
 //
 // #define getnodenumber(v) ((v) - nodearrayhead)
-int Tree::get_node_number( Nptr v ) const
+int Tree::get_node_number( Node* v ) const
 {
-    return (v - node_array_head() );
+    return ( v - node_array_head() );
 }
 
 
@@ -259,155 +270,202 @@ int Tree::get_node_number( Nptr v ) const
 //
 // top level search call
 //
-Nptr Tree::search( keyT key )
+Node* Tree::search( Key key )
 {
-  Nptr    findNode;
-
 #ifdef DEBUG
-  fprintf(stderr, "SEARCH:  key %d.\n", key);
+    fprintf( stderr, "Tree::search: key %d.\n", key.get_value() );
 #endif
 
-  set_fun_key( key );            /* set search key */
-  findNode = descend_to_leaf( get_root() );    /* start search from root node */
+    if( get_root()->num_entries() == 0 )
+    {
+        return nullptr;
+    }
+
+    set_fun_key( key );
+
+    // start search from root node
+    Node* find_node = descend_to_leaf( get_root() );
 
 #ifdef DEBUG
-  fprintf(stderr, "SEARCH:  found on page %d.\n", getnodenumber(findNode));
+    if( find_node  )
+    {
+        fprintf( stderr, "Tree::search: found on page %d.\n", get_node_number( find_node ) );
+    }
+    else
+    {
+        fprintf( stderr, "Tree::search: node not found.\n" );
+    }
 #endif
 
-  return findNode;
+    return find_node;
 }
 
 //
 // `recurse' down B+tree
 //
-Nptr Tree::descend_to_leaf( Nptr curr )
+Node* Tree::descend_to_leaf( Node* curr )
 {
-  int    slot;
-  Nptr    findNode;
+    int slot = 0;
 
-  for (slot = get_slot( curr); curr->is_internal(); slot = get_slot( curr))
-    curr = curr->get_node( slot );
-  if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot ) ) )
-    findNode = curr;            /* correct key value found */
-  else
-    findNode = NONODE();            /* key value not in tree */
+    while( curr->is_internal() )
+    {
+        slot = get_slot( curr );
+        curr = curr->get_node( slot );
+    }
 
-  return findNode;
+    assert( curr->is_leaf() );
+    slot = get_slot( curr );
+
+    if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
+    {
+        // correct key value found
+        return curr;
+    }
+
+
+    return nullptr;
 }
 
 //
 // find slot for search key
 //
-int Tree::get_slot( Nptr curr )
+int Tree::get_slot( Node* curr )
 {
-  int slot, entries;
+    int slot = 0;
+    const int entries = curr->num_entries();
 
-  entries = curr->num_entries();        /* need this if root is ever empty */
-  slot = !entries ? 0 : find_key( curr, 1, entries);
+    if( entries >= 1 )
+    {
+        slot = find_key( curr, 1, entries );
+    }
+
 
 #ifdef DEBUG
-  fprintf(stderr, "GETSLOT:  slot %d.\n", slot);
+    fprintf(stderr, "get_slot:  slot %d.\n", slot);
 #endif
 
-  return slot;
+    return slot;
 }
 
 //
 // recursive binary search
 //
-int Tree::find_key( Nptr curr, int lo, int hi )
+int Tree::find_key( Node* curr, int lo, int hi )
 {
-  int mid, findslot;
 
 #ifdef DEBUG
-  fprintf(stderr, "GETSLOT:  lo %d, hi %d.\n", lo, hi);
-  showNode(B, curr);
+    fprintf(stderr, "find_key:  lo %d, hi %d.\n", lo, hi);
+    show_node( curr );
 #endif
 
-  if (hi == lo) {
-    findslot = best_match( curr, lo);        /* recursion base case */
-
-#ifdef DEBUG
-    if (findslot == ERROR)
-      fprintf(stderr, "Bad key ordering on node %d\n", getnodenumber(curr));
-#endif
-
-  }
-  else {
-    mid = (lo + hi) >> 1;
-    switch (findslot = best_match( curr, mid)) {
-    case LOWER:                /* check lower half of range */
-      findslot = find_key( curr, lo, mid - 1);        /* never in 2-3+trees */
-    break;
-    case UPPER:                /* check upper half of range */
-      findslot = find_key( curr, mid + 1, hi);
-    break;
-
-#ifdef DEBUG
-    case ERROR:
-      fprintf(stderr, "Bad key ordering on node %d\n", getnodenumber(curr));
-#endif
-
+    if( hi == lo )
+    {
+        // recursion base case
+        const int find_slot = best_match( curr, lo );
+        return find_slot;
     }
-  }
-  return findslot;
+
+    assert( hi > lo );
+
+    const int mid = ( lo + hi ) >> 1;
+    int find_slot = best_match( curr, mid );
+    switch ( find_slot )
+    {
+        case LOWER:
+            // check lower half of range
+            // never in 2-3+trees
+            find_slot = find_key( curr, lo, mid - 1 );
+        break;
+
+        case UPPER:
+            // check upper half of range
+            find_slot = find_key( curr, mid + 1, hi );
+        break;
+
+        default:
+            // Do nothing
+        break;
+    }
+    return find_slot;
 }
 
 
 //
 // comparison of key with a target key slot
 //
-int Tree::best_match( Nptr curr, int slot )
+int Tree::best_match( Node* curr, const int slot )
 {
-  int diff, comp, findslot;
+    int find_slot = ERROR;
 
-  diff = compare_keys()( get_fun_key( ), curr->get_key( slot ));
-  if (diff < 0) {        /* also check previous slot */
-    if ((slot == 1) ||
-        ((comp = compare_keys()( get_fun_key( ), curr->get_key( slot - 1 ))) >= 0))
-      findslot = slot - 1;
+    const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ) );
+    if( diff < 0 )
+    {
+        if( slot == 1 )
+        {
+            return ( slot - 1 );
+        }
 
-#ifdef DEBUG
-    else if (comp < diff)
-      findslot = ERROR;        /* inconsistent ordering of keys */
-#endif
+        //
+        // also check the previous slot
+        //
+        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ) );
 
+        if( comp >= 0 )
+        {
+            find_slot = slot - 1;
+        }
+        else
+        {
+            // key must be below in node ordering
+            find_slot = LOWER;
+        }
+    }
     else
-      findslot = LOWER;        /* key must be below in node ordering */
-  }
-  else {            /* or check following slot */
-    if ((slot == curr->num_entries()) ||
-        ((comp = compare_keys()( get_fun_key( ), curr->get_key( slot + 1 ))) < 0))
-      findslot = slot;
-    else if (comp == 0)
-      findslot = slot + 1;
+    {
+        if( slot == curr->num_entries() )
+        {
+            return slot;
+        }
 
-#ifdef DEBUG
-    else if (comp > diff)
-      findslot = ERROR;        /* inconsistent ordering of keys */
-#endif
+        //
+        // or check following slot
+        //
+        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ) );
 
-    else
-      findslot = UPPER;        /* key must be above in node ordering */
-  }
-  return findslot;
+        if( comp < 0 )
+        {
+            find_slot = slot;
+        }
+        else if( comp == 0 )
+        {
+            find_slot = slot + 1;
+        }
+        else
+        {
+            // key must be above in node ordering
+            find_slot = UPPER;
+        }
+    }
+
+    assert( find_slot != ERROR ); // Bad key ordering on node "curr"
+    return find_slot;
 }
 
 
 //
 // top level insert call
 //
-void Tree::insert( keyT key )
+void Tree::insert( Key key )
 {
-  Nptr newNode;
+  Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "INSERT:  key %d.\n", key);
+  fprintf(stderr, "INSERT:  key %d.\n", key.get_value() );
 #endif
 
   set_fun_key( key );            /* set insertion key */
   set_fun_data( "data" );            /* a node containing data */
-  set_split_path( NONODE() );
+  set_split_path( NO_NODE() );
   newNode = descend_split( get_root( ));    /* insertion point search from root */
   if (newNode != get_split_path() )        /* indicates the root node has split */
     make_new_root( get_root( ), newNode);
@@ -417,30 +475,30 @@ void Tree::insert( keyT key )
 //
 // recurse down and split back up
 //
-Nptr Tree::descend_split( Nptr curr )
+Node* Tree::descend_split( Node* curr )
 {
-  Nptr    newMe, newNode;
+  Node*    newMe, *newNode;
   int    slot;
 
   if (!curr->is_full())
-    set_split_path( NONODE() );
-  else if ( get_split_path() == NONODE())
+    set_split_path( NO_NODE() );
+  else if ( get_split_path() == NO_NODE())
     set_split_path( curr );            /* indicates where nodes must split */
 
   slot = get_slot( curr);        /* is null only if the root is empty */
   if (curr->is_internal())            /* continue recursion to leaves */
     newMe = descend_split( curr->get_node( slot ));
-  else if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot ))) {
-    newMe = NONODE();            /* this code discards duplicates */
-    set_split_path( NONODE() );
+  else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot ))) {
+    newMe = NO_NODE();            /* this code discards duplicates */
+    set_split_path( NO_NODE() );
   }
   else
     newMe = get_data_node( get_fun_key( ) );    /* an insertion takes place */
 
-  newNode = NONODE();            /* assume no node splitting necessary */
+  newNode = NO_NODE();            /* assume no node splitting necessary */
 
-  if (newMe != NONODE()) {        /* insert only where necessary */
-    if ( get_split_path() != NONODE())
+  if (newMe != NO_NODE()) {        /* insert only where necessary */
+    if ( get_split_path() != NO_NODE())
       newNode = split( curr);        /* a sibling node is prepared */
     insert_entry( curr, slot, newNode, newMe);
   }
@@ -451,67 +509,67 @@ Nptr Tree::descend_split( Nptr curr )
 //
 // determine location of inserted key
 //
-void Tree::insert_entry( Nptr newNode, int slot, Nptr sibling, Nptr downPtr )
+void Tree::insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr )
 {
-  int split, i, j, k, x, y;
+    int split, i, j, k, x, y;
 
-  if (sibling == NONODE()) {        /* no split occurred */
-    place_entry( newNode, slot + 1, downPtr);
-    newNode->clr_flag( FEWEST );
-  }
-  else {                /* split entries between the two */
-    i = newNode->is_internal();        /* adjustment values */
-    split = i ? get_fanout( ) - get_min_fanout( newNode ): get_min_fanout( newNode );
-    j = (slot != split);
-    k = (slot >= split);
-
-    for (x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++) {
-      newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
-      newNode->dec_entries();
-      sibling->inc_entries();
+    if (sibling == NO_NODE()) {        /* no split occurred */
+        place_entry( newNode, slot + 1, downPtr);
+        newNode->clr_flag( Node::Node::FEWEST );
     }
-    if (sibling->num_entries() == get_fanout())
-      sibling->set_flag( isFULL );        /* only ever happens in 2-3+trees */
+    else {                /* split entries between the two */
+        i = newNode->is_internal();        /* adjustment values */
+        split = i ? get_fanout( ) - get_min_fanout( newNode ): get_min_fanout( newNode );
+        j = (slot != split);
+        k = (slot >= split);
 
-    if (i) {                /* set first pointer of internal node */
-      if (j) {
-        sibling->set_first_node( newNode->get_node( split + k));
-        newNode->dec_entries();
-      }
-      else
-        sibling->set_first_node( downPtr);
-    }
+        for (x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++) {
+            newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
+            newNode->dec_entries();
+            sibling->inc_entries();
+        }
+        if (sibling->num_entries() == get_fanout())
+            sibling->set_flag( Node::isFULL );        /* only ever happens in 2-3+trees */
 
-    if (j) {                /* insert new entry into correct spot */
-      x = newNode->get_key( split + k );
-      if (k)
-    place_entry( sibling, slot - split + 1 - i, downPtr);
-      else
-    place_entry( newNode, slot + 1, downPtr);
-      set_fun_key( x );            /* set key separating nodes */
-    }
-    else if (!i)
-      place_entry( sibling, 1, downPtr);
+        if (i) {                /* set first pointer of internal node */
+            if (j) {
+                sibling->set_first_node( newNode->get_node( split + k));
+                newNode->dec_entries();
+            }
+            else
+                sibling->set_first_node( downPtr);
+        }
 
-    newNode->clr_flag( isFULL );        /* adjust node flags */
-    if (newNode->num_entries() == get_min_fanout( newNode ))
-      newNode->set_flag( FEWEST );        /* never happens in even size nodes */
-    if (sibling->num_entries() > get_min_fanout( sibling ))
-      sibling->clr_flag( FEWEST );
+        if (j) {                /* insert new entry into correct spot */
+            const Key xx = newNode->get_key( split + k );
+            if (k)
+                place_entry( sibling, slot - split + 1 - i, downPtr);
+            else
+                place_entry( newNode, slot + 1, downPtr);
+            set_fun_key( xx );            /* set key separating nodes */
+        }
+        else if (!i)
+            place_entry( sibling, 1, downPtr);
+
+        newNode->clr_flag( Node::isFULL );        /* adjust node flags */
+        if (newNode->num_entries() == get_min_fanout( newNode ))
+            newNode->set_flag( Node::FEWEST );        /* never happens in even size nodes */
+        if (sibling->num_entries() > get_min_fanout( sibling ))
+            sibling->clr_flag( Node::FEWEST );
 
 #ifdef DEBUG
-  fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, getnodenumber(downPtr));
-  showNode(B, newNode);
-  showNode(B, sibling);
+        fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, get_node_number(downPtr));
+        show_node( newNode);
+        show_node( sibling);
 #endif
 
-  }
+    }
 }
 
 //
 // place key into appropriate node & slot
 //
-void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
+void Tree::place_entry( Node* newNode, int slot, Node* downPtr )
 {
   int x;
 
@@ -521,28 +579,28 @@ void Tree::place_entry( Nptr newNode, int slot, Nptr downPtr )
 
   newNode->inc_entries();                /* adjust entry counter */
   if (newNode->num_entries() == get_fanout())
-    newNode->set_flag( isFULL );
+    newNode->set_flag( Node::isFULL );
 }
 
 
 //
 // split full node and set flags
 //
-Nptr Tree::split( Nptr newNode )
+Node* Tree::split( Node* newNode )
 {
-  Nptr sibling;
+  Node* sibling;
 
   sibling = get_free_node();
 
-  sibling->set_flag( FEWEST );            /* set up node flags */
+  sibling->set_flag( Node::FEWEST );            /* set up node flags */
 
   if ( newNode->is_leaf()) {
-    sibling->set_flag( isLEAF );
+    sibling->set_flag( Node::isLEAF );
     sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
     newNode->set_next_node( sibling);
   }
   if ( get_split_path() == newNode)
-    set_split_path( NONODE() );            /* no more splitting needed */
+    set_split_path( NO_NODE() );            /* no more splitting needed */
 
   return sibling;
 }
@@ -551,7 +609,7 @@ Nptr Tree::split( Nptr newNode )
 //
 // build new root node
 //
-void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
+void Tree::make_new_root( Node* oldRoot, Node* newNode )
 {
   set_root( get_free_node() );
 
@@ -559,9 +617,9 @@ void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
   get_root( )->set_entry( 1, get_fun_key( ), newNode);    /* old root's sibling also */
   get_root( )->inc_entries();
 
-  oldRoot->clr_flag( isROOT );
-  get_root( )->set_flag( isROOT );
-  get_root( )->set_flag( FEWEST );
+  oldRoot->clr_flag( Node::isROOT );
+  get_root( )->set_flag( Node::isROOT );
+  get_root( )->set_flag( Node::FEWEST );
   inc_tree_height( );
 }
 
@@ -583,17 +641,17 @@ void Tree::make_new_root( Nptr oldRoot, Nptr newNode )
 //    are most efficient, that is, cause the least rearranging of data,
 //    and minimize the need for non-local key manipulation.
 //
-void Tree::erase( keyT key )
+void Tree::erase( Key key )
 {
-  Nptr newNode;
+  Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  key %d.\n", key);
+  fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
 #endif
 
   set_fun_key( key );            /* set deletion key */
-  set_merge_path( NONODE() );
-  newNode = descend_balance( get_root( ), NONODE(), NONODE(), NONODE(), NONODE(), NONODE());
+  set_merge_path( NO_NODE() );
+  newNode = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE());
   if ( is_node( newNode ))
     collapse_root( get_root( ), newNode);    /* remove root when superfluous */
 }
@@ -602,17 +660,17 @@ void Tree::erase( keyT key )
 //
 // remove old root node
 //
-void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
+void Tree::collapse_root( Node* oldRoot, Node* newRoot )
 {
 
 #ifdef DEBUG
-  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", getnodenumber(oldRoot), getnodenumber(newRoot));
-  showNode(B, oldRoot);
-  showNode(B, newRoot);
+  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", get_node_number(oldRoot), get_node_number(newRoot));
+  show_node( oldRoot);
+  show_node( newRoot);
 #endif
 
   set_root( newRoot);
-  newRoot->set_flag( isROOT );
+  newRoot->set_flag( Node::isROOT );
   put_free_node( oldRoot );
   dec_tree_height( );            /* the height of the tree decreases */
 }
@@ -621,21 +679,21 @@ void Tree::collapse_root( Nptr oldRoot, Nptr newRoot )
 //
 // recurse down and balance back up
 //
-Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rAnc, Nptr parent )
+Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, Node* rAnc, Node* parent )
 {
-  Nptr    newMe, myLeft, myRight, lAnchor, rAnchor, newNode;
+  Node*    newMe, *myLeft, *myRight, *lAnchor, *rAnchor, *newNode;
   int    slot, notleft, notright, fewleft, fewright, test;
 
   if (!curr->is_few())
-    set_merge_path( NONODE() );
-  else if ( get_merge_path() == NONODE())
+    set_merge_path( NO_NODE() );
+  else if ( get_merge_path() == NO_NODE())
     set_merge_path( curr );        /* mark which nodes may need rebalancing */
 
   slot = get_slot( curr);
   newNode = curr->get_node( slot );
   if (curr->is_internal()) {    /* set up next recursion call's parameters */
     if (slot == 0) {
-      myLeft = isnt_node( left ) ? NONODE() : left->get_last_node();
+      myLeft = isnt_node( left ) ? NO_NODE() : left->get_last_node();
       lAnchor = lAnc;
     }
     else {
@@ -643,7 +701,7 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
       lAnchor = curr;
     }
     if (slot == curr->num_entries()) {
-      myRight = isnt_node( right ) ? NONODE() : right->get_first_node();
+      myRight = isnt_node( right ) ? NO_NODE() : right->get_first_node();
       rAnchor = rAnc;
     }
     else {
@@ -652,11 +710,11 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
     }
     newMe = descend_balance( newNode, myLeft, myRight, lAnchor, rAnchor, curr);
   }
-  else if ((slot > 0) && !compare_keys()( get_fun_key( ), curr->get_key( slot )))
+  else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot )))
     newMe = newNode;        /* a key to be deleted is found */
   else {
-    newMe = NONODE();        /* no deletion possible, key not found */
-    set_merge_path( NONODE() );
+    newMe = NO_NODE();        /* no deletion possible, key not found */
+    set_merge_path( NO_NODE() );
   }
 
 //~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
@@ -684,16 +742,16 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
 // begin deletion, working upwards from leaves
 //
 
-  if (newMe != NONODE())    /* this node removal doesn't consider duplicates */
+  if (newMe != NO_NODE())    /* this node removal doesn't consider duplicates */
     remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, getnodenumber(newMe));
-  showNode(B, curr);
+  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number(newMe));
+  show_node( curr);
 #endif
 
-  if ( get_merge_path() == NONODE())
-    newNode = NONODE();
+  if ( get_merge_path() == NO_NODE())
+    newNode = NO_NODE();
   else {        /* tree rebalancing rules for node merges and shifts */
     notleft = isnt_node( left );
     notright = isnt_node( right );
@@ -703,7 +761,7 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
             /* CASE 1:  prepare root node (curr) for removal */
     if (notleft && notright) {
       test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? NONODE() : curr->get_first_node();
+      newNode = test ? NO_NODE() : curr->get_first_node();
     }
             /* CASE 2:  the merging of two nodes is a must */
     else if ((notleft || fewleft) && (notright || fewright)) {
@@ -739,7 +797,7 @@ Nptr Tree::descend_balance( Nptr curr, Nptr left, Nptr right, Nptr lAnc, Nptr rA
 //
 // remove key and pointer from node
 //
-void Tree::remove_entry( Nptr curr, int slot )
+void Tree::remove_entry( Node* curr, int slot )
 {
   int x;
 
@@ -747,27 +805,27 @@ void Tree::remove_entry( Nptr curr, int slot )
   for (x = slot; x < curr->num_entries(); x++)
     curr->pull_entry( x, 1);        /* adjust node with removed key */
   curr->dec_entries();
-  curr->clr_flag( isFULL );        /* keep flag information up to date */
+  curr->clr_flag( Node::isFULL );        /* keep flag information up to date */
   if (curr->is_root()) {
     if (curr->num_entries() == 1)
-      curr->set_flag( FEWEST );
+      curr->set_flag( Node::FEWEST );
   }
   else if (curr->num_entries() == get_min_fanout( curr ))
-    curr->set_flag( FEWEST );
+    curr->set_flag( Node::FEWEST );
 }
 
 
 //
 // merge a node pair & set emptied node up for removal
 //
-Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
+Node* Tree::merge( Node* left, Node* right, Node* anchor )
 {
   int    x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "MERGE:  left %d, right %d.\n", getnodenumber(left), getnodenumber(right));
-  showNode(B, left);
-  showNode(B, right);
+  fprintf(stderr, "MERGE:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+  show_node( left);
+  show_node( right);
 #endif
 
   if (left->is_internal()) {
@@ -784,12 +842,12 @@ Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
     right->xfer_entry( y, left, x);    /* transfer entries to left node */
   }
   if (left->num_entries() > get_min_fanout( left ))
-    left->clr_flag( FEWEST );
+    left->clr_flag( Node::FEWEST );
   if (left->num_entries() == get_fanout())
-    left->set_flag( isFULL );        /* never happens in even size nodes */
+    left->set_flag( Node::isFULL );        /* never happens in even size nodes */
 
   if ( get_merge_path() == left || get_merge_path() == right)
-    set_merge_path( NONODE() );        /* indicate rebalancing is complete */
+    set_merge_path( NO_NODE() );        /* indicate rebalancing is complete */
 
   return right;
 }
@@ -798,14 +856,14 @@ Nptr Tree::merge( Nptr left, Nptr right, Nptr anchor )
 //
 // shift entries in a node pair & adjust anchor key value
 //
-Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
+Node* Tree::shift( Node* left, Node* right, Node* anchor )
 {
   int    i, x, y, z;
 
 #ifdef DEBUG
-  fprintf(stderr, "SHIFT:  left %d, right %d.\n", getnodenumber(left), getnodenumber(right));
-  showNode(B, left);
-  showNode(B, right);
+  fprintf(stderr, "SHIFT:  left %d, right %d.\n", get_node_number(left), get_node_number(right));
+  show_node( left);
+  show_node( right);
 #endif
 
   i = left->is_internal();
@@ -820,7 +878,7 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
       left->set_entry( left->num_entries(), anchor->get_key( z ), right->get_first_node());
       right->set_first_node( right->get_node( y + 1 - i ));
     }
-    right->clr_flag( isFULL );
+    right->clr_flag( Node::isFULL );
     anchor->set_key( z, get_fun_key( ) );        /* set new anchor value */
     for (z = y, y -= i; y > 0; y--, x--) {
       right->dec_entries();            /* adjust entry count */
@@ -846,7 +904,7 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
       right->set_entry( y, anchor->get_key( z ), right->get_first_node());
       right->set_first_node( left->get_node( x ));
     }
-    left->clr_flag( isFULL );
+    left->clr_flag( Node::isFULL );
     anchor->set_key( z, get_fun_key( ) );
     for (x = left->num_entries() + i, y -= i; y > 0; y--, x--) {
       left->dec_entries();
@@ -855,21 +913,21 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
     }
   }
   if (left->num_entries() == get_min_fanout( left ))        /* adjust node flags */
-    left->set_flag( FEWEST );
+    left->set_flag( Node::FEWEST );
   else
-    left->clr_flag( FEWEST );            /* never happens in 2-3+trees */
+    left->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
   if (right->num_entries() == get_min_fanout( right ))
-    right->set_flag( FEWEST );
+    right->set_flag( Node::FEWEST );
   else
-    right->clr_flag( FEWEST );            /* never happens in 2-3+trees */
-  set_merge_path( NONODE() );
+    right->clr_flag( Node::FEWEST );            /* never happens in 2-3+trees */
+  set_merge_path( NO_NODE() );
 
 #ifdef DEBUG
-  showNode(B, left);
-  showNode(B, right);
+  show_node( left);
+  show_node( right);
 #endif
 
-  return NONODE();
+  return NO_NODE();
 }
 
 
@@ -878,44 +936,50 @@ Nptr Tree::shift( Nptr left, Nptr right, Nptr anchor )
 //
 void Tree::init_free_node_pool( int quantity )
 {
-  int    i;
-  Nptr    n;
+    set_pool_size( quantity );
+    set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
+    set_first_free_node( node_array_head() );    /* start a list of free nodes */
 
-  set_pool_size( quantity );
-  set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-  set_first_free_node( node_array_head() );    /* start a list of free nodes */
-  for (n = get_first_free_node(), i = 0; i < quantity; n++, i++) {
-    n->clear_flags();
-    n->clear_entries();
-    n->set_next_node( n + 1);        /* insert node into free node list */
-  }
-  (--n)->set_next_node( NONODE() );        /* indicates end of free node list */
+    Node* n = get_first_free_node();
+    for( int i = 0; i < quantity; i++ )
+    {
+        n->clear_flags();
+        n->clear_entries();
+        n->set_next_node( n + 1 );        /* insert node into free node list */
+        n++;
+    }
+    --n;
+    n->set_next_node( NO_NODE() );        /* indicates end of free node list */
 }
 
 
 //
 // take a free B+tree node from the pool
 //
-Nptr Tree::get_free_node( )
+Node* Tree::get_free_node( )
 {
-  Nptr newNode = get_first_free_node( );
+    Node* newNode = get_first_free_node( );
 
-  if (newNode != NONODE()) {
-    set_first_free_node( newNode->get_next_node( ) );    /* adjust free node list */
-    newNode->set_next_node( NONODE());        /* remove node from list */
-  }
-  else {
-    fprintf(stderr, "Out of tree nodes.");    /* can't recover from this */
-    exit(0);
-  }
-  return newNode;
+    if( newNode == NO_NODE() )
+    {
+          // can't recover from this
+          throw std::runtime_error( "Out of tree nodes." );
+    }
+
+    // adjust free node list
+    set_first_free_node( newNode->get_next_node( ) );
+
+    // remove node from list
+    newNode->set_next_node( NO_NODE() );
+
+    return newNode;
 }
 
 
 //
 // return a deleted B+tree node to the pool
 //
-void Tree::put_free_node( Nptr self )
+void Tree::put_free_node( Node* self )
 {
   self->clear_flags();
   self->clear_entries();
@@ -927,12 +991,12 @@ void Tree::put_free_node( Nptr self )
 // fill a free data node with a key and associated data
 // can add data parameter
 //
-Nptr Tree::get_data_node( keyT key )
+Node* Tree::get_data_node( Key key )
 {
-    Nptr newNode = get_free_node( );
-    keyT* value;
+    Node* newNode = get_free_node( );
+    Key* value;
 
-    value = (keyT *) &newNode->X.d;
+    value = (Key *) &newNode->data;
 
     // can add code to fill node
     *value = key;
@@ -944,20 +1008,20 @@ Nptr Tree::get_data_node( keyT key )
 //
 // B+tree node printer
 //
-void Tree::show_node( Nptr n ) const
+void Tree::show_node( Node* n ) const
 {
   int x;
 
   fprintf(stderr, "------------------------------------------------\n");
   fprintf(stderr, "| node %6d                 ", get_node_number(n));
-  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & MASK);
+  fprintf(stderr, "  magic    %4x  |\n", n->get_flags() & Node::MASK);
   fprintf(stderr, "|- - - - - - - - - - - - - - - - - - - - - - - |\n");
   fprintf(stderr, "| flags   %1d%1d%1d%1d ", n->is_few(), n->is_full(), n->is_root(), n->is_leaf());
   fprintf(stderr, "| keys = %5d ", n->num_entries());
   fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_first_node()));
   for (x = 1; x <= n->num_entries(); x++) {
     fprintf(stderr, "| entry %6d ", x);
-    fprintf(stderr, "| key = %6d ", n->get_key( x ) & 0xFFFF);
+    fprintf(stderr, "| key = %6d ", n->get_key( x ).get_value() & 0xFFFF);
     fprintf(stderr, "| node = %6d  |\n", get_node_number( n->get_node( x )));
   }
   fprintf(stderr, "------------------------------------------------\n\n");
@@ -977,12 +1041,12 @@ void Tree::show_btree( ) const
   fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
   fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
   fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
-  fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key() );
+  fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key().get_value() );
   fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
   fprintf(stderr, "-  --  --  --  --  --  -\n");
 
-   Nptr n = get_root();
-   while( n != NONODE() )
+   Node* n = get_root();
+   while( n != NO_NODE() )
    {
        show_node( n );
        n = n->get_next_node();
@@ -993,17 +1057,18 @@ void Tree::show_btree( ) const
 //
 // B+tree data printer
 //
-void Tree::list_btree_values( Nptr n, int num ) const
+void Tree::list_btree_values( Node* n ) const
 {
     int slot, prev = -1;
+    int num = 0;
 
-    for( slot = 1; ( n != NONODE() ) && num && n->num_entries(); num-- )
+    for( slot = 1; ( n != NO_NODE() ) && n->num_entries(); num++ )
     {
-        if( n->get_key( slot ) <= prev)
+        if( n->get_key( slot ).get_value() <= prev)
         {
             fprintf(stderr, "BOMB");
         }
-        prev = n->get_key( slot );
+        prev = n->get_key( slot ).get_value();
 
 
         fprintf( stderr, "%8d%c", prev, ( num & 7 ? ' ' : '\n' ) );
@@ -1021,5 +1086,5 @@ void Tree::list_btree_values( Nptr n, int num ) const
 //
 void Tree::list_all_btree_values( ) const
 {
-  list_btree_values( get_leaf( ), ERROR );
+  list_btree_values( get_leaf( ) );
 }

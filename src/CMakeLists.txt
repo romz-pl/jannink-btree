@@ -3,6 +3,7 @@ set( LIB_NAME jannink-btree )
 
 add_library( ${LIB_NAME} STATIC
     btree.cpp
+    key.cpp
     node.cpp
 )
 
