@@ -28,8 +28,8 @@ public:
     void set_fun_data( const char* v );
 
      // define number of B+tree nodes for free node pool
-    int get_pool_size( ) const;
-    void set_pool_size( int v );
+    //int get_pool_size( ) const;
+    //void set_pool_size( int v );
 
     // access memory region containing B+tree nodes
     Node* get_node_array( ) const;
@@ -80,7 +80,7 @@ public:
     Node* node_array_head( ) const;
 
     Node* get_free_node();
-    void init_free_node_pool( int quantity );
+    void init_free_node_pool();
 
     int best_match( Node* curr, const int slot );
     int find_key( Node* curr, int lo, int hi );
@@ -113,7 +113,7 @@ public:
 private:
 
     // # of nodes allocated for tree
-    int m_pool_size;
+    const int m_pool_size;
 
     // pointer to array of nodes (NOT Nptr !)
     Node* m_tree;

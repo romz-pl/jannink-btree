@@ -15,7 +15,7 @@
 //
 //
 Tree::Tree( int pool_size )
-    : m_pool_size( 0 )
+    : m_pool_size( pool_size )
     , m_tree( nullptr )
     , m_root( nullptr )
     , m_leaf( nullptr )
@@ -34,7 +34,7 @@ Tree::Tree( int pool_size )
 
     set_fanout( fanout );
     set_min_fanout( ( fanout + 1 ) >> 1 );
-    init_free_node_pool( pool_size );
+    init_free_node_pool( );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
     set_root( get_leaf( ) );            /* the root is initially the leaf */
@@ -120,7 +120,7 @@ void Tree::set_fun_data( const char* v )
     m_the_data = strdup( v );
 }
 
-
+/*
 // #define getpoolsize B->poolsize
 int Tree::get_pool_size( ) const
 {
@@ -132,6 +132,7 @@ void Tree::set_pool_size( int v )
 {
     m_pool_size = v;
 }
+*/
 
 // #define getnodearray B->tree
 Node* Tree::get_node_array( ) const
@@ -1144,22 +1145,27 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
 //
 // Set up pool of free nodes
 //
-void Tree::init_free_node_pool( int quantity )
+void Tree::init_free_node_pool( )
 {
-    set_pool_size( quantity );
-    set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-    set_first_free_node( node_array_head() );    /* start a list of free nodes */
+    // node memory block
+    set_node_array( ( Node* )malloc( m_pool_size * sizeof( Node ) ) );
+
+    // start a list of free nodes
+    set_first_free_node( node_array_head() );
 
     Node* n = get_first_free_node();
-    for( int i = 0; i < quantity; i++ )
+    for( int i = 0; i < m_pool_size; i++ )
     {
         n->clear_flags();
         n->clear_entries();
-        n->set_next_node( n + 1 );        /* insert node into free node list */
+
+        // insert node into free node list
+        n->set_next_node( n + 1 );
         n++;
     }
     --n;
-    n->set_next_node( NO_NODE() );        /* indicates end of free node list */
+    // indicates end of free node list
+    n->set_next_node( NO_NODE() );
 }
 
 
