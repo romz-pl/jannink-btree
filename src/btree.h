@@ -85,7 +85,7 @@ public:
     Node* get_free_node();
     void init_free_node_pool( int quantity );
 
-    int best_match( Node* curr, int slot );
+    int best_match( Node* curr, const int slot );
     int find_key( Node* curr, int lo, int hi );
     int get_slot( Node* curr );
     Node* descend_to_leaf( Node* curr );

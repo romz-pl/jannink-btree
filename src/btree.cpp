@@ -47,7 +47,7 @@ Tree::Tree( int pool_size )
 
 
 #ifdef DEBUG
-    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", fan);
+    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", get_fanout() );
     show_btree();
     show_node( get_root() );
 #endif
@@ -273,7 +273,7 @@ int Tree::get_node_number( Node* v ) const
 Node* Tree::search( Key key )
 {
 #ifdef DEBUG
-    fprintf(stderr, "SEARCH:  key %d.\n", key);
+    fprintf( stderr, "Tree::search: key %d.\n", key.get_value() );
 #endif
 
     if( get_root()->num_entries() == 0 )
@@ -284,13 +284,20 @@ Node* Tree::search( Key key )
     set_fun_key( key );
 
     // start search from root node
-    Node* findNode = descend_to_leaf( get_root() );
+    Node* find_node = descend_to_leaf( get_root() );
 
 #ifdef DEBUG
-    fprintf(stderr, "SEARCH:  found on page %d.\n", get_node_number(findNode) );
+    if( find_node  )
+    {
+        fprintf( stderr, "Tree::search: found on page %d.\n", get_node_number( find_node ) );
+    }
+    else
+    {
+        fprintf( stderr, "Tree::search: node not found.\n" );
+    }
 #endif
 
-    return findNode;
+    return find_node;
 }
 
 //
@@ -345,7 +352,6 @@ int Tree::get_slot( Node* curr )
 //
 int Tree::find_key( Node* curr, int lo, int hi )
 {
-    int findslot;
 
 #ifdef DEBUG
     fprintf(stderr, "find_key:  lo %d, hi %d.\n", lo, hi);
@@ -355,68 +361,58 @@ int Tree::find_key( Node* curr, int lo, int hi )
     if( hi == lo )
     {
         // recursion base case
-        findslot = best_match( curr, lo );
-
-#ifdef DEBUG
-        if (findslot == ERROR)
-        {
-            fprintf(stderr, "Bad key ordering on node %d\n", get_node_number(curr));
-        }
-#endif
-
+        const int find_slot = best_match( curr, lo );
+        return find_slot;
     }
-    else
+
+    assert( hi > lo );
+
+    const int mid = ( lo + hi ) >> 1;
+    int find_slot = best_match( curr, mid );
+    switch ( find_slot )
     {
-        const int mid = ( lo + hi ) >> 1;
-        findslot = best_match( curr, mid );
-        switch ( findslot )
-        {
-            case LOWER:
-                // check lower half of range
-                // never in 2-3+trees
-                findslot = find_key( curr, lo, mid - 1 );
-            break;
+        case LOWER:
+            // check lower half of range
+            // never in 2-3+trees
+            find_slot = find_key( curr, lo, mid - 1 );
+        break;
 
-            case UPPER:
-                // check upper half of range
-                findslot = find_key( curr, mid + 1, hi );
-            break;
+        case UPPER:
+            // check upper half of range
+            find_slot = find_key( curr, mid + 1, hi );
+        break;
 
-#ifdef DEBUG
-            case ERROR:
-                fprintf(stderr, "Bad key ordering on node %d\n", get_node_number(curr));
-            break;
-#endif
-
-        }
+        default:
+            // Do nothing
+        break;
     }
-    return findslot;
+    return find_slot;
 }
 
 
 //
 // comparison of key with a target key slot
 //
-int Tree::best_match( Node* curr, int slot )
+int Tree::best_match( Node* curr, const int slot )
 {
-    int findslot = ERROR;
+    int find_slot = ERROR;
 
-    const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ));
+    const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ) );
     if( diff < 0 )
     {
         //
         // also check previous slot
         //
-        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ));
+        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ) );
 
         if( ( slot == 1 ) || ( comp >= 0 ) )
         {
-            findslot = slot - 1;
+            find_slot = slot - 1;
         }
         else
         {
             // key must be below in node ordering
-            findslot = LOWER;
+            find_slot = LOWER;
         }
     }
     else
@@ -426,21 +422,23 @@ int Tree::best_match( Node* curr, int slot )
         //
         const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ));
 
-        if( ( slot == curr->num_entries() ) || ( comp < 0) )
+        if( ( slot == curr->num_entries() ) || ( comp < 0 ) )
         {
-            findslot = slot;
+            find_slot = slot;
         }
         else if( comp == 0 )
         {
-            findslot = slot + 1;
+            find_slot = slot + 1;
         }
         else
         {
             // key must be above in node ordering
-            findslot = UPPER;
+            find_slot = UPPER;
         }
     }
-    return findslot;
+
+    assert( find_slot != ERROR ); // Bad key ordering on node "curr"
+    return find_slot;
 }
 
 
@@ -452,7 +450,7 @@ void Tree::insert( Key key )
   Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "INSERT:  key %d.\n", key);
+  fprintf(stderr, "INSERT:  key %d.\n", key.get_value() );
 #endif
 
   set_fun_key( key );            /* set insertion key */
@@ -638,7 +636,7 @@ void Tree::erase( Key key )
   Node* newNode;
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  key %d.\n", key);
+  fprintf(stderr, "DELETE:  key %d.\n", key.get_value() );
 #endif
 
   set_fun_key( key );            /* set deletion key */
