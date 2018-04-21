@@ -79,9 +79,6 @@ public:
     Node* NO_NODE() const;
     Node* node_array_head( ) const;
 
-    void list_all_btree_values( ) const;
-    void list_btree_values( Node* n ) const;
-
     Node* get_free_node();
     void init_free_node_pool( int quantity );
 
@@ -105,8 +102,13 @@ public:
     void collapse_root( Node* oldRoot, Node* newRoot );
     void erase( Key key );
 
+#ifdef DEBUG
     void show_node( Node* n ) const;
     void show_btree( ) const;
+    void list_all_btree_values( ) const;
+    void list_btree_values( Node* n ) const;
+#endif
+
 
 public:
 

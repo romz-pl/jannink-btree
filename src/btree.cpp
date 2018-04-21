@@ -1216,6 +1216,7 @@ Node* Tree::get_data_node( Key key )
     return newNode;
 }
 
+#ifdef DEBUG
 
 //
 // B+tree node printer
@@ -1300,3 +1301,6 @@ void Tree::list_all_btree_values( ) const
 {
     list_btree_values( get_leaf( ) );
 }
+
+#endif
+
