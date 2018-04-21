@@ -245,7 +245,6 @@ void Tree::set_merge_path( Node* v )
     branch.merge = v;
 }
 
-
 //
 // top level search call
 //
