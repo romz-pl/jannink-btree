@@ -122,14 +122,15 @@ TEST( btree, insert_search_delete )
 TEST( btree, insert_random )
 {
     std::set< Key > sset;
-    const int pool_size = 182100;
+    const int pool_size = 20000;
     Tree B( pool_size );
 
     const double threshold = 0.6;
-    const int iter_no = 1000;
+    const int iter_no = 2000;
 
-    std::random_device rd; // only used once to initialise (seed) engine
-    std::mt19937 rng( rd() ); // random-number engine used (Mersenne-Twister in this case)
+    //std::random_device rd; // only used once to initialise (seed) engine
+    //std::mt19937 rng( rd() ); // random-number engine used (Mersenne-Twister in this case)
+    std::mt19937 rng;
     std::uniform_real_distribution<> dist_real( 0, 1 );
 
     std::uniform_int_distribution< int > dist_int( 0, iter_no/2 );
@@ -142,7 +143,7 @@ TEST( btree, insert_random )
         if( x > threshold )
         {
             sset.insert( key );
-            B.insert( key );
+            ASSERT_NO_THROW( B.insert( key ) );
         }
         else
         {
@@ -155,8 +156,46 @@ TEST( btree, insert_random )
         for( auto v : sset )
         {
             Node* na = B.search( v );
-            assert( na  );
+            ASSERT_TRUE( na  );
         }
 
     }
 }
+
+TEST( btree, erase_random )
+{
+    std::set< Key > sset;
+    const int pool_size = 30000;
+    Tree B( pool_size );
+
+    const int iter_no = 5000;
+
+    //std::random_device rd; // only used once to initialise (seed) engine
+    // std::mt19937 rng( rd() ); // random-number engine used (Mersenne-Twister in this case)
+    std::mt19937 rng;
+
+    std::uniform_int_distribution< int > dist_int( 0, iter_no/2 );
+
+    for( int i = 0; i < iter_no; i++ )
+    {
+        const Key key( dist_int( rng ) );
+        sset.insert( key );
+        ASSERT_NO_THROW( B.insert( key ) );
+    }
+
+    while( !sset.empty() )
+    {
+        const Key key( dist_int( rng ) );
+        sset.erase( key );
+        B.erase( key );
+    }
+
+    for( auto v : sset )
+    {
+        Node* na = B.search( v );
+        ASSERT_TRUE( na  );
+    }
+
+
+}
+
