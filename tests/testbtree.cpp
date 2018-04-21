@@ -2,19 +2,34 @@
 #include "btree.h"
 
 
-TEST( btree, init_free )
+TEST( btree, constuction )
+{
+    const int pool_size = 100;
+
+    EXPECT_NO_THROW( Tree{ pool_size } );
+}
+
+TEST( btree, search_empty )
+{
+    const int pool_size = 100;
+    Tree tree( pool_size );
+    Node* nb = tree.search( Key( 1 ) );
+    EXPECT_TRUE( !nb );
+}
+
+TEST( btree, one_item )
 {
     const int pool_size = 100;
     const Key k( 17 );
 
-    Tree B( pool_size );
+    Tree tree( pool_size );
 
-    EXPECT_NO_THROW( B.insert( k ) );
-    Node* na = B.search( k );
+    EXPECT_NO_THROW( tree.insert( k ) );
+    Node* na = tree.search( k );
     EXPECT_TRUE( na );
 
-    B.erase( k );
-    Node* nb = B.search( k );
+    tree.erase( k );
+    Node* nb = tree.search( k );
     EXPECT_TRUE( !nb );
 }
 

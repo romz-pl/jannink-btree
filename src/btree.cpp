@@ -276,6 +276,11 @@ Node* Tree::search( Key key )
     fprintf(stderr, "SEARCH:  key %d.\n", key);
 #endif
 
+    if( get_root()->num_entries() == 0 )
+    {
+        return nullptr;
+    }
+
     set_fun_key( key );
 
     // start search from root node
@@ -319,13 +324,17 @@ Node* Tree::descend_to_leaf( Node* curr )
 //
 int Tree::get_slot( Node* curr )
 {
-    // need this if root is ever empty
+    int slot = 0;
     const int entries = curr->num_entries();
 
-    const int slot = !entries ? 0 : find_key( curr, 1, entries );
+    if( entries >= 1 )
+    {
+        slot = find_key( curr, 1, entries );
+    }
+
 
 #ifdef DEBUG
-    fprintf(stderr, "GETSLOT:  slot %d.\n", slot);
+    fprintf(stderr, "get_slot:  slot %d.\n", slot);
 #endif
 
     return slot;
@@ -339,7 +348,7 @@ int Tree::find_key( Node* curr, int lo, int hi )
     int findslot;
 
 #ifdef DEBUG
-    fprintf(stderr, "GETSLOT:  lo %d, hi %d.\n", lo, hi);
+    fprintf(stderr, "find_key:  lo %d, hi %d.\n", lo, hi);
     show_node( curr );
 #endif
 
