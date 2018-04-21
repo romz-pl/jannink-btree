@@ -27,10 +27,6 @@ public:
     data_type get_fun_data( ) const;
     void set_fun_data( const char* v );
 
-     // define number of B+tree nodes for free node pool
-    //int get_pool_size( ) const;
-    //void set_pool_size( int v );
-
     // access memory region containing B+tree nodes
     Node* get_node_array( ) const;
     void set_node_array( Node* v );
@@ -112,7 +108,7 @@ public:
 
 private:
 
-    // # of nodes allocated for tree
+    // Defines number of B+tree nodes for free node pool
     const int m_pool_size;
 
     // pointer to array of nodes (NOT Nptr !)
