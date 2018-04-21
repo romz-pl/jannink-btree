@@ -457,18 +457,27 @@ int Tree::best_match( Node* curr, const int slot )
 //
 void Tree::insert( Key key )
 {
-  Node* newNode;
-
 #ifdef DEBUG
-  fprintf(stderr, "INSERT:  key %d.\n", key.get_value() );
+    fprintf( stderr, "Tree::insert:  key %d.\n", key.get_value() );
 #endif
 
-  set_fun_key( key );            /* set insertion key */
-  set_fun_data( "data" );            /* a node containing data */
-  set_split_path( NO_NODE() );
-  newNode = descend_split( get_root( ));    /* insertion point search from root */
-  if (newNode != get_split_path() )        /* indicates the root node has split */
-    make_new_root( get_root( ), newNode);
+    // set insertion key
+    set_fun_key( key );
+
+    // a node containing data
+    set_fun_data( "data" );
+
+    set_split_path( NO_NODE() );
+
+    // insertion point search from root
+    Node* newNode = descend_split( get_root() );
+
+
+    // indicates the root node has split
+    if( newNode != get_split_path() )
+    {
+        make_new_root( get_root(), newNode );
+    }
 }
 
 
