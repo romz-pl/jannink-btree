@@ -730,6 +730,7 @@ void Tree::erase( Key key )
     // set deletion key
     set_fun_key( key );
     set_merge_path( NO_NODE() );
+
     Node* new_node = descend_balance( get_root( ), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE(), NO_NODE() );
 
     if( is_node( new_node ) )
@@ -743,19 +744,21 @@ void Tree::erase( Key key )
 //
 // remove old root node
 //
-void Tree::collapse_root( Node* oldRoot, Node* newRoot )
+void Tree::collapse_root( Node* old_root, Node* new_root )
 {
 
 #ifdef DEBUG
-  fprintf(stderr, "COLLAPSE:  old %d, new %d.\n", get_node_number(oldRoot), get_node_number(newRoot));
-  show_node( oldRoot);
-  show_node( newRoot);
+    fprintf(stderr, "Tree::collapse_root:  old %d, new %d.\n", get_node_number( old_root ), get_node_number( new_root ) );
+    show_node( old_root );
+    show_node( new_root );
 #endif
 
-  set_root( newRoot);
-  newRoot->set_flag( Node::isROOT );
-  put_free_node( oldRoot );
-  dec_tree_height( );            /* the height of the tree decreases */
+    set_root( new_root );
+    new_root->set_flag( Node::isROOT );
+    put_free_node( old_root );
+
+    // the height of the tree decreases
+    dec_tree_height( );
 }
 
 
