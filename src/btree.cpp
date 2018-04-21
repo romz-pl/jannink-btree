@@ -633,7 +633,7 @@ void Tree::place_entry( Node* newNode, int slot, Node* downPtr )
 {
     for( int x = newNode->num_entries(); x >= slot; x-- )
     {
-        /* make room for new entry */
+        // make room for new entry
         newNode->push_entry( x, 1 );
     }
 
@@ -653,41 +653,50 @@ void Tree::place_entry( Node* newNode, int slot, Node* downPtr )
 //
 // split full node and set flags
 //
-Node* Tree::split( Node* newNode )
+Node* Tree::split( Node* new_node )
 {
-  Node* sibling;
+    Node* sibling = get_free_node();
 
-  sibling = get_free_node();
+    // set up node flags
+    sibling->set_flag( Node::FEWEST );
 
-  sibling->set_flag( Node::FEWEST );            /* set up node flags */
+    if( new_node->is_leaf() )
+    {
+        sibling->set_flag( Node::isLEAF );
 
-  if ( newNode->is_leaf()) {
-    sibling->set_flag( Node::isLEAF );
-    sibling->set_next_node( newNode->get_next_node());    /* adjust leaf pointers */
-    newNode->set_next_node( sibling);
-  }
-  if ( get_split_path() == newNode)
-    set_split_path( NO_NODE() );            /* no more splitting needed */
+        // adjust leaf pointers
+        sibling->set_next_node( new_node->get_next_node() );
+        new_node->set_next_node( sibling );
+    }
 
-  return sibling;
+    if( get_split_path() == new_node )
+    {
+        // no more splitting needed
+        set_split_path( NO_NODE() );
+    }
+
+    return sibling;
 }
 
 
 //
 // build new root node
 //
-void Tree::make_new_root( Node* oldRoot, Node* newNode )
+void Tree::make_new_root( Node* old_root, Node* new_node )
 {
-  set_root( get_free_node() );
+    set_root( get_free_node() );
 
-  get_root( )->set_first_node( oldRoot);    /* old root becomes new root's child */
-  get_root( )->set_entry( 1, get_fun_key( ), newNode);    /* old root's sibling also */
-  get_root( )->inc_entries();
+    // old root becomes new root's child
+    get_root()->set_first_node( old_root );
 
-  oldRoot->clr_flag( Node::isROOT );
-  get_root( )->set_flag( Node::isROOT );
-  get_root( )->set_flag( Node::FEWEST );
-  inc_tree_height( );
+    // old root's sibling also
+    get_root()->set_entry( 1, get_fun_key(), new_node );
+    get_root()->inc_entries();
+
+    old_root->clr_flag( Node::isROOT );
+    get_root()->set_flag( Node::isROOT );
+    get_root()->set_flag( Node::FEWEST );
+    inc_tree_height();
 }
 
 
