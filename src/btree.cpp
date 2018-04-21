@@ -767,116 +767,153 @@ void Tree::collapse_root( Node* old_root, Node* new_root )
 //
 Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, Node* rAnc, Node* parent )
 {
-  Node*    newMe, *myLeft, *myRight, *lAnchor, *rAnchor, *newNode;
-  int    slot, notleft, notright, fewleft, fewright, test;
+    Node*    newMe, *myLeft, *myRight, *lAnchor, *rAnchor, *newNode;
+    int    slot, notleft, notright, fewleft, fewright, test;
 
-  if (!curr->is_few())
-    set_merge_path( NO_NODE() );
-  else if ( get_merge_path() == NO_NODE())
-    set_merge_path( curr );        /* mark which nodes may need rebalancing */
-
-  slot = get_slot( curr);
-  newNode = curr->get_node( slot );
-  if (curr->is_internal()) {    /* set up next recursion call's parameters */
-    if (slot == 0) {
-      myLeft = isnt_node( left ) ? NO_NODE() : left->get_last_node();
-      lAnchor = lAnc;
+    if( !curr->is_few() )
+    {
+        set_merge_path( NO_NODE() );
     }
-    else {
-      myLeft = curr->get_node( slot - 1 );
-      lAnchor = curr;
+    else if ( get_merge_path() == NO_NODE() )
+    {
+        // mark which nodes may need rebalancing
+        set_merge_path( curr );
     }
-    if (slot == curr->num_entries()) {
-      myRight = isnt_node( right ) ? NO_NODE() : right->get_first_node();
-      rAnchor = rAnc;
+
+    slot = get_slot( curr);
+    newNode = curr->get_node( slot );
+    if( curr->is_internal() )
+    {
+        // set up next recursion call's parameters
+        if( slot == 0 )
+        {
+            myLeft = isnt_node( left ) ? NO_NODE() : left->get_last_node();
+            lAnchor = lAnc;
+        }
+        else
+        {
+            myLeft = curr->get_node( slot - 1 );
+            lAnchor = curr;
+        }
+
+        if( slot == curr->num_entries() )
+        {
+            myRight = isnt_node( right ) ? NO_NODE() : right->get_first_node();
+            rAnchor = rAnc;
+        }
+        else
+        {
+            myRight = curr->get_node( slot + 1 );
+            rAnchor = curr;
+        }
+        newMe = descend_balance( newNode, myLeft, myRight, lAnchor, rAnchor, curr );
     }
-    else {
-      myRight = curr->get_node( slot + 1 );
-      rAnchor = curr;
+    else if( ( slot > 0 ) && !Key::compare( get_fun_key( ), curr->get_key( slot ) ) )
+    {
+        // a key to be deleted is found
+        newMe = newNode;
     }
-    newMe = descend_balance( newNode, myLeft, myRight, lAnchor, rAnchor, curr);
-  }
-  else if ((slot > 0) && !Key::compare( get_fun_key( ), curr->get_key( slot )))
-    newMe = newNode;        /* a key to be deleted is found */
-  else {
-    newMe = NO_NODE();        /* no deletion possible, key not found */
-    set_merge_path( NO_NODE() );
-  }
+    else
+    {
+        // no deletion possible, key not found
+        newMe = NO_NODE();
+        set_merge_path( NO_NODE() );
+    }
 
-//~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
-//
-//    The simplest B+tree rebalancing consists of the following rules.
-//
-//    If a node underflows:
-//    CASE 1 check if it is the root, and collapse it if it is,
-//    CASE 2 otherwise, check if both of its neighbors are minimum
-//        sized and merge the underflowing node with one of them,
-//    CASE 3 otherwise shift surplus entries to the underflowing node.
-//
-//    The choice of which neighbor to use is optional.  However, the
-//    rebalancing rules that follow also ensure whenever possible
-//    that the merges and shifts which do occur use a neighbor whose
-//    anchor is the parent of the underflowing node.
-//
-//    Cases 3, 4, 5 below are more an optimization than a requirement,
-//    and can be omitted, with a change of the action value in case 6,
-//    which actually corresponds to the third case described above.
-//
-//
+    //~~~~~~~~~~~~~~~~   rebalancing tree after deletion   ~~~~~~~~~~~~~~~~
+    //
+    //    The simplest B+tree rebalancing consists of the following rules.
+    //
+    //    If a node underflows:
+    //    CASE 1 check if it is the root, and collapse it if it is,
+    //    CASE 2 otherwise, check if both of its neighbors are minimum
+    //        sized and merge the underflowing node with one of them,
+    //    CASE 3 otherwise shift surplus entries to the underflowing node.
+    //
+    //    The choice of which neighbor to use is optional.  However, the
+    //    rebalancing rules that follow also ensure whenever possible
+    //    that the merges and shifts which do occur use a neighbor whose
+    //    anchor is the parent of the underflowing node.
+    //
+    //    Cases 3, 4, 5 below are more an optimization than a requirement,
+    //    and can be omitted, with a change of the action value in case 6,
+    //    which actually corresponds to the third case described above.
+    //
+    //
 
-//
-// begin deletion, working upwards from leaves
-//
+    //
+    // begin deletion, working upwards from leaves
+    //
 
-  if (newMe != NO_NODE())    /* this node removal doesn't consider duplicates */
-    remove_entry( curr, slot + (newMe != newNode));    /* removes one of two */
+    if( newMe != NO_NODE() )
+    {
+        /* this node removal doesn't consider duplicates */
+        /* removes one of two */
+        remove_entry( curr, slot + ( newMe != newNode ) );
+    }
 
 #ifdef DEBUG
-  fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number(newMe));
-  show_node( curr);
+    fprintf(stderr, "DELETE:  slot %d, node %d.\n", slot, get_node_number(newMe));
+    show_node( curr);
 #endif
 
-  if ( get_merge_path() == NO_NODE())
-    newNode = NO_NODE();
-  else {        /* tree rebalancing rules for node merges and shifts */
-    notleft = isnt_node( left );
-    notright = isnt_node( right );
-    fewleft = left->is_few();        /* only used when defined */
-    fewright = right->is_few();
+    if( get_merge_path() == NO_NODE() )
+    {
+        newNode = NO_NODE();
+    }
+    else
+    {
+        // tree rebalancing rules for node merges and shifts
+        notleft = isnt_node( left );
+        notright = isnt_node( right );
 
-            /* CASE 1:  prepare root node (curr) for removal */
-    if (notleft && notright) {
-      test = curr->is_leaf();        /* check if B+tree has become empty */
-      newNode = test ? NO_NODE() : curr->get_first_node();
-    }
-            /* CASE 2:  the merging of two nodes is a must */
-    else if ((notleft || fewleft) && (notright || fewright)) {
-      test = !(lAnc == parent);
-      newNode = test ? merge( curr, right, rAnc) : merge( left, curr, lAnc);
-    }
-            /* CASE 3: choose the better of a merge or a shift */
-    else if (!notleft && fewleft && !notright && !fewright) {
-      test = !(rAnc == parent) && (curr == get_merge_path() );
-      newNode = test ? merge( left, curr, lAnc) : shift( curr, right, rAnc);
-    }
-            /* CASE 4: also choose between a merge or a shift */
-    else if (!notleft && !fewleft && !notright && fewright) {
-      test = !(lAnc == parent) && (curr == get_merge_path() );
-      newNode = test ? merge( curr, right, rAnc) : shift( left, curr, lAnc);
-    }
-            /* CASE 5: choose the more effective of two shifts */
-    else if (lAnc == rAnc) {         /* => both anchors are the parent */
-      test = (left->num_entries() <= right->num_entries());
-      newNode = test ? shift( curr, right, rAnc) : shift( left, curr, lAnc);
-    }
-            /* CASE 6: choose the shift with more local effect */
-    else {                /* if omitting cases 3,4,5 use below */
-      test = (lAnc == parent);        /* test = (!notleft && !fewleft); */
-      newNode = test ? shift( left, curr, lAnc) : shift( curr, right, rAnc);
-    }
-  }
+        // only used when defined
+        fewleft = left->is_few();
+        fewright = right->is_few();
 
-  return newNode;
+
+        if( notleft && notright )
+        {
+            // CASE 1:  prepare root node (curr) for removal
+            // check if B+tree has become empty
+            test = curr->is_leaf();
+            newNode = test ? NO_NODE() : curr->get_first_node();
+        }
+        else if ((notleft || fewleft) && (notright || fewright))
+        {
+            // CASE 2:  the merging of two nodes is a must
+            test = !( lAnc == parent );
+            newNode = test ? merge( curr, right, rAnc ) : merge( left, curr, lAnc );
+        }
+        else if (!notleft && fewleft && !notright && !fewright)
+        {
+            // CASE 3: choose the better of a merge or a shift
+            test = !( rAnc == parent ) && ( curr == get_merge_path() );
+            newNode = test ? merge( left, curr, lAnc ) : shift( curr, right, rAnc );
+        }
+        else if (!notleft && !fewleft && !notright && fewright)
+        {
+            // CASE 4: also choose between a merge or a shift
+            test = !( lAnc == parent ) && ( curr == get_merge_path() );
+            newNode = test ? merge( curr, right, rAnc ) : shift( left, curr, lAnc );
+        }
+        /* CASE 5: choose the more effective of two shifts */
+        else if (lAnc == rAnc)
+        {
+            /* => both anchors are the parent */
+            test = (left->num_entries() <= right->num_entries());
+            newNode = test ? shift( curr, right, rAnc) : shift( left, curr, lAnc);
+        }
+        else
+        {
+            // CASE 6: choose the shift with more local effect
+            // if omitting cases 3,4,5 use below
+            test = ( lAnc == parent );        /* test = (!notleft && !fewleft); */
+            newNode = test ? shift( left, curr, lAnc ) : shift( curr, right, rAnc );
+        }
+    }
+
+    return newNode;
 }
 
 
