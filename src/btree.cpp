@@ -19,7 +19,7 @@ Tree::Tree( int pool_size )
     , m_tree( nullptr )
     , m_root( nullptr )
     , m_leaf( nullptr )
-    , m_fanout( 0 )
+    // , m_fanout( 0 )
     , m_min_fanout( 0 )
     , m_height( 0 )
     , m_pool( 0 )
@@ -30,10 +30,7 @@ Tree::Tree( int pool_size )
 
     branch.split = nullptr;
 
-    const int fanout = Data::NODE_SIZE / sizeof( Entry );
-
-    set_fanout( fanout );
-    set_min_fanout( ( fanout + 1 ) >> 1 );
+    set_min_fanout( ( m_fanout + 1 ) >> 1 );
     init_free_node_pool( );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
@@ -47,7 +44,7 @@ Tree::Tree( int pool_size )
 
 
 #ifdef DEBUG
-    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", get_fanout() );
+    fprintf(stderr, "INIT:  B+tree of fanout %d.\n", m_fanout );
     show_btree();
     show_node( get_root() );
 #endif
@@ -155,19 +152,6 @@ Node* Tree::get_leaf( ) const
 void Tree::set_leaf( Node* v )
 {
     m_leaf = v;
-}
-
-
-// #define getfanout B->fanout
-int Tree::get_fanout( ) const
-{
-    return m_fanout;
-}
-
-// #define setfanout(v) (B->fanout = (v) - 1)
-void Tree::set_fanout( int v )
-{
-    m_fanout = v - 1;
 }
 
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
@@ -531,12 +515,12 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
     // split entries between the two
     const int i = new_node->is_internal();
     // adjustment values
-    // const int split = ( i ? get_fanout( ) - get_min_fanout( new_node ) : get_min_fanout( new_node ) );
-    const int split = get_fanout() / 2;
+    // const int split = ( i ? m_fanout - get_min_fanout( new_node ) : get_min_fanout( new_node ) );
+    const int split = m_fanout / 2;
     const int j = ( slot != split );
     const int k = ( slot >= split );
 
-    for( int x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++ )
+    for( int x = split + k + j * i, y = 1; x <= m_fanout; x++, y++ )
     {
         // copy entries to sibling
         new_node->xfer_entry( x, sibling, y );
@@ -544,7 +528,7 @@ void Tree::insert_entry( Node* new_node, const int slot, Node* sibling, Node* do
         sibling->inc_entries();
     }
 
-    if( sibling->num_entries() == get_fanout() )
+    if( sibling->num_entries() == m_fanout )
     {
         // only ever happens in 2-3+trees
         sibling->set_flag( Node::isFULL );
@@ -623,7 +607,7 @@ void Tree::place_entry( Node* new_node, int slot, Node* down_ptr )
     // adjust entry counter
     new_node->inc_entries();
 
-    if( new_node->num_entries() == get_fanout() )
+    if( new_node->num_entries() == m_fanout )
     {
         new_node->set_flag( Node::isFULL );
     }
@@ -980,7 +964,7 @@ Node* Tree::merge( Node* left, Node* right, Node* anchor )
         left->clr_flag( Node::FEWEST );
     }
 
-    if( left->num_entries() == get_fanout() )
+    if( left->num_entries() == m_fanout )
     {
         // never happens in even size nodes
         left->set_flag( Node::isFULL );
@@ -1232,7 +1216,7 @@ void Tree::show_btree( ) const
     fprintf(stderr, "-  --  --  --  --  --  -\n");
     fprintf(stderr, "|  root        %6d  |\n", get_node_number( get_root() ));
     fprintf(stderr, "|  leaf        %6d  |\n", get_node_number( get_leaf() ));
-    fprintf(stderr, "|  fanout         %3d  |\n", get_fanout() + 1);
+    fprintf(stderr, "|  fanout         %3d  |\n", m_fanout + 1);
     fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
     fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
     fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));

@@ -38,10 +38,6 @@ public:
     Node* get_leaf( ) const;
     void set_leaf( Node* v );
 
-    // define max/min number of pointers per node
-    int get_fanout( ) const;
-    void set_fanout( int v );
-
     int get_min_fanout( const Node* j ) const;
     void set_min_fanout( int v );
 
@@ -119,7 +115,7 @@ private:
     Node* m_leaf;
 
     // # of pointers to other nodes
-    int m_fanout;
+    const int m_fanout = Data::NODE_SIZE / sizeof( Entry ) - 1; // Why (-1) ???
 
     // usually min_fanout == ceil(fanout / 2)
     int m_min_fanout;
