@@ -538,61 +538,92 @@ Node* Tree::descend_split( Node* curr )
 //
 // determine location of inserted key
 //
-void Tree::insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr )
+void Tree::insert_entry( Node* newNode, const int slot, Node* sibling, Node* downPtr )
 {
-    int split, i, j, k, x, y;
-
-    if (sibling == NO_NODE()) {        /* no split occurred */
-        place_entry( newNode, slot + 1, downPtr);
+    if( sibling == NO_NODE() )
+    {
+        // no split occurred
+        place_entry( newNode, slot + 1, downPtr );
         newNode->clr_flag( Node::Node::FEWEST );
+        return;
     }
-    else {                /* split entries between the two */
-        i = newNode->is_internal();        /* adjustment values */
-        split = i ? get_fanout( ) - get_min_fanout( newNode ): get_min_fanout( newNode );
-        j = (slot != split);
-        k = (slot >= split);
 
-        for (x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++) {
-            newNode->xfer_entry( x, sibling, y);    /* copy entries to sibling */
+    assert( sibling != NO_NODE() );
+
+    // split entries between the two
+    const int i = newNode->is_internal();
+    // adjustment values
+    const int split = ( i ? get_fanout( ) - get_min_fanout( newNode ) : get_min_fanout( newNode ) );
+    const int j = ( slot != split );
+    const int k = ( slot >= split );
+
+    for( int x = split + k + j * i, y = 1; x <= get_fanout(); x++, y++ )
+    {
+        // copy entries to sibling
+        newNode->xfer_entry( x, sibling, y );
+        newNode->dec_entries();
+        sibling->inc_entries();
+    }
+    if( sibling->num_entries() == get_fanout() )
+    {
+        // only ever happens in 2-3+trees
+        sibling->set_flag( Node::isFULL );
+    }
+
+    if( i )
+    {
+        // set first pointer of internal node
+        if( j )
+        {
+            sibling->set_first_node( newNode->get_node( split + k ) );
             newNode->dec_entries();
-            sibling->inc_entries();
         }
-        if (sibling->num_entries() == get_fanout())
-            sibling->set_flag( Node::isFULL );        /* only ever happens in 2-3+trees */
-
-        if (i) {                /* set first pointer of internal node */
-            if (j) {
-                sibling->set_first_node( newNode->get_node( split + k));
-                newNode->dec_entries();
-            }
-            else
-                sibling->set_first_node( downPtr);
+        else
+        {
+            sibling->set_first_node( downPtr );
         }
+    }
 
-        if (j) {                /* insert new entry into correct spot */
-            const Key xx = newNode->get_key( split + k );
-            if (k)
-                place_entry( sibling, slot - split + 1 - i, downPtr);
-            else
-                place_entry( newNode, slot + 1, downPtr);
-            set_fun_key( xx );            /* set key separating nodes */
+    if( j )
+    {
+        // insert new entry into correct spot
+        const Key xx = newNode->get_key( split + k );
+        if( k )
+        {
+            place_entry( sibling, slot - split + 1 - i, downPtr );
         }
-        else if (!i)
-            place_entry( sibling, 1, downPtr);
+        else
+        {
+            place_entry( newNode, slot + 1, downPtr );
+        }
+        // set key separating nodes
+        set_fun_key( xx );
+    }
+    else if( !i )
+    {
+        place_entry( sibling, 1, downPtr );
+    }
 
-        newNode->clr_flag( Node::isFULL );        /* adjust node flags */
-        if (newNode->num_entries() == get_min_fanout( newNode ))
-            newNode->set_flag( Node::FEWEST );        /* never happens in even size nodes */
-        if (sibling->num_entries() > get_min_fanout( sibling ))
-            sibling->clr_flag( Node::FEWEST );
+    // adjust node flags
+    newNode->clr_flag( Node::isFULL );
+
+    if( newNode->num_entries() == get_min_fanout( newNode ) )
+    {
+        // never happens in even size nodes
+        newNode->set_flag( Node::FEWEST );
+    }
+
+    if( sibling->num_entries() > get_min_fanout( sibling ) )
+    {
+        sibling->clr_flag( Node::FEWEST );
+    }
 
 #ifdef DEBUG
-        fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, get_node_number(downPtr));
-        show_node( newNode);
-        show_node( sibling);
+    fprintf(stderr, "INSERT:  slot %d, node %d.\n", slot, get_node_number(downPtr));
+    show_node( newNode);
+    show_node( sibling);
 #endif
 
-    }
 }
 
 //

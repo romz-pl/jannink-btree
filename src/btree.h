@@ -92,7 +92,7 @@ public:
     Node* search( Key key );
 
     void place_entry( Node* newNode, int slot, Node* downPtr );
-    void insert_entry( Node* newNode, int slot, Node* sibling, Node* downPtr );
+    void insert_entry( Node* newNode, const int slot, Node* sibling, Node* downPtr );
     Node* split( Node* newNode );
     void make_new_root( Node* oldRoot, Node* newNode );
     Node* descend_split( Node* curr );
