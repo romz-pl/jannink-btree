@@ -85,7 +85,7 @@ Node* Tree::node_array_head( ) const
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != NONODE() && ( ( j->i.info.flags & Node::MASK ) == Node::MAGIC ) );
+    return ( j != NONODE() && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
@@ -975,7 +975,7 @@ Node* Tree::get_data_node( Key key )
     Node* newNode = get_free_node( );
     Key* value;
 
-    value = (Key *) &newNode->d;
+    value = (Key *) &newNode->data;
 
     // can add code to fill node
     *value = key;

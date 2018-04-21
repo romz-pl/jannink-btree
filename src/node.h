@@ -132,8 +132,8 @@ public:
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-static_assert( sizeof( Entry ) <= sizeof( Inner ), "idendical size" );
-static_assert( sizeof( Entry ) <= sizeof( Leaf  ), "idendical size" );
+static_assert( sizeof( Entry ) == sizeof( Inner ), "idendical size" );
+static_assert( sizeof( Entry ) == sizeof( Leaf  ), "idendical size" );
 
 
 class Node
@@ -200,11 +200,11 @@ public:
     static constexpr int ARRAY = 1;
     union
     {
-        Entry   e[ ARRAY ];    /* allows access to entry array */
-        Inner   i;
-        Leaf    l;
-        Data    d;
-        DupData dd;
+        Entry   entry[ ARRAY ];    /* allows access to entry array */
+        Inner   inner;
+        Leaf    leaf;
+        Data    data;
+        DupData dup_data;
     };
 } ;
 
