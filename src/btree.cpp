@@ -183,10 +183,11 @@ void Tree::set_fanout( int v )
 }
 
 // #define getminfanout(j) ((nAdr(j).i.info.flags & isLEAF) ? B->fanout - B->minfanout: B->minfanout)
-int Tree::get_min_fanout( const Node* j ) const
+int Tree::get_min_fanout( const Node* /*j*/ ) const
 {
     // return ( j->inner.info.flags & Node::isLEAF ) ? fanout - minfanout : minfanout;
-    return j->is_leaf() ? fanout - min_fanout : min_fanout;
+    // return j->is_leaf() ? fanout - min_fanout : min_fanout;
+    return min_fanout;
 }
 
 
