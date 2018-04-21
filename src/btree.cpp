@@ -15,12 +15,25 @@
 //
 //
 Tree::Tree( int pool_size )
-    : theKey( 0 )
+    : pool_size( 0 )
+    , tree( nullptr )
+    , root( nullptr )
+    , leaf( nullptr )
+    , fanout( 0 )
+    , minfanout( 0 )
+    , height( 0 )
+    , pool( 0 )
+    , theKey( 0 )
+    , theData( nullptr )
+    // , branch.split( nullptr )
 {
+
+    branch.split = nullptr;
+
     const int fanout = Data::NODE_SIZE / sizeof( Entry );
 
     set_fanout( fanout );
-    set_min_fanout( (fanout + 1) >> 1 );
+    set_min_fanout( ( fanout + 1 ) >> 1 );
     init_free_node_pool( pool_size );
 
     set_leaf( get_free_node() );        /* set up the first leaf node */
@@ -382,6 +395,7 @@ int Tree::best_match( Node* curr, int slot )
         // also check previous slot
         //
         const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ));
+
         if( ( slot == 1 ) || ( comp >= 0 ) )
         {
             findslot = slot - 1;
@@ -397,6 +411,7 @@ int Tree::best_match( Node* curr, int slot )
         // or check following slot
         //
         const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ));
+
         if( ( slot == curr->num_entries() ) || ( comp < 0) )
         {
             findslot = slot;
@@ -898,18 +913,20 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
 //
 void Tree::init_free_node_pool( int quantity )
 {
-  int    i;
-  Node*    n;
+    set_pool_size( quantity );
+    set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
+    set_first_free_node( node_array_head() );    /* start a list of free nodes */
 
-  set_pool_size( quantity );
-  set_node_array( (Node*)malloc(quantity * sizeof(Node)) );    /* node memory block */
-  set_first_free_node( node_array_head() );    /* start a list of free nodes */
-  for (n = get_first_free_node(), i = 0; i < quantity; n++, i++) {
-    n->clear_flags();
-    n->clear_entries();
-    n->set_next_node( n + 1);        /* insert node into free node list */
-  }
-  (--n)->set_next_node( NONODE() );        /* indicates end of free node list */
+    Node* n = get_first_free_node();
+    for( int i = 0; i < quantity; i++ )
+    {
+        n->clear_flags();
+        n->clear_entries();
+        n->set_next_node( n + 1 );        /* insert node into free node list */
+        n++;
+    }
+    --n;
+    n->set_next_node( NONODE() );        /* indicates end of free node list */
 }
 
 
