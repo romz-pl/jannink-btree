@@ -205,7 +205,7 @@ public:
         Leaf    l;
         Data    d;
         DupData dd;
-    } X;
+    };
 } ;
 
 

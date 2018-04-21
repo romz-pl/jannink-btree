@@ -85,7 +85,7 @@ Node* Tree::node_array_head( ) const
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != NONODE() && ( ( j->X.i.info.flags & Node::MASK ) == Node::MAGIC ) );
+    return ( j != NONODE() && ( ( j->i.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 // #define isntnode(j) ((j) == NONODE)
@@ -293,10 +293,10 @@ Node* Tree::search( Key key )
 //
 Node* Tree::descend_to_leaf( Node* curr )
 {
-    int slot = get_slot( curr);
+    int slot = get_slot( curr );
     Node* findNode = NONODE();
 
-    for( ; curr->is_internal(); slot = get_slot( curr) )
+    for( ; curr->is_internal(); slot = get_slot( curr ) )
     {
         curr = curr->get_node( slot );
     }
@@ -318,7 +318,7 @@ int Tree::get_slot( Node* curr )
     // need this if root is ever empty
     const int entries = curr->num_entries();
 
-    const int slot = !entries ? 0 : find_key( curr, 1, entries);
+    const int slot = !entries ? 0 : find_key( curr, 1, entries );
 
 #ifdef DEBUG
     fprintf(stderr, "GETSLOT:  slot %d.\n", slot);
@@ -402,7 +402,8 @@ int Tree::best_match( Node* curr, int slot )
         }
         else
         {
-            findslot = LOWER;        /* key must be below in node ordering */
+            // key must be below in node ordering
+            findslot = LOWER;
         }
     }
     else
@@ -422,7 +423,8 @@ int Tree::best_match( Node* curr, int slot )
         }
         else
         {
-            findslot = UPPER;        /* key must be above in node ordering */
+            // key must be above in node ordering
+            findslot = UPPER;
         }
     }
     return findslot;
@@ -973,7 +975,7 @@ Node* Tree::get_data_node( Key key )
     Node* newNode = get_free_node( );
     Key* value;
 
-    value = (Key *) &newNode->X.d;
+    value = (Key *) &newNode->d;
 
     // can add code to fill node
     *value = key;
