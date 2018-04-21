@@ -927,19 +927,30 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
 //
 void Tree::remove_entry( Node* curr, int slot )
 {
-  int x;
+    // return deleted node to free list
+    put_free_node( curr->get_node( slot ) );
 
-  put_free_node( curr->get_node( slot ));    /* return deleted node to free list */
-  for (x = slot; x < curr->num_entries(); x++)
-    curr->pull_entry( x, 1);        /* adjust node with removed key */
-  curr->dec_entries();
-  curr->clr_flag( Node::isFULL );        /* keep flag information up to date */
-  if (curr->is_root()) {
-    if (curr->num_entries() == 1)
-      curr->set_flag( Node::FEWEST );
-  }
-  else if (curr->num_entries() == get_min_fanout( curr ))
-    curr->set_flag( Node::FEWEST );
+    for( int x = slot; x < curr->num_entries(); x++ )
+    {
+        // adjust node with removed key
+        curr->pull_entry( x, 1);
+    }
+
+    curr->dec_entries();
+
+    // keep flag information up to date
+    curr->clr_flag( Node::isFULL );
+    if( curr->is_root() )
+    {
+        if( curr->num_entries() == 1 )
+        {
+            curr->set_flag( Node::FEWEST );
+        }
+    }
+    else if( curr->num_entries() == get_min_fanout( curr ) )
+    {
+        curr->set_flag( Node::FEWEST );
+    }
 }
 
 
