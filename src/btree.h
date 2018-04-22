@@ -27,10 +27,6 @@ public:
     data_type get_fun_data( ) const;
     void set_fun_data( const char* v );
 
-    // locations from which tree access begins
-    Node* get_root( ) const;
-    void set_root( Node* v );
-
     Node* get_leaf( ) const;
     void set_leaf( Node* v );
 

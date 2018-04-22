@@ -30,11 +30,15 @@ Tree::Tree( int pool_size )
 
     init_free_node_pool( );
 
-    set_leaf( get_free_node() );        /* set up the first leaf node */
-    set_root( get_leaf( ) );            /* the root is initially the leaf */
-    get_root( )->set_flag( Node::isLEAF );
-    get_root( )->set_flag( Node::isROOT );
-    get_root( )->set_flag( Node::Node::FEWEST );
+    // set up the first leaf node
+    set_leaf( get_free_node() );
+
+    // the root is initially the leaf
+    m_root = get_leaf( );
+
+    m_root->set_flag( Node::isLEAF );
+    m_root->set_flag( Node::isROOT );
+    m_root->set_flag( Node::Node::FEWEST );
     init_tree_height( );
 
     set_fun_data( "0" );
@@ -43,7 +47,7 @@ Tree::Tree( int pool_size )
 #ifdef DEBUG
     fprintf(stderr, "INIT:  B+tree of fanout %d.\n", m_fanout );
     show_btree();
-    show_node( get_root() );
+    show_node( m_root );
 #endif
 }
 
@@ -84,18 +88,6 @@ void Tree::set_fun_key( Key v )
 void Tree::set_fun_data( const char* v )
 {
     m_the_data = strdup( v );
-}
-
-// #define getroot B->root
-Node* Tree::get_root( ) const
-{
-    return m_root;
-}
-
-// #define setroot(v) (B->root = (v))
-void Tree::set_root( Node* v )
-{
-    m_root = v;
 }
 
 // #define getleaf B->leaf
@@ -179,7 +171,7 @@ Node* Tree::search( Key key )
     fprintf( stderr, "Tree::search: key %d.\n", key.get_value() );
 #endif
 
-    if( get_root()->num_entries() == 0 )
+    if( m_root->num_entries() == 0 )
     {
         return nullptr;
     }
@@ -187,7 +179,7 @@ Node* Tree::search( Key key )
     set_fun_key( key );
 
     // start search from root node
-    Node* find_node = descend_to_leaf( get_root() );
+    Node* find_node = descend_to_leaf( m_root );
 
 #ifdef DEBUG
     if( find_node  )
@@ -373,13 +365,13 @@ void Tree::insert( Key key )
     set_split_path( nullptr );
 
     // insertion point search from root
-    Node* new_node = descend_split( get_root() );
+    Node* new_node = descend_split( m_root );
 
 
     // indicates the root node has split
     if( new_node != get_split_path() )
     {
-        make_new_root( get_root(), new_node );
+        make_new_root( m_root, new_node );
     }
 }
 
@@ -589,18 +581,18 @@ Node* Tree::split( Node* new_node )
 //
 void Tree::make_new_root( Node* old_root, Node* new_node )
 {
-    set_root( get_free_node() );
+    m_root = get_free_node();
 
     // old root becomes new root's child
-    get_root()->set_first_node( old_root );
+    m_root->set_first_node( old_root );
 
     // old root's sibling also
-    get_root()->set_entry( 1, get_fun_key(), new_node );
-    get_root()->inc_entries();
+    m_root->set_entry( 1, get_fun_key(), new_node );
+    m_root->inc_entries();
 
     old_root->clr_flag( Node::isROOT );
-    get_root()->set_flag( Node::isROOT );
-    get_root()->set_flag( Node::FEWEST );
+    m_root->set_flag( Node::isROOT );
+    m_root->set_flag( Node::FEWEST );
     inc_tree_height();
 }
 
@@ -633,12 +625,12 @@ void Tree::erase( Key key )
     set_fun_key( key );
     set_merge_path( nullptr );
 
-    Node* new_node = descend_balance( get_root( ), nullptr, nullptr, nullptr, nullptr, nullptr );
+    Node* new_node = descend_balance( m_root, nullptr, nullptr, nullptr, nullptr, nullptr );
 
     if( new_node && new_node->is_node() )
     {
         // remove root when superfluous
-        collapse_root( get_root(), new_node );
+        collapse_root( m_root, new_node );
     }
 }
 
@@ -655,7 +647,7 @@ void Tree::collapse_root( Node* old_root, Node* new_root )
     show_node( new_root );
 #endif
 
-    set_root( new_root );
+    m_root = new_root;
     new_root->set_flag( Node::isROOT );
     put_free_node( old_root );
 
@@ -1155,17 +1147,17 @@ void Tree::show_btree( ) const
     fprintf(stderr, "-  --  --  --  --  --  -\n");
     fprintf(stderr, "|  B+tree  %10p  |\n", (void *) this);
     fprintf(stderr, "-  --  --  --  --  --  -\n");
-    fprintf(stderr, "|  root        %6d  |\n", get_node_number( get_root() ));
+    fprintf(stderr, "|  root        %6d  |\n", get_node_number( m_root ));
     fprintf(stderr, "|  leaf        %6d  |\n", get_node_number( get_leaf() ));
     fprintf(stderr, "|  fanout         %3d  |\n", m_fanout + 1);
-    fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( get_root() ) + 1);
+    fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( m_root ) + 1);
     fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
     fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
     fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key().get_value() );
     fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
     fprintf(stderr, "-  --  --  --  --  --  -\n");
 
-    Node* n = get_root();
+    Node* n = m_root;
     while( n != nullptr )
     {
         show_node( n );
