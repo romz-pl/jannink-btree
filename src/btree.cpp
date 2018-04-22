@@ -39,7 +39,6 @@ Tree::Tree( int pool_size )
     m_root->set_flag( Node::isLEAF );
     m_root->set_flag( Node::isROOT );
     m_root->set_flag( Node::Node::FEWEST );
-    init_tree_height( );
 
     set_fun_data( "0" );
 
@@ -88,12 +87,6 @@ void Tree::set_fun_key( Key v )
 void Tree::set_fun_data( const char* v )
 {
     m_the_data = strdup( v );
-}
-
-// #define inittreeheight (B->height = 0)
-void Tree::init_tree_height( )
-{
-    m_height = 0;
 }
 
 // #define inctreeheight B->height++

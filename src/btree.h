@@ -28,7 +28,6 @@ public:
     void set_fun_data( const char* v );
 
     // manage B+tree height
-    void init_tree_height( );
     void inc_tree_height( );
     void dec_tree_height( );
     int get_tree_height( ) const;
