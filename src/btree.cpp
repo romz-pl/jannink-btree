@@ -59,14 +59,6 @@ Tree::~Tree()
     free( m_tree );
 }
 
-//
-// check that a node is in fact a node
-//
-// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
-bool Tree::is_node( Node* j ) const
-{
-    return ( j && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
-}
 
 
 // #define getfunkey B->theKey
@@ -643,10 +635,10 @@ void Tree::erase( Key key )
 
     Node* new_node = descend_balance( get_root( ), nullptr, nullptr, nullptr, nullptr, nullptr );
 
-    if( is_node( new_node ) )
+    if( new_node && new_node->is_node() )
     {
         // remove root when superfluous
-        collapse_root( get_root( ), new_node );
+        collapse_root( get_root(), new_node );
     }
 }
 

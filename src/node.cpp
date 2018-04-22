@@ -168,3 +168,13 @@ void Node::set_entry( int q, Key v, Node* z )
     entry[ q ].key = v;
     entry[ q ].down_node = z;
 }
+
+//
+// check that a node is in fact a node
+//
+// #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
+bool Node::is_node( ) const
+{
+    return ( ( inner.info.flags & MASK ) == MAGIC );
+}
+
