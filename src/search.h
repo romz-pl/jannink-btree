@@ -20,6 +20,11 @@ private:
 
     Node* descend_to_leaf( Node* curr );
 
+private:
+    // special node slot values used in key search
+    static constexpr int UPPER = -2;
+    static constexpr int LOWER = -3;
+
 };
 
 #endif

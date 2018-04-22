@@ -10,12 +10,6 @@ public:
     Core( std::uint32_t pool_size );
     ~Core() = default;
 
-protected:
-    // special node slot values used in key search
-    static constexpr int UPPER = -2;
-    static constexpr int LOWER = -3;
-
-public:
     Key get_fun_key( ) const;
     void set_fun_key( Key v );
 
@@ -69,8 +63,6 @@ private:
         Node* split;
         Node* merge;
     } branch;
-
-
 };
 
 
