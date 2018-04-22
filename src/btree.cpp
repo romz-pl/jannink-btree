@@ -38,7 +38,7 @@ Tree::Tree( int pool_size )
 
     m_root->set_flag( Node::isLEAF );
     m_root->set_flag( Node::isROOT );
-    m_root->set_flag( Node::Node::FEWEST );
+    m_root->set_flag( Node::FEWEST );
 
     set_fun_data( "0" );
 
