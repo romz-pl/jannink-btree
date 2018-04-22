@@ -17,7 +17,7 @@ private:
     static constexpr int LOWER = -3;
 
 public:
-    Tree( int pool_size );
+    Tree( std::uint32_t pool_size );
     ~Tree();
 
 

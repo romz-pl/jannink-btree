@@ -14,7 +14,7 @@
 //
 //
 //
-Tree::Tree( int pool_size )
+Tree::Tree( std::uint32_t pool_size )
     : m_pool_store( pool_size )
     , m_root( nullptr )
     , m_leaf( nullptr )

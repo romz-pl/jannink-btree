@@ -4,14 +4,14 @@
 
 TEST( btree, constuction )
 {
-    const int pool_size = 100;
+    const std::uint32_t pool_size = 100;
 
     ASSERT_NO_THROW( Tree{ pool_size } );
 }
 
 TEST( btree, search_empty )
 {
-    const int pool_size = 100;
+    const std::uint32_t pool_size = 100;
     Tree tree( pool_size );
     Node* nb = tree.search( Key( 1 ) );
     ASSERT_TRUE( !nb );
@@ -19,7 +19,7 @@ TEST( btree, search_empty )
 
 TEST( btree, one_item )
 {
-    const int pool_size = 100;
+    const std::uint32_t pool_size = 100;
     const Key k( 17 );
 
     Tree tree( pool_size );
@@ -35,7 +35,7 @@ TEST( btree, one_item )
 
 TEST( btree, more_items )
 {
-    const int pool_size = 1000;
+    const std::uint32_t pool_size = 1000;
     const int item_no = 200;
     Tree tree( pool_size );
 
@@ -60,7 +60,7 @@ TEST( btree, more_items )
 
 TEST( btree, reverse_erase )
 {
-    const int pool_size = 1000;
+    const std::uint32_t pool_size = 1000;
     const int item_no = 200;
     Tree tree( pool_size );
 
@@ -88,7 +88,7 @@ TEST( btree, insert_search_delete )
     const unsigned seed = 12345;
     std::set< Key > sset;
     std::srand( seed );
-    const int pool_size = 50000;
+    const std::uint32_t pool_size = 50000;
 
     Tree tree( pool_size );
 
@@ -122,7 +122,7 @@ TEST( btree, insert_search_delete )
 TEST( btree, insert_random )
 {
     std::set< Key > sset;
-    const int pool_size = 20000;
+    const std::uint32_t pool_size = 20000;
     Tree tree( pool_size );
 
     const double threshold = 0.6;
@@ -165,7 +165,7 @@ TEST( btree, insert_random )
 TEST( btree, erase_random )
 {
     std::set< Key > sset;
-    const int pool_size = 30000;
+    const std::uint32_t pool_size = 30000;
     Tree tree( pool_size );
 
     const int iter_no = 5000;
