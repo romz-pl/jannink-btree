@@ -20,7 +20,11 @@ public:
     Tree( std::uint32_t pool_size );
     ~Tree();
 
+    Node* search( Key key );
+    void insert( Key key );
+    void erase( Key key );
 
+private:
     // access key and data values for B+tree methods
     Key get_fun_key( ) const;
     void set_fun_key( Key v );
@@ -45,21 +49,21 @@ public:
     int find_key( Node* curr, int lo, int hi );
     int get_slot( Node* curr );
     Node* descend_to_leaf( Node* curr );
-    Node* search( Key key );
 
-    void place_entry( Node* newNode, int slot, Node* downPtr );
-    void insert_entry( Node* newNode, const int slot, Node* sibling, Node* downPtr );
+
+    void place_entry( Node* new_node, int slot, Node* down_ptr );
+    void insert_entry( Node* new_node, const int slot, Node* sibling, Node* down_ptr );
     Node* split( Node* newNode );
-    void make_new_root( Node* oldRoot, Node* newNode );
+    void make_new_root( Node* old_root, Node* new_node );
     Node* descend_split( Node* curr );
-    void insert( Key key );
+
 
     Node* shift( Node* left, Node* right, Node* anchor );
     Node* merge( Node* left, Node* right, Node* anchor );
     void remove_entry( Node* curr, int slot );
     Node* descend_balance( Node* curr, Node* left, Node* right, Node* lAnc, Node* rAnc, Node* parent );
-    void collapse_root( Node* oldRoot, Node* newRoot );
-    void erase( Key key );
+    void collapse_root( Node* old_root, Node* new_root );
+
 
 #ifdef DEBUG
     void show_node( Node* n ) const;
