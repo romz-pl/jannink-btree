@@ -11,8 +11,7 @@ public:
     ~Core() = default;
 
 protected:
-    /* special node slot values used in key search */
-    static constexpr int ERROR = -1;
+    // special node slot values used in key search
     static constexpr int UPPER = -2;
     static constexpr int LOWER = -3;
 

@@ -138,8 +138,6 @@ int Search::find_key( Node* curr, int lo, int hi )
 //
 int Search::best_match( Node* curr, const int slot )
 {
-    int find_slot = ERROR;
-
     const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ) );
     if( diff < 0 )
     {
@@ -155,12 +153,12 @@ int Search::best_match( Node* curr, const int slot )
 
         if( comp >= 0 )
         {
-            find_slot = slot - 1;
+            return ( slot - 1 );
         }
         else
         {
             // key must be below in node ordering
-            find_slot = LOWER;
+            return ( LOWER );
         }
     }
     else
@@ -177,19 +175,19 @@ int Search::best_match( Node* curr, const int slot )
 
         if( comp < 0 )
         {
-            find_slot = slot;
+            return ( slot );
         }
         else if( comp == 0 )
         {
-            find_slot = slot + 1;
+            return ( slot + 1 );
         }
         else
         {
             // key must be above in node ordering
-            find_slot = UPPER;
+            return ( UPPER );
         }
     }
 
-    assert( find_slot != ERROR ); // Bad key ordering on node "curr"
-    return find_slot;
+    assert( 0 ); // Bad key ordering on node "curr"
+    return -1;
 }
