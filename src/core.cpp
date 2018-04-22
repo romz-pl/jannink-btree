@@ -38,77 +38,83 @@ Core::Core( std::uint32_t pool_size )
 
 }
 
+
 //
+// access key and data values for B+tree methods
 //
-//
-Core::~Core()
-{
-#ifdef DEBUG
-    fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) this);
-#endif
-
-}
-
-
-
-// #define getfunkey B->theKey
 Key Core::get_fun_key( ) const
 {
     return m_the_key;
 }
 
-// #define getfundata B->theData
-data_type Core::get_fun_data( ) const
-{
-    return m_the_data;
-}
-
-// #define setfunkey(v) (B->theKey = (v))
+//
+//
+//
 void Core::set_fun_key( Key v )
 {
     m_the_key = v;
 }
 
-// #define setfundata(v) (B->theData = strdup(v))
-// void setfundata( Tree* B, dataT v )
+//
+//
+//
+data_type Core::get_fun_data( ) const
+{
+    return m_the_data;
+}
+
+//
+//
+//
 void Core::set_fun_data( const char* v )
 {
     m_the_data = strdup( v );
 }
 
-// #define inctreeheight B->height++
+//
+//
+//
 void Core::inc_tree_height( )
 {
     m_height++;
 }
 
-// #define dectreeheight B->height--
+//
+//
+//
 void Core::dec_tree_height( )
 {
     assert( m_height > 0 );
     m_height--;
 }
 
-
-// #define getsplitpath B->branch.split
+//
+//
+//
 Node* Core::get_split_path( ) const
 {
     return branch.split;
 }
 
-// #define setsplitpath(v) (B->branch.split = (v))
+//
+//
+//
 void Core::set_split_path( Node* v )
 {
     branch.split = v;
 }
 
-// #define getmergepath B->branch.merge
+//
+//
+//
 Node* Core::get_merge_path( ) const
 {
     return branch.merge;
 }
 
-// #define setmergepath(v) (B->branch.merge = (v))
+//
+//
+//
 void Core::set_merge_path( Node* v )
 {
     branch.merge = v;
