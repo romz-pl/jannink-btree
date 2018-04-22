@@ -15,20 +15,16 @@
 //
 //
 Tree::Tree( int pool_size )
-    : m_pool_size( pool_size )
-    , m_tree( nullptr )
+    : m_pool_store( pool_size )
     , m_root( nullptr )
     , m_leaf( nullptr )
     , m_height( 0 )
-    , m_pool( nullptr )
     , m_the_key( 0 )
     , m_the_data( nullptr )
     // , branch.split( nullptr )
 {
 
     branch.split = nullptr;
-
-    init_free_node_pool( );
 
     // set up the first leaf node
     m_leaf = get_free_node();
@@ -59,7 +55,6 @@ Tree::~Tree()
     fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) this);
 #endif
 
-    free( m_tree );
 }
 
 
@@ -105,18 +100,6 @@ void Tree::dec_tree_height( )
 int Tree::get_tree_height( ) const
 {
     return m_height;
-}
-
-// #define getfirstfreenode B->pool
-Node* Tree::get_first_free_node( ) const
-{
-    return m_pool;
-}
-
-// #define setfirstfreenode(v) (B->pool = (v))
-void Tree::set_first_free_node( Node* v )
-{
-    m_pool = v;
 }
 
 // #define getsplitpath B->branch.split
@@ -1016,31 +999,6 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
 }
 
 
-//
-// Set up pool of free nodes
-//
-void Tree::init_free_node_pool( )
-{
-    // node memory block
-    m_tree = ( Node* )malloc( m_pool_size * sizeof( Node ) );
-
-    // start a list of free nodes
-    set_first_free_node( m_tree );
-
-    Node* n = get_first_free_node();
-    for( int i = 0; i < m_pool_size; i++ )
-    {
-        n->clear_flags();
-        n->clear_entries();
-
-        // insert node into free node list
-        n->set_next_node( n + 1 );
-        n++;
-    }
-    --n;
-    // indicates end of free node list
-    n->set_next_node( nullptr );
-}
 
 
 //
@@ -1048,21 +1006,7 @@ void Tree::init_free_node_pool( )
 //
 Node* Tree::get_free_node( )
 {
-    Node* newNode = get_first_free_node( );
-
-    if( newNode == nullptr )
-    {
-          // can't recover from this
-          throw std::runtime_error( "Out of tree nodes." );
-    }
-
-    // adjust free node list
-    set_first_free_node( newNode->get_next_node( ) );
-
-    // remove node from list
-    newNode->set_next_node( nullptr );
-
-    return newNode;
+    return m_pool_store.get_free_node();
 }
 
 
@@ -1071,14 +1015,8 @@ Node* Tree::get_free_node( )
 //
 void Tree::put_free_node( Node* self )
 {
-    self->clear_flags();
-    self->clear_entries();
+    m_pool_store.put_free_node( self );
 
-    // add node to list
-    self->set_next_node(  get_first_free_node() );
-
-    // set it to be list head
-    set_first_free_node( self );
 }
 
 //
@@ -1133,7 +1071,7 @@ void Tree::show_btree( ) const
     fprintf(stderr, "|  fanout         %3d  |\n", m_fanout + 1);
     fprintf(stderr, "|  minfanout      %3d  |\n", get_min_fanout( m_root ) + 1);
     fprintf(stderr, "|  height         %3d  |\n", get_tree_height() );
-    fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
+//    fprintf(stderr, "|  freenode    %6d  |\n", get_node_number( get_first_free_node() ));
     fprintf(stderr, "|  theKey      %6d  |\n", get_fun_key().get_value() );
     fprintf(stderr, "|  theData     %6s  |\n", get_fun_data( ));
     fprintf(stderr, "-  --  --  --  --  --  -\n");

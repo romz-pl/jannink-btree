@@ -5,6 +5,7 @@ add_library( ${LIB_NAME} STATIC
     btree.cpp
     key.cpp
     node.cpp
+    pool.cpp
 )
 
 target_include_directories( ${LIB_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src )

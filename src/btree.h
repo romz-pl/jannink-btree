@@ -3,6 +3,7 @@
 
 
 #include "node.h"
+#include "pool.h"
 
 //
 // tree definitions
@@ -31,10 +32,6 @@ public:
     void inc_tree_height( );
     void dec_tree_height( );
     int get_tree_height( ) const;
-
-    // access pool of free nodes
-    Node* get_first_free_node( ) const;
-    void set_first_free_node( Node* v );
 
     // handle split/merge points during insert/delete
     Node* get_split_path( ) const;
@@ -82,12 +79,7 @@ public:
 
 private:
 
-    // Defines number of B+tree nodes for free node pool
-    const int m_pool_size;
-
-    // pointer to array of nodes (NOT Nptr !)
-    // access memory region containing B+tree nodes
-    Node* m_tree;
+    Pool m_pool_store;
 
     // pointer to root node
     Node* m_root;
@@ -103,9 +95,6 @@ private:
 
     // nodes traversed from root to leaves
     int m_height;
-
-    // list of empty nodes
-    Node* m_pool;
 
     //  the key value used in tree operations
     Key m_the_key;
