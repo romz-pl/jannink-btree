@@ -31,7 +31,6 @@ public:
     // manage B+tree height
     void inc_tree_height( );
     void dec_tree_height( );
-    int get_tree_height( ) const;
 
     // handle split/merge points during insert/delete
     Node* get_split_path( ) const;
@@ -94,7 +93,7 @@ private:
     const int m_min_fanout = ( ( m_fanout + 1 ) >> 1 ) - 1;
 
     // nodes traversed from root to leaves
-    int m_height;
+    std::uint32_t m_height;
 
     //  the key value used in tree operations
     Key m_the_key;

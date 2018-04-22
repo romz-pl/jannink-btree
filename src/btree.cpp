@@ -93,14 +93,10 @@ void Tree::inc_tree_height( )
 // #define dectreeheight B->height--
 void Tree::dec_tree_height( )
 {
+    assert( m_height > 0 );
     m_height--;
 }
 
-// #define gettreeheight B->height
-int Tree::get_tree_height( ) const
-{
-    return m_height;
-}
 
 // #define getsplitpath B->branch.split
 Node* Tree::get_split_path( ) const
