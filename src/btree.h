@@ -1,28 +1,25 @@
 #ifndef ROMZ_JANNINEK_BTREE_H
 #define ROMZ_JANNINEK_BTREE_H
 
-#include "core.h"
+#include "search.h"
 
 
 //
 // tree definitions
 //
-class Tree : public Core
+class Tree : public Search
 {
 
 public:
     Tree( std::uint32_t pool_size );
     ~Tree();
 
-    Node* search( Key key );
+
     void insert( Key key );
     void erase( Key key );
 
 private:
-    int best_match( Node* curr, const int slot );
-    int find_key( Node* curr, int lo, int hi );
-    int get_slot( Node* curr );
-    Node* descend_to_leaf( Node* curr );
+
 
 
     void place_entry( Node* new_node, int slot, Node* down_ptr );

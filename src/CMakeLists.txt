@@ -7,6 +7,7 @@ add_library( ${LIB_NAME} STATIC
     key.cpp
     node.cpp
     pool.cpp
+    search.cpp
 )
 
 target_include_directories( ${LIB_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src )
