@@ -174,6 +174,7 @@ public:
     bool is_root( ) const;
     bool is_full( ) const;
     bool is_few( ) const;
+    bool is_node( ) const;
 
     short num_entries( ) const;
     void clear_entries( );

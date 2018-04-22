@@ -3,8 +3,13 @@ set( LIB_NAME jannink-btree )
 
 add_library( ${LIB_NAME} STATIC
     btree.cpp
+    core.cpp
+    erase.cpp
+    insert.cpp
     key.cpp
     node.cpp
+    pool.cpp
+    search.cpp
 )
 
 target_include_directories( ${LIB_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src )
