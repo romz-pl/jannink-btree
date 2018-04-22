@@ -1,13 +1,13 @@
 #ifndef ROMZ_JANNINEK_BTREE_H
 #define ROMZ_JANNINEK_BTREE_H
 
-#include "search.h"
+#include "insert.h"
 
 
 //
 // tree definitions
 //
-class Tree : public Search
+class Tree : public Insert
 {
 
 public:
@@ -15,18 +15,11 @@ public:
     ~Tree();
 
 
-    void insert( Key key );
+
     void erase( Key key );
 
 private:
 
-
-
-    void place_entry( Node* new_node, int slot, Node* down_ptr );
-    void insert_entry( Node* new_node, const int slot, Node* sibling, Node* down_ptr );
-    Node* split( Node* newNode );
-    void make_new_root( Node* old_root, Node* new_node );
-    Node* descend_split( Node* curr );
 
 
     Node* shift( Node* left, Node* right, Node* anchor );
