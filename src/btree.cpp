@@ -15,7 +15,7 @@
 //
 //
 Tree::Tree( std::uint32_t pool_size )
-    : m_pool_store( pool_size )
+    : m_pool( pool_size )
     , m_root( nullptr )
     , m_leaf( nullptr )
     , m_height( 0 )
@@ -27,7 +27,7 @@ Tree::Tree( std::uint32_t pool_size )
     branch.split = nullptr;
 
     // set up the first leaf node
-    m_leaf = get_free_node();
+    m_leaf = m_pool.get_free_node();
 
     // the root is initially the leaf
     m_root = m_leaf;
@@ -512,7 +512,7 @@ void Tree::place_entry( Node* new_node, int slot, Node* down_ptr )
 //
 Node* Tree::split( Node* new_node )
 {
-    Node* sibling = get_free_node();
+    Node* sibling = m_pool.get_free_node();
 
     // set up node flags
     sibling->set_flag( Node::FEWEST );
@@ -541,7 +541,7 @@ Node* Tree::split( Node* new_node )
 //
 void Tree::make_new_root( Node* old_root, Node* new_node )
 {
-    m_root = get_free_node();
+    m_root = m_pool.get_free_node();
 
     // old root becomes new root's child
     m_root->set_first_node( old_root );
@@ -609,7 +609,7 @@ void Tree::collapse_root( Node* old_root, Node* new_root )
 
     m_root = new_root;
     new_root->set_flag( Node::isROOT );
-    put_free_node( old_root );
+    m_pool.put_free_node( old_root );
 
     // the height of the tree decreases
     dec_tree_height( );
@@ -787,7 +787,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
 void Tree::remove_entry( Node* curr, int slot )
 {
     // return deleted node to free list
-    put_free_node( curr->get_node( slot ) );
+    m_pool.put_free_node( curr->get_node( slot ) );
 
     for( int x = slot; x < curr->num_entries(); x++ )
     {
@@ -994,34 +994,13 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
     return nullptr;
 }
 
-
-
-
-//
-// take a free B+tree node from the pool
-//
-Node* Tree::get_free_node( )
-{
-    return m_pool_store.get_free_node();
-}
-
-
-//
-// return a deleted B+tree node to the pool
-//
-void Tree::put_free_node( Node* self )
-{
-    m_pool_store.put_free_node( self );
-
-}
-
 //
 // fill a free data node with a key and associated data
 // can add data parameter
 //
 Node* Tree::get_data_node( Key key )
 {
-    Node* newNode = get_free_node( );
+    Node* newNode = m_pool.get_free_node( );
     Key* value = ( Key * ) &newNode->data;
 
     // can add code to fill node

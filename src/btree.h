@@ -39,14 +39,7 @@ public:
     Node* get_merge_path( ) const;
     void set_merge_path( Node* v );
 
-    bool is_node( Node* j ) const;
-
-    void put_free_node( Node* self );
-
     Node* get_data_node( Key key );
-
-    Node* get_free_node();
-    void init_free_node_pool();
 
     int best_match( Node* curr, const int slot );
     int find_key( Node* curr, int lo, int hi );
@@ -78,7 +71,7 @@ public:
 
 private:
 
-    Pool m_pool_store;
+    Pool m_pool;
 
     // pointer to root node
     Node* m_root;
