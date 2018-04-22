@@ -127,7 +127,7 @@ void Core::set_merge_path( Node* v )
 Node* Core::get_data_node( Key key )
 {
     Node* newNode = m_pool.get_free_node( );
-    Key* value = ( Key * ) &newNode->data;
+    Key* value = ( Key * ) newNode->get_data();
 
     // can add code to fill node
     *value = key;

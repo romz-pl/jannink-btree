@@ -150,8 +150,8 @@ public:
     // bits set at key insertion/deletion
     static constexpr int isFULL = 0x4;
     static constexpr int FEWEST = 0x8;
-    static constexpr int FLAGS = 0xF;
 
+private:
     // identifies data as being a B+tree node
     static constexpr int MAGIC = 0xDEC0;
     static constexpr int MASK = 0xFFF0;
@@ -196,7 +196,9 @@ public:
     void xfer_entry( int q, Node* v, int z ) const;
     void set_entry( int q, Key v, Node* z );
 
-public:
+    Data* get_data();
+
+private:
     // ARRAY is a place holder value for:  fanout
     static constexpr int ARRAY = 1;
     union

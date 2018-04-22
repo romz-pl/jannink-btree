@@ -178,3 +178,10 @@ bool Node::is_node( ) const
     return ( ( inner.info.flags & MASK ) == MAGIC );
 }
 
+//
+//
+//
+Data* Node::get_data()
+{
+    return &data;
+}
