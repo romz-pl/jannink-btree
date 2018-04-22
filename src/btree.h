@@ -1,20 +1,14 @@
 #ifndef ROMZ_JANNINEK_BTREE_H
 #define ROMZ_JANNINEK_BTREE_H
 
+#include "core.h"
 
-#include "node.h"
-#include "pool.h"
 
 //
 // tree definitions
 //
-class Tree
+class Tree : public Core
 {
-private:
-    /* special node slot values used in key search */
-    static constexpr int ERROR = -1;
-    static constexpr int UPPER = -2;
-    static constexpr int LOWER = -3;
 
 public:
     Tree( std::uint32_t pool_size );
@@ -25,26 +19,6 @@ public:
     void erase( Key key );
 
 private:
-    // access key and data values for B+tree methods
-    Key get_fun_key( ) const;
-    void set_fun_key( Key v );
-
-    data_type get_fun_data( ) const;
-    void set_fun_data( const char* v );
-
-    // manage B+tree height
-    void inc_tree_height( );
-    void dec_tree_height( );
-
-    // handle split/merge points during insert/delete
-    Node* get_split_path( ) const;
-    void set_split_path( Node* v );
-
-    Node* get_merge_path( ) const;
-    void set_merge_path( Node* v );
-
-    Node* get_data_node( Key key );
-
     int best_match( Node* curr, const int slot );
     int find_key( Node* curr, int lo, int hi );
     int get_slot( Node* curr );
@@ -73,36 +47,6 @@ private:
 #endif
 
 
-private:
-
-    Pool m_pool;
-
-    // pointer to root node
-    Node* m_root;
-
-    // pointer to first leaf node in B+tree
-    Node* m_leaf;
-
-    // # of pointers to other nodes
-    const int m_fanout = Data::NODE_SIZE / sizeof( Entry ) - 1; // Why (-1) ???
-
-    // usually min_fanout == ceil(fanout / 2)
-    const int m_min_fanout = ( ( m_fanout + 1 ) >> 1 ) - 1;
-
-    // nodes traversed from root to leaves
-    std::uint32_t m_height;
-
-    //  the key value used in tree operations
-    Key m_the_key;
-
-    //  data used for insertions/deletions
-    data_type m_the_data;
-
-    union /* nodes to change in insert and delete */
-    {
-        Node* split;
-        Node* merge;
-    } branch;
 };
 
 
