@@ -27,9 +27,6 @@ public:
     data_type get_fun_data( ) const;
     void set_fun_data( const char* v );
 
-    Node* get_leaf( ) const;
-    void set_leaf( Node* v );
-
     // manage B+tree height
     void init_tree_height( );
     void inc_tree_height( );

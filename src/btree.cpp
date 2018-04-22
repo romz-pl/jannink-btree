@@ -31,10 +31,10 @@ Tree::Tree( int pool_size )
     init_free_node_pool( );
 
     // set up the first leaf node
-    set_leaf( get_free_node() );
+    m_leaf = get_free_node();
 
     // the root is initially the leaf
-    m_root = get_leaf( );
+    m_root = m_leaf;
 
     m_root->set_flag( Node::isLEAF );
     m_root->set_flag( Node::isROOT );
@@ -88,18 +88,6 @@ void Tree::set_fun_key( Key v )
 void Tree::set_fun_data( const char* v )
 {
     m_the_data = strdup( v );
-}
-
-// #define getleaf B->leaf
-Node* Tree::get_leaf( ) const
-{
-    return m_leaf;
-}
-
-// #define setleaf(v) (B->leaf = (v))
-void Tree::set_leaf( Node* v )
-{
-    m_leaf = v;
 }
 
 // #define inittreeheight (B->height = 0)
