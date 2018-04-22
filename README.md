@@ -7,3 +7,7 @@
 
 * There is the article, where Jan Jannink describes the delete procedure in all details, [PS](http://infolab.stanford.edu/pub/jannink/1995/btree.ps).
 
+* For more information about B+ trees see:
+   * [wiki pages](https://en.wikipedia.org/wiki/B+_tree) in Wikipedia
+   * wiki pages in my project [b-plus-tree](https://github.com/romz-pl/b-plus-tree/wiki)
+
