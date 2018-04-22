@@ -52,8 +52,6 @@ public:
     void set_merge_path( Node* v );
 
     bool is_node( Node* j ) const;
-    bool isnt_node( Node* j ) const;
-
 
     void put_free_node( Node* self );
 

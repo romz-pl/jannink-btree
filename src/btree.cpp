@@ -65,13 +65,7 @@ Tree::~Tree()
 // #define isnode(j) (((j) != NONODE) && ((nAdr(j).i.info.flags & Node::MASK) == Node::MAGIC))
 bool Tree::is_node( Node* j ) const
 {
-    return ( j != nullptr && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
-}
-
-// #define isntnode(j) ((j) == NONODE)
-bool Tree::isnt_node( Node* j ) const
-{
-    return ( j == nullptr );
+    return ( j && ( ( j->inner.info.flags & Node::MASK ) == Node::MAGIC ) );
 }
 
 
@@ -708,7 +702,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
         // set up next recursion call's parameters
         if( slot == 0 )
         {
-            my_left = isnt_node( left ) ? nullptr : left->get_last_node();
+            my_left = !left ? nullptr : left->get_last_node();
             left_anchor = l_anc;
         }
         else
@@ -719,7 +713,7 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
 
         if( slot == curr->num_entries() )
         {
-            my_right = isnt_node( right ) ? nullptr : right->get_first_node();
+            my_right = !right ? nullptr : right->get_first_node();
             right_anchor = r_anc;
         }
         else
@@ -785,8 +779,8 @@ Node* Tree::descend_balance( Node* curr, Node* left, Node* right, Node* l_anc, N
     else
     {
         // tree rebalancing rules for node merges and shifts
-        const int notleft = isnt_node( left );
-        const int notright = isnt_node( right );
+        const int notleft = !left;
+        const int notright = !right;
 
         // only used when defined
         //assert( left != nullptr );
