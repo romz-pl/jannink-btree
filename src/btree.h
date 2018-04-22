@@ -60,7 +60,6 @@ public:
     Node* get_data_node( Key key );
 
     Node* NO_NODE() const;
-    Node* node_array_head( ) const;
 
     Node* get_free_node();
     void init_free_node_pool();

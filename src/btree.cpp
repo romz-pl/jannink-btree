@@ -20,7 +20,7 @@ Tree::Tree( int pool_size )
     , m_root( nullptr )
     , m_leaf( nullptr )
     , m_height( 0 )
-    , m_pool( 0 )
+    , m_pool( nullptr )
     , m_the_key( 0 )
     , m_the_data( nullptr )
     // , branch.split( nullptr )
@@ -64,13 +64,7 @@ Tree::~Tree()
 //
 Node* Tree::NO_NODE() const
 {
-    return node_array_head( ) - 1;
-}
-
-// #define nodearrayhead B->tree
-Node* Tree::node_array_head( ) const
-{
-    return m_tree;
+    return m_tree - 1;
 }
 
 //
@@ -1080,7 +1074,7 @@ void Tree::init_free_node_pool( )
     m_tree = ( Node* )malloc( m_pool_size * sizeof( Node ) );
 
     // start a list of free nodes
-    set_first_free_node( node_array_head() );
+    set_first_free_node( m_tree );
 
     Node* n = get_first_free_node();
     for( int i = 0; i < m_pool_size; i++ )
