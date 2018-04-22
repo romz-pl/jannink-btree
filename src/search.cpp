@@ -139,53 +139,71 @@ int Search::find_key( Node* curr, int lo, int hi )
 int Search::best_match( Node* curr, const int slot )
 {
     const int diff = Key::compare( get_fun_key( ), curr->get_key( slot ) );
+
     if( diff < 0 )
     {
-        if( slot == 1 )
-        {
-            return ( slot - 1 );
-        }
+        return best_match_lower( curr, slot );
+    }
 
-        //
-        // also check the previous slot
-        //
-        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ) );
+    assert( diff >= 0 );
+    return best_match_upper( curr, slot );
+}
 
-        if( comp >= 0 )
-        {
-            return ( slot - 1 );
-        }
-        else
-        {
-            // key must be below in node ordering
-            return ( LOWER );
-        }
+//
+//
+//
+int Search::best_match_lower( Node* curr, const int slot )
+{
+    if( slot == 1 )
+    {
+        return ( slot - 1 );
+    }
+
+    //
+    // also check the previous slot
+    //
+    const int comp = Key::compare( get_fun_key( ), curr->get_key( slot - 1 ) );
+
+    if( comp >= 0 )
+    {
+        return ( slot - 1 );
     }
     else
     {
-        if( slot == curr->num_entries() )
-        {
-            return slot;
-        }
+        // key must be below in node ordering
+        return LOWER;
+    }
+    assert( 0 ); // Bad key ordering on node "curr"
+    return -1;
+}
 
-        //
-        // or check following slot
-        //
-        const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ) );
+//
+//
+//
+int Search::best_match_upper( Node* curr, const int slot )
+{
+    if( slot == curr->num_entries() )
+    {
+        return slot;
+    }
 
-        if( comp < 0 )
-        {
-            return ( slot );
-        }
-        else if( comp == 0 )
-        {
-            return ( slot + 1 );
-        }
-        else
-        {
-            // key must be above in node ordering
-            return ( UPPER );
-        }
+    //
+    // or check following slot
+    //
+    const int comp = Key::compare( get_fun_key( ), curr->get_key( slot + 1 ) );
+
+    if( comp < 0 )
+    {
+        return ( slot );
+    }
+    else if( comp == 0 )
+    {
+        return ( slot + 1 );
+    }
+    else
+    {
+        // key must be above in node ordering
+        return UPPER;
     }
 
     assert( 0 ); // Bad key ordering on node "curr"

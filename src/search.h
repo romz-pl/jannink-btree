@@ -20,6 +20,9 @@ private:
 
     Node* descend_to_leaf( Node* curr );
 
+    int best_match_lower( Node* curr, const int slot );
+    int best_match_upper( Node* curr, const int slot );
+
 private:
     // special node slot values used in key search
     static constexpr int UPPER = -2;
