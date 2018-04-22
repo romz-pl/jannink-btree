@@ -27,10 +27,6 @@ public:
     data_type get_fun_data( ) const;
     void set_fun_data( const char* v );
 
-    // access memory region containing B+tree nodes
-    Node* get_node_array( ) const;
-    void set_node_array( Node* v );
-
     // locations from which tree access begins
     Node* get_root( ) const;
     void set_root( Node* v );
@@ -103,6 +99,7 @@ private:
     const int m_pool_size;
 
     // pointer to array of nodes (NOT Nptr !)
+    // access memory region containing B+tree nodes
     Node* m_tree;
 
     // pointer to root node

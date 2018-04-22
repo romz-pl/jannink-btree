@@ -56,7 +56,7 @@ Tree::~Tree()
     fprintf(stderr, "FREE:  B+tree at %10p.\n", (void *) this);
 #endif
 
-    free( (void *)get_node_array( ) );
+    free( m_tree );
 }
 
 //
@@ -112,19 +112,6 @@ void Tree::set_fun_key( Key v )
 void Tree::set_fun_data( const char* v )
 {
     m_the_data = strdup( v );
-}
-
-
-// #define getnodearray B->tree
-Node* Tree::get_node_array( ) const
-{
-    return m_tree;
-}
-
-// #define setnodearray(v) (B->tree = (Node *)(v))
-void Tree::set_node_array( Node* v )
-{
-    m_tree = v;
 }
 
 // #define getroot B->root
@@ -1090,7 +1077,7 @@ Node* Tree::shift( Node* left, Node* right, Node* anchor )
 void Tree::init_free_node_pool( )
 {
     // node memory block
-    set_node_array( ( Node* )malloc( m_pool_size * sizeof( Node ) ) );
+    m_tree = ( Node* )malloc( m_pool_size * sizeof( Node ) );
 
     // start a list of free nodes
     set_first_free_node( node_array_head() );
